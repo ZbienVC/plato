@@ -1186,7 +1186,7 @@ export default function App() {
       return { primaryGoal: 'maintain', secondaryGoals: [] };
     }
     
-    // Check if already new format (has primaryGoal)
+    // Check if alrea• new format (has primaryGoal)
     if (typeof oldGoal === 'object' && oldGoal.primaryGoal) {
       return oldGoal;
     }
@@ -1199,7 +1199,7 @@ export default function App() {
   
   /**
    * Get valid target rate options based on primary goal and secondary goals
-   * Returns array of valid rate options, dynamically filtered
+   * Returns array of valid rate options, •ally filtered
    */
   const getValidTargetRates = (primaryGoal, secondaryGoals = []) => {
     // Maintain weight: No pace selector needed
@@ -1334,7 +1334,7 @@ export default function App() {
   const [importStep, setImportStep] = useState('input'); // 'input', 'reviewing'
   const [importSource, setImportSource] = useState('paste'); // 'paste', 'file'
   const [importText, setImportText] = useState('');
-  const [parsedPlan, setParsedPlan] = useState(null); // Parsed import ready for review
+  const [parsedPlan, setParsedPlan] = useState(null); // Parsed import rea• for review
   const [exportText, setExportText] = useState('');
   const [showExportOptions, setShowExportOptions] = useState(false);
   // ========== END IMPORT/EXPORT STATES ==========
@@ -1929,7 +1929,7 @@ export default function App() {
     const totalDays = (newestDate - oldestDate) / (1000 * 60 * 60 * 24);
     
     // Require minimum 1 day span for meaningful trend
-    // If entries are within same day, don't show a trend (too volatile)
+    // If entries are within same day, Don't show a trend (too volatile)
     if (totalDays < 1) {
       return null; // Not enough time has passed for a reliable trend
     }
@@ -2090,10 +2090,10 @@ export default function App() {
     ));
   };
   
-  // Mark item as "already have" (for meal card interactions)
-  const markAsAlreadyHave = (id) => {
+  // Mark item as "alrea• have" (for meal card interactions)
+  const markAsAlrea• = (id) => {
     setGroceryList(groceryList.map(item =>
-      item.id === id ? {...item, checked: true, alreadyHave: true} : item
+      item.id === id ? {...item, checked: true, alrea• true} : item
     ));
   };
   
@@ -2278,13 +2278,13 @@ export default function App() {
     
     const updatedMeals = plan.meals.map((meal, idx) => {
       // Skip meals that have been logged (simple name matching)
-      // Note: This is a best-effort approach since we don't have perfect meal-to-plan mapping
+      // Note: This is a best-effort approach since we Don't have perfect meal-to-plan mapping
       if (loggedMealNames.has(meal.name) && adjustedCount < dailyLog.meals.length) {
         adjustedCount++;
         return meal;
       }
       
-      // Store original if not already stored
+      // Store original if not alrea• stored
       if (!originalMealMacros[idx]) {
         setOriginalMealMacros(prev => ({
           ...prev,
@@ -2853,7 +2853,7 @@ export default function App() {
     // Calorie questions
     else if (query.includes('calorie') || query.includes('deficit') || query.includes('surplus')) {
       const deficit = form.goals === 'fat-loss' ? 'deficit' : form.goals === 'lean-bulk' ? 'surplus' : 'maintenance';
-      response = `You're targeting ${plan.calories} calories for ${form.goals}. This puts you in a ${deficit} based on your ${form.activity} activity level and ${form.weight}lbs bodyweight. ${form.targetRate === 'aggressive' ? 'Your aggressive rate means faster results but requires strict adherence.' : form.targetRate === 'slow' ? 'Your slow & steady approach is sustainable and easier to stick to long-term.' : 'Your moderate pace balances results with sustainability.'}`;
+      response = `You're targeting ${plan.calories} calories for ${form.goals}. This puts you in a ${deficit} based on your ${form.activity} activity level and ${form.weight}lbs bo•t. ${form.targetRate === 'aggressive' ? 'Your aggressive rate means faster results but requires strict adherence.' : form.targetRate === 'slow' ? 'Your slow & stea• approach is sustainable and easier to stick to long-term.' : 'Your moderate pace balances results with sustainability.'}`;
     }
     // Meal timing
     else if (query.includes('when') && (query.includes('eat') || query.includes('meal'))) {
@@ -2864,7 +2864,7 @@ export default function App() {
       response = form.trainingType === 'strength' 
         ? "Since you're focused on strength training, keep cardio to 2-3 sessions of 20-30min weekly. Too much interferes with recovery and gains."
         : form.trainingType === 'cardio'
-        ? "You're already doing cardio training! Aim for 4-5 sessions weekly. Mix steady-state and HIIT for best results."
+        ? "You're alrea• doing cardio training! Aim for 4-5 sessions weekly. Mix stea•e and HIIT for best results."
         : "As a hybrid athlete, balance 2-3 cardio sessions with your strength work. Don't let cardio interfere with recovery!";
     }
     // Cheat meal questions
@@ -2879,7 +2879,7 @@ export default function App() {
     }
     // Water/hydration
     else if (query.includes('water') || query.includes('hydrat')) {
-      response = `Aim for ${Math.round(form.weight / 2)} oz daily (bodyweight Ã· 2). More if you're training hard or it's hot. Track it in the daily tracker!`;
+      response = `Aim for ${Math.round(form.weight / 2)} oz daily (bo•t Ã· 2). More if you're training hard or it's hot. Track it in the daily tracker!`;
     }
     // Sleep
     else if (query.includes('sleep')) {
@@ -2893,7 +2893,7 @@ export default function App() {
     }
     // Progress tracking
     else if (query.includes('track') || query.includes('progress') || query.includes('measure')) {
-      response = "Track weekly: bodyweight (same day/time), progress photos, and how clothes fit. Scale weight fluctuates daily due to water/food. Focus on 2-4 week trends, not daily changes!";
+      response = "Track weekly: bo•t (same day/time), progress photos, and how clothes fit. Scale weight fluctuates daily due to water/food. Focus on 2-4 week trends, not daily changes!";
     }
     // Meal prep
     else if (query.includes('meal prep') || query.includes('prepare')) {
@@ -3070,7 +3070,7 @@ export default function App() {
       setLoading(true);
       setLoadingStep(0);
       
-      const steps = ['Calculating nutrition...', 'Generating meals...', 'Almost ready...'];
+      const steps = ['Calculating nutrition...', 'Generating meals...', 'Almost rea•'];
       for (let i = 0; i < steps.length; i++) {
         await new Promise(r => setTimeout(r, 600));
         setLoadingStep(i + 1);
@@ -3149,7 +3149,7 @@ export default function App() {
       const daysToExport = 7; // Export 7 days
       let text = `MEAL PLAN\n`;
       text += `Calories: ${Math.round(planToExport.calories || 0).toLocaleString()} / day\n`;
-      text += `Macros: ${Math.round(planToExport.protein || 0)}g Protein â€¢ ${Math.round(planToExport.carbs || 0)}g Carbs â€¢ ${Math.round(planToExport.fat || 0)}g Fat\n\n`;
+      text += `Macros: ${Math.round(planToExport.protein || 0)}g Protein - ${Math.round(planToExport.carbs || 0)}g Carbs - ${Math.round(planToExport.fat || 0)}g Fat\n\n`;
       
       if (!planToExport.meals || planToExport.meals.length === 0) {
         text += `No meals in plan.\n`;
@@ -3240,9 +3240,9 @@ export default function App() {
           confidence: 'high'
         };
       }
-      // Check if this is a food item (starts with -, â€¢, or number)
-      else if (currentMeal && (line.startsWith('-') || line.startsWith('â€¢') || /^\d/.test(line))) {
-        let foodName = line.replace(/^[-â€¢\d.)\s]+/, '').trim();
+      // Check if this is a food item (starts with -, -, or number)
+      else if (currentMeal && (line.startsWith('-') || line.startsWith('-') || /^\d/.test(line))) {
+        let foodName = line.replace(/^[--\d.)\s]+/, '').trim();
         let portion = '';
         
         // Try to extract portion
@@ -3418,9 +3418,9 @@ export default function App() {
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
-    document.body.appendChild(a);
+    document.bo•ndChild(a);
     a.click();
-    document.body.removeChild(a);
+    document.bo•veChild(a);
     URL.revokeObjectURL(url);
     showToast('Downloaded!', 'success');
   };
@@ -3458,7 +3458,7 @@ export default function App() {
             quantity: itemPortion,
             category: categorizeIngredient(itemName),
             checked: false,
-            alreadyHave: false,
+            alrea• false,
             usedInMeals: 1,
             id: Math.random().toString(36).substr(2, 9)
           });
@@ -3558,9 +3558,9 @@ export default function App() {
   const toggleGroceryChecked = (index) => {
     const updated = [...groceryList];
     updated[index].checked = !updated[index].checked;
-    // When unchecking, also clear alreadyHave flag
+    // When unchecking, also clear alrea• flag
     if (!updated[index].checked) {
-      updated[index].alreadyHave = false;
+      updated[index].alrea• = false;
     }
     setGroceryList(updated);
   };
@@ -4189,7 +4189,7 @@ export default function App() {
       instructions: recipe.instructions || [],
       // PART 7: Use macro estimation for MealDB recipes
       nutritionPerServing: (() => {
-        // If recipe already has macros, use them
+        // If recipe alrea• has macros, use them
         if (recipe.macros) {
           return recipe.macros;
         }
@@ -4241,7 +4241,7 @@ export default function App() {
       quantity: '1 serving',
       category: categorizeIngredient(ing),
       checked: false,
-      alreadyHave: false,
+      alrea• false,
       usedInMeals: 1
     }));
     setGroceryList(prev => [...prev, ...newItems]);
@@ -4265,7 +4265,7 @@ export default function App() {
   
   // ========== INSIGHT & INTENT LOGIC (ADDITIVE) ==========
   
-  // FEATURE C: Meal Confidence Badge - Dynamic calculation
+  // FEATURE C: Meal Confidence Badge - • calculation
   const getMealConfidence = (meal) => {
     if (!meal || !plan) return null;
     
@@ -5093,7 +5093,7 @@ export default function App() {
           throw new Error('Invalid data URL format');
         }
       } else {
-        // Assume it's already base64 without prefix
+        // Assume it's alrea• base64 without prefix
         base64Data = imageDataUrl;
         mediaType = 'image/jpeg'; // Default fallback
       }
@@ -5140,7 +5140,7 @@ export default function App() {
           'x-api-key': 'sk-ant-api03-', // API key handled by Claude artifacts environment
           'anthropic-version': '2023-06-01'
         },
-        body: JSON.stringify({
+        bo• JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 2000,
           temperature: 0, // Deterministic - same image always gives same result
@@ -5453,7 +5453,7 @@ Return ONLY the JSON object. No explanation before or after.`
     }
     
     // VISIBLE PORTION ADJUSTMENT
-    // Be conservative with scaling - don't over-extrapolate from partial views
+    // Be conservative with scaling - Don't over-extrapolate from partial views
     let portionMultiplier = visiblePercent / 100;
     
     // If only partial portion visible, increase uncertainty
@@ -5554,7 +5554,7 @@ Return ONLY the JSON object. No explanation before or after.`
         // Get nutrition data (with caching)
         const nutritionData = await lookupUSDANutrition(item.name, item.category);
         
-        // Estimate portion if not already set
+        // Estimate portion if not alrea• set
         const portionGrams = item.portionGrams || estimatePortionGrams(item);
         const gramsLow = item.gramsLow || Math.round(portionGrams * 0.7);
         const gramsHigh = item.gramsHigh || Math.round(portionGrams * 1.3);
@@ -5752,7 +5752,7 @@ Return ONLY the JSON object. No explanation before or after.`
       return nutrient?.value || 0;
     };
     
-    // Extract nutrients (USDA values are already per 100g for most entries)
+    // Extract nutrients (USDA values are alrea• per 100g for most entries)
     const calories = findNutrient(['energy', 'calories']);
     const protein = findNutrient(['protein']);
     const carbs = findNutrient(['carbohydrate, by difference', 'carbohydrate']);
@@ -5857,7 +5857,7 @@ Return ONLY the JSON object. No explanation before or after.`
       }
     }
     
-    return portions.join(' â€¢ ');
+    return portions.join(' - ');
   };
   
   /**
@@ -6366,7 +6366,7 @@ Return ONLY the JSON object. No explanation before or after.`
         <rect fill='url(%23grad${hash})' width='400' height='300'/>
         <circle cx='200' cy='150' r='80' fill='white' opacity='0.2'/>
         <text x='50%' y='45%' font-family='Arial' font-size='28' font-weight='bold' fill='white' text-anchor='middle' opacity='0.9'>${meal.name}</text>
-        <text x='50%' y='60%' font-family='Arial' font-size='16' fill='white' text-anchor='middle' opacity='0.7'>${meal.calories || 0} cal â€¢ ${meal.protein || 0}g protein</text>
+        <text x='50%' y='60%' font-family='Arial' font-size='16' fill='white' text-anchor='middle' opacity='0.7'>${meal.calories || 0} cal - ${meal.protein || 0}g protein</text>
       </svg>
     `.trim();
     
@@ -6387,7 +6387,7 @@ Return ONLY the JSON object. No explanation before or after.`
         
         try {
           const url = await generateMealImage(meal);
-          setMealImages(prev => ({...prev, [mealKey]: { status: 'ready', url }}));
+          setMealImages(prev => ({...prev, [mealKey]: { status: 'rea👍, url }}));
         } catch (e) {
           setMealImages(prev => ({...prev, [mealKey]: { status: 'error', url: null }}));
         }
@@ -6643,7 +6643,7 @@ Return ONLY the JSON object. No explanation before or after.`
       const video = videoRef.current;
       const canvas = canvasRef.current;
       
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      if (video.rea• === video.HAVE_ENOUGH_DATA) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
@@ -7700,7 +7700,7 @@ Return ONLY the JSON object. No explanation before or after.`
         
         localStorage.setItem('plato_user_corrections', JSON.stringify(existingCorrections));
         
-        // TODO: Send to backend when DB layer ready
+        // TODO: Send to backend when DB layer rea•
         // await saveUserCorrections(correctionRecord);
       }
 
@@ -7776,7 +7776,7 @@ Return ONLY the JSON object. No explanation before or after.`
                     </p>
                     <ul className={`text-xs space-y-1 ${dark?'text-orange-300':'text-orange-600'}`}>
                       {plateResult.errors.map((error, idx) => (
-                        <li key={idx}>â€¢ {error}</li>
+                        <li key={idx}>- {error}</li>
                       ))}
                     </ul>
                     <p className={`text-xs mt-2 ${dark?'text-orange-300':'text-orange-600'}`}>
@@ -8281,11 +8281,11 @@ Return ONLY the JSON object. No explanation before or after.`
                 </div>
               )}
               
-              {/* Info when ready to log after review */}
+              {/* Info when rea• to log after review */}
               {requiresConfirmation && canLog && (
                 <div className={`p-3 rounded-lg ${dark?'bg-green-900/20 border border-green-700/30':'bg-green-50 border border-green-200'}`}>
                   <p className={`text-xs ${dark?'text-green-300':'text-green-700'}`}>
-                    <strong>âœ“ Ready to log:</strong> You've reviewed and confirmed all items.
+                    <strong>âœ“ Rea• to log:</strong> You've reviewed and confirmed all items.
                   </p>
                 </div>
               )}
@@ -8359,7 +8359,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 <CheckCircle className="w-6 h-6 opacity-80" />
               </div>
               <h3 className="text-2xl font-bold mb-2">Scan Packaged Food</h3>
-              <p className="text-blue-100">Barcode & QR codes â€¢ High accuracy</p>
+              <p className="text-blue-100">Barcode & QR codes - High accuracy</p>
             </button>
 
             {/* Plate AI */}
@@ -8376,7 +8376,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 </div>
               </div>
               <h3 className="text-2xl font-bold mb-2">Analyze My Plate</h3>
-              <p className="text-purple-100">Photo-based estimates â€¢ Quick logging</p>
+              <p className="text-purple-100">Photo-based estimates - Quick logging</p>
             </button>
           </div>
 
@@ -8714,7 +8714,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 </p>
                 <p className={`text-sm font-medium flex items-center gap-2 ${dark?'text-slate-400':'text-slate-500'}`}>
                   <Zap className="w-4 h-4" />
-                  <span>Fastest setup â€¢ Focus on food</span>
+                  <span>Fastest setup - Focus on food</span>
                 </p>
               </button>
 
@@ -8742,7 +8742,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 </p>
                 <p className="text-sm text-blue-200 font-medium flex items-center gap-2">
                   <Sparkles className="w-4 h-4" />
-                  <span>Complete experience â€¢ Adaptive learning</span>
+                  <span>Complete experience - Adaptive learning</span>
                 </p>
               </button>
             </div>
@@ -8809,7 +8809,7 @@ Return ONLY the JSON object. No explanation before or after.`
                   </h2>
                 </div>
                 <p className={`text-sm ${dark?'text-slate-400':'text-slate-600'}`}>
-                  {currentPhase.subtitle} â€¢ Step {currentPhase.progress}
+                  {currentPhase.subtitle} - Step {currentPhase.progress}
                 </p>
               </div>
               <button
@@ -9143,7 +9143,7 @@ Return ONLY the JSON object. No explanation before or after.`
                     </div>
                   )}
 
-                  {/* ========== TARGET RATE (Dynamic Filtering) ========== */}
+                  {/* ========== TARGET RATE (• Filtering) ========== */}
                   {form.primaryGoal && (() => {
                     const validRates = getValidTargetRates(form.primaryGoal, form.secondaryGoals || []);
                     
@@ -9815,7 +9815,7 @@ Return ONLY the JSON object. No explanation before or after.`
         <div className="max-w-4xl mx-auto p-4">
           <div className="text-center mb-6">
             <h2 className={`text-2xl font-bold mb-2 ${dark?'text-white':'text-gray-900'}`}>
-              Find recipes using ingredients you already have
+              Find recipes using ingredients you alrea• have
             </h2>
             <p className={`text-sm ${dark?'text-slate-400':'text-gray-600'}`}>
               Take photos, choose from your gallery, or type ingredients manually
@@ -10040,7 +10040,7 @@ Return ONLY the JSON object. No explanation before or after.`
                         )}
                         {recipe.area && (
                           <>
-                            <span className={`${dark?'text-slate-600':'text-gray-400'}`}>â€¢</span>
+                            <span className={`${dark?'text-slate-600':'text-gray-400'}`}>-</span>
                             <span className={`${dark?'text-slate-400':'text-gray-600'}`}>
                               {recipe.area}
                             </span>
@@ -10048,7 +10048,7 @@ Return ONLY the JSON object. No explanation before or after.`
                         )}
                         {recipe.time && (
                           <>
-                            <span className={`${dark?'text-slate-600':'text-gray-400'}`}>â€¢</span>
+                            <span className={`${dark?'text-slate-600':'text-gray-400'}`}>-</span>
                             <span className={`${dark?'text-slate-400':'text-gray-600'}`}>
                               {recipe.time} min
                             </span>
@@ -10219,7 +10219,7 @@ Return ONLY the JSON object. No explanation before or after.`
                                         quantity: ingMeasure || '1',
                                         category: categorizeIngredient(ingName),
                                         checked: false,
-                                        alreadyHave: false
+                                        alrea• false
                                       };
                                     });
                                     
@@ -10288,7 +10288,7 @@ Return ONLY the JSON object. No explanation before or after.`
                       </h3>
                       {recipe.time && (
                         <p className={`text-sm ${dark?'text-slate-400':'text-gray-600'}`}>
-                          {recipe.time} min â€¢ {recipe.difficulty}
+                          {recipe.time} min - {recipe.difficulty}
                         </p>
                       )}
                     </div>
@@ -10350,7 +10350,7 @@ Return ONLY the JSON object. No explanation before or after.`
                         {fav.name}
                       </h3>
                       <p className={`text-sm ${dark?'text-slate-400':'text-gray-600'}`}>
-                        {fav.calories} cal â€¢ {fav.protein}g P â€¢ {fav.carbs}g C â€¢ {fav.fat}g F
+                        {fav.calories} cal - {fav.protein}g P - {fav.carbs}g C - {fav.fat}g F
                       </p>
                     </div>
                     <button
@@ -10479,7 +10479,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 
                 <p className={`text-sm ${dark?'text-slate-400':'text-gray-600'}`}>
                   {forecast.energyTrend === 'improving' && 'Your calorie and carb intake are supporting consistent energy levels.'}
-                  {forecast.energyTrend === 'stable' && 'Your current intake is maintaining steady energy availability.'}
+                  {forecast.energyTrend === 'stable' && 'Your current intake is maintaining stea• energy availability.'}
                   {forecast.energyTrend === 'volatile' && 'Daily intake varies significantly, which may affect energy consistency.'}
                   {forecast.energyTrend === 'likely low' && 'Current intake may not be fully supporting energy demands.'}
                 </p>
@@ -10700,7 +10700,7 @@ Return ONLY the JSON object. No explanation before or after.`
                             onClick={() => toggleGroceryChecked(idx)}
                             className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                               item.checked
-                                ? item.alreadyHave
+                                ? item.alrea•
                                   ? 'bg-blue-500 border-blue-500'
                                   : 'bg-emerald-500 border-emerald-500'
                                 : dark?'border-slate-600 hover:border-slate-500':'border-gray-300 hover:border-gray-400'
@@ -10720,7 +10720,7 @@ Return ONLY the JSON object. No explanation before or after.`
                             )}
                           </div>
                           
-                          {item.alreadyHave && (
+                          {item.alrea• && (
                             <span className={`text-xs font-medium px-2 py-1 rounded-full ${dark?'bg-blue-500/20 text-blue-400':'bg-blue-100 text-blue-700'}`}>
                               Have it
                             </span>
@@ -11011,7 +11011,7 @@ Return ONLY the JSON object. No explanation before or after.`
                           {meal.name}
                         </h3>
                         <p className={`text-sm ${dark?'text-slate-400':'text-gray-600'}`}>
-                          {Math.round(meal.calories)} cal â€¢ 
+                          {Math.round(meal.calories)} cal - 
                           {Math.round(meal.protein)}P / 
                           {Math.round(meal.carbs)}C / 
                           {Math.round(meal.fat)}F
@@ -11350,7 +11350,7 @@ Lunch
                   <h3 className={`text-sm font-semibold ${dark?'text-slate-300':'text-gray-700'}`}>Your Profile</h3>
                 </div>
                 <div className={`text-xs ${dark?'text-slate-400':'text-gray-600'}`}>
-                  {userProfile.weight} lbs â€¢ {Math.floor(userProfile.height / 12)}'{userProfile.height % 12}" â€¢ {userProfile.birthday ? calculateAge(userProfile.birthday) : userProfile.age} years
+                  {userProfile.weight} lbs - {Math.floor(userProfile.height / 12)}'{userProfile.height % 12}" - {userProfile.birthday ? calculateAge(userProfile.birthday) : userProfile.age} years
                 </div>
               </div>
               <button
@@ -11375,7 +11375,7 @@ Lunch
               <div>
                 <h2 className={`text-xl font-bold mb-1 ${dark?'text-white':'text-gray-900'}`}>Training Context</h2>
                 <p className={`text-xs ${dark?'text-slate-500':'text-gray-500'} mb-4`}>
-                  These settings affect how your meals are structured â€” not your profile.
+                  These settings affect how your meals are structured "” not your profile.
                 </p>
               </div>
 
@@ -11401,7 +11401,7 @@ Lunch
                   onChange={(e) => setTempPlanConfig({...tempPlanConfig, trainingType: e.target.value})}
                   className={`w-full px-4 py-3 rounded-xl ${dark?'bg-slate-800 text-white border-slate-700':'bg-white border-gray-300'} border-2`}
                 >
-                  <option value="bodybuilding">Bodybuilding</option>
+                  <option value="bo•ing">Bo•ing</option>
                   <option value="powerlifting">Powerlifting</option>
                   <option value="endurance">Endurance</option>
                   <option value="hybrid">Hybrid</option>
@@ -11697,7 +11697,7 @@ Lunch
                 <Sparkles className="w-5 h-5" />
               </div>
               <p className={`text-sm ${dark?'text-slate-300':'text-gray-700'}`}>
-                <span className="font-semibold">Demo Mode:</span> Paste any YouTube URL to see how the AI extraction works. This demonstrates structured recipe extraction - ready to connect to real transcript API.
+                <span className="font-semibold">Demo Mode:</span> Paste any YouTube URL to see how the AI extraction works. This demonstrates structured recipe extraction - rea• to connect to real transcript API.
               </p>
             </div>
           </div>
@@ -11781,7 +11781,7 @@ Lunch
               <ul className="space-y-2">
                 {(recipeInReview.ingredients || []).map((ing, i) => (
                   <li key={i} className={`text-sm ${dark?'text-slate-300':'text-gray-700'}`}>
-                    â€¢ {typeof ing === 'string' ? ing : `${ing.quantity || ''} ${ing.unit || ''} ${ing.name || ing}`}
+                    - {typeof ing === 'string' ? ing : `${ing.quantity || ''} ${ing.unit || ''} ${ing.name || ing}`}
                   </li>
                 ))}
                 {(!recipeInReview.ingredients || recipeInReview.ingredients.length === 0) && (
@@ -11881,9 +11881,9 @@ Lunch
                 min="1"
               />
               <p className={`text-sm mt-2 ${dark?'text-slate-400':'text-gray-600'}`}>
-                {Math.round(addToPlanRecipe.nutritionPerServing.calories * addToPlanConfig.servings)} cal â€¢ 
-                {Math.round(addToPlanRecipe.nutritionPerServing.protein * addToPlanConfig.servings)}g P â€¢ 
-                {Math.round(addToPlanRecipe.nutritionPerServing.carbs * addToPlanConfig.servings)}g C â€¢ 
+                {Math.round(addToPlanRecipe.nutritionPerServing.calories * addToPlanConfig.servings)} cal - 
+                {Math.round(addToPlanRecipe.nutritionPerServing.protein * addToPlanConfig.servings)}g P - 
+                {Math.round(addToPlanRecipe.nutritionPerServing.carbs * addToPlanConfig.servings)}g C - 
                 {Math.round(addToPlanRecipe.nutritionPerServing.fat * addToPlanConfig.servings)}g F
               </p>
             </div>
@@ -12081,12 +12081,12 @@ Lunch
                       <span className={`text-xs ${dark?'text-slate-500':'text-gray-500'}`}>Protein</span>
                       <span className="text-sm font-medium text-blue-500">{proteinRemaining}g</span>
                     </div>
-                    <span className={`text-xs ${dark?'text-slate-600':'text-gray-400'}`}>â€¢</span>
+                    <span className={`text-xs ${dark?'text-slate-600':'text-gray-400'}`}>-</span>
                     <div className="flex items-baseline gap-1">
                       <span className={`text-xs ${dark?'text-slate-500':'text-gray-500'}`}>Carbs</span>
                       <span className="text-sm font-medium text-orange-500">{carbsRemaining}g</span>
                     </div>
-                    <span className={`text-xs ${dark?'text-slate-600':'text-gray-400'}`}>â€¢</span>
+                    <span className={`text-xs ${dark?'text-slate-600':'text-gray-400'}`}>-</span>
                     <div className="flex items-baseline gap-1">
                       <span className={`text-xs ${dark?'text-slate-500':'text-gray-500'}`}>Fat</span>
                       <span className="text-sm font-medium text-purple-500">{fatRemaining}g</span>
@@ -12400,7 +12400,7 @@ Lunch
                       {meal.name}
                     </h3>
                     <p className="text-white/90 text-sm md:text-base relative z-10" style={{textShadow: '0 1px 2px rgba(0,0,0,0.2)'}}>
-                      {meal.calories || 0} cal â€¢ {meal.protein || 0}g protein
+                      {meal.calories || 0} cal - {meal.protein || 0}g protein
                     </p>
                   </div>
                 )}
@@ -12467,7 +12467,7 @@ Lunch
                       
                       {!plan.isMealsOnly && (
                         <div className={`text-sm mt-1 ${dark?'text-slate-400':'text-slate-600'}`}>
-                          {meal.calories} cal â€¢ {meal.protein}g protein â€¢ {meal.carbs}g carbs â€¢ {meal.fat}g fat
+                          {meal.calories} cal - {meal.protein}g protein - {meal.carbs}g carbs - {meal.fat}g fat
                         </div>
                       )}
                     </div>
@@ -12559,7 +12559,7 @@ Lunch
                           }`}>
                             {getConfidenceTierLabel(meal.macroConfidence)}
                           </span>
-                          {meal.source === 'mealdb' && ' Â· Macros estimated from ingredients'}
+                          {meal.source === 'mealdb' && ' · Macros estimated from ingredients'}
                         </div>
                       )}
                       
@@ -12595,12 +12595,12 @@ Lunch
                                     onClick={() => toggleGroceryItem(groceryItem.id)}
                                     className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                                       groceryItem.checked
-                                        ? groceryItem.alreadyHave 
+                                        ? groceryItem.alrea• 
                                           ? 'bg-blue-500 border-blue-500'
                                           : 'bg-green-500 border-green-500'
                                         : dark?'border-slate-600 hover:border-slate-500':'border-gray-300 hover:border-gray-400'
                                     }`}
-                                    title={groceryItem.alreadyHave ? "Already have" : "Check off"}
+                                    title={groceryItem.alrea• ? "Alrea• have" : "Check off"}
                                   >
                                     {groceryItem.checked && <CheckCircle className="w-3 h-3 text-white" />}
                                   </button>
@@ -12608,7 +12608,7 @@ Lunch
                                     {ingMeasure ? `${ingMeasure} ${ingName}` : ingName}
                                   </span>
                                   <button
-                                      onClick={() => markAsAlreadyHave(groceryItem.id)}
+                                      onClick={() => markAsAlrea•groceryItem.id)}
                                       className={`opacity-0 group-hover:opacity-100 text-xs px-2 py-1 rounded transition-all ${dark?'bg-blue-600 hover:bg-blue-700 text-white':'bg-blue-500 hover:bg-blue-600 text-white'}`}
                                     >
                                       Have it
@@ -12617,7 +12617,7 @@ Lunch
                                 </>
                               ) : (
                                 <span className={`${dark?'text-slate-400':'text-gray-600'}`}>
-                                  â€¢ {ingMeasure ? `${ingMeasure} ${ingName}` : ingName}
+                                  - {ingMeasure ? `${ingMeasure} ${ingName}` : ingName}
                                 </span>
                               )}
                             </li>
@@ -12762,9 +12762,9 @@ Lunch
                     Plato is currently using demo data for all features. To enable real API integrations:
                   </p>
                   <ul className={`text-sm ${dark?'text-slate-300':'text-slate-700'} text-left space-y-2 max-w-md mx-auto`}>
-                    <li>â€¢ Get a free Unsplash key for real meal photos</li>
-                    <li>â€¢ Add Spoonacular API for 5000+ real recipes</li>
-                    <li>â€¢ Configure Claude API for YouTube recipe extraction</li>
+                    <li>- Get a free Unsplash key for real meal photos</li>
+                    <li>- Add Spoonacular API for 5000+ real recipes</li>
+                    <li>- Configure Claude API for YouTube recipe extraction</li>
                   </ul>
                   <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
                     <p className={`text-xs ${dark?'text-slate-500':'text-slate-600'}`}>
@@ -12904,7 +12904,7 @@ Lunch
                             </div>
                             {nutrient.mealAddIns && nutrient.mealAddIns.length > 0 && (
                               <div className={`mt-2 text-xs ${dark?'text-slate-400':'text-gray-600'}`}>
-                                <span className="font-medium">Tips:</span> {nutrient.mealAddIns.join(' â€¢ ')}
+                                <span className="font-medium">Tips:</span> {nutrient.mealAddIns.join(' - ')}
                               </div>
                             )}
                           </div>
@@ -13268,7 +13268,7 @@ Lunch
                     Faster prep
                   </div>
                   <div className={`text-xs ${dark?'text-slate-400':'text-gray-600'}`}>
-                    Ready in 15 minutes or less
+                    Rea• in 15 minutes or less
                   </div>
                 </button>
                 
@@ -13903,7 +13903,7 @@ Lunch
                   </div>
                   <div className={`p-3 rounded-xl ${dark?'bg-slate-900':'bg-blue-50'} text-center`}>
                     <div className={`text-2xl font-bold ${dark?'text-blue-400':'text-blue-600'}`}>
-                      {dailyTrainingContext.trained ? 'âœ“' : 'â€”'}
+                      {dailyTrainingContext.trained ? 'âœ“' : '"”'}
                     </div>
                     <div className={`text-xs ${dark?'text-slate-400':'text-slate-600'}`}>Today's Training</div>
                   </div>
@@ -14077,12 +14077,12 @@ Lunch
                             )}
                             {meal.source === 'plate-ai' && (
                               <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-semibold rounded">
-                                AI â€¢ {Math.round((meal.confidence || 0) * 100)}%
+                                AI - {Math.round((meal.confidence || 0) * 100)}%
                               </span>
                             )}
                           </div>
                           <div className={`text-xs ${dark?'text-slate-400':'text-slate-600'}`}>
-                            {meal.calories} cal â€¢ {meal.protein}g P â€¢ {meal.carbs}g C â€¢ {meal.fat}g F
+                            {meal.calories} cal - {meal.protein}g P - {meal.carbs}g C - {meal.fat}g F
                           </div>
                           {meal.brand && (
                             <div className={`text-xs ${dark?'text-slate-500':'text-slate-500'} mt-0.5`}>
@@ -14120,7 +14120,7 @@ Lunch
                           <span className={`${dark?'text-slate-400':'text-slate-600'}`}>{log.meals.length} meals</span>
                         </div>
                         <div className={`text-xs mt-1 ${dark?'text-slate-500':'text-slate-500'}`}>
-                          {log.totalCalories} cal â€¢ {log.totalProtein}g P â€¢ {log.water} glasses ðŸ’§
+                          {log.totalCalories} cal - {log.totalProtein}g P - {log.water} glasses ðŸ’§
                         </div>
                       </div>
                     ))}
@@ -14161,7 +14161,7 @@ Lunch
                       </span>
                       {item.usedIn > 1 && (
                         <span className={`ml-2 text-xs ${dark?'text-slate-400':'text-slate-600'}`}>
-                          â€¢ Used in {item.usedIn} meals
+                          - Used in {item.usedIn} meals
                         </span>
                       )}
                     </div>
@@ -14169,7 +14169,7 @@ Lunch
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          markAsAlreadyHave(item.id);
+                          markAsAlrea•item.id);
                         }}
                         className={`text-xs px-2 py-1 rounded ${dark?'bg-slate-700 text-slate-300 hover:bg-slate-600':'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                       >
@@ -14741,7 +14741,7 @@ Lunch
                     <CheckCircle className="w-6 h-6 opacity-80" />
                   </div>
                   <h3 className="text-2xl font-bold mb-2">Scan Packaged Food</h3>
-                  <p className="text-blue-100">Barcode & QR codes â€¢ High accuracy</p>
+                  <p className="text-blue-100">Barcode & QR codes - High accuracy</p>
                 </button>
 
                 {/* Plate AI Tile */}
@@ -14758,7 +14758,7 @@ Lunch
                     </div>
                   </div>
                   <h3 className="text-2xl font-bold mb-2">Analyze My Plate</h3>
-                  <p className="text-purple-100">Photo-based estimates â€¢ Quick logging</p>
+                  <p className="text-purple-100">Photo-based estimates - Quick logging</p>
                 </button>
               </div>
 
@@ -14934,7 +14934,7 @@ Lunch
                   <ul className="space-y-2">
                     {(recipeInReview.ingredients || []).map((ing, i) => (
                       <li key={i} className={`text-sm ${dark?'text-slate-300':'text-gray-700'}`}>
-                        â€¢ {typeof ing === 'string' ? ing : `${ing.quantity || ''} ${ing.unit || ''} ${ing.name || ing}`}
+                        - {typeof ing === 'string' ? ing : `${ing.quantity || ''} ${ing.unit || ''} ${ing.name || ing}`}
                       </li>
                     ))}
                     {(!recipeInReview.ingredients || recipeInReview.ingredients.length === 0) && (
@@ -15031,9 +15031,9 @@ Lunch
                     min="1"
                   />
                   <p className={`text-sm mt-2 ${dark?'text-slate-400':'text-gray-600'}`}>
-                    {Math.round(addToPlanRecipe.nutritionPerServing.calories * addToPlanConfig.servings)} cal â€¢ 
-                    {Math.round(addToPlanRecipe.nutritionPerServing.protein * addToPlanConfig.servings)}g P â€¢ 
-                    {Math.round(addToPlanRecipe.nutritionPerServing.carbs * addToPlanConfig.servings)}g C â€¢ 
+                    {Math.round(addToPlanRecipe.nutritionPerServing.calories * addToPlanConfig.servings)} cal - 
+                    {Math.round(addToPlanRecipe.nutritionPerServing.protein * addToPlanConfig.servings)}g P - 
+                    {Math.round(addToPlanRecipe.nutritionPerServing.carbs * addToPlanConfig.servings)}g C - 
                     {Math.round(addToPlanRecipe.nutritionPerServing.fat * addToPlanConfig.servings)}g F
                   </p>
                 </div>
