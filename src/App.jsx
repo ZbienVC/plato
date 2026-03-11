@@ -1228,7 +1228,7 @@ export default function App() {
       return { primaryGoal: 'maintain', secondaryGoals: [] };
     }
     
-    // Check if alrea• new format (has primaryGoal)
+    // Check if already new format (has primaryGoal)
     if (typeof oldGoal === 'object' && oldGoal.primaryGoal) {
       return oldGoal;
     }
@@ -1241,7 +1241,7 @@ export default function App() {
   
   /**
    * Get valid target rate options based on primary goal and secondary goals
-   * Returns array of valid rate options, •ally filtered
+   * Returns array of valid rate options, -ally filtered
    */
   const getValidTargetRates = (primaryGoal, secondaryGoals = []) => {
     // Maintain weight: No pace selector needed
@@ -1376,7 +1376,7 @@ export default function App() {
   const [importStep, setImportStep] = useState('input'); // 'input', 'reviewing'
   const [importSource, setImportSource] = useState('paste'); // 'paste', 'file'
   const [importText, setImportText] = useState('');
-  const [parsedPlan, setParsedPlan] = useState(null); // Parsed import rea• for review
+  const [parsedPlan, setParsedPlan] = useState(null); // Parsed import ready for review
   const [exportText, setExportText] = useState('');
   const [showExportOptions, setShowExportOptions] = useState(false);
   // ========== END IMPORT/EXPORT STATES ==========
@@ -2135,10 +2135,10 @@ export default function App() {
     ));
   };
   
-  // Mark item as "alrea• have" (for meal card interactions)
-  const markAsAlrea• = (id) => {
+  // Mark item as "already have" (for meal card interactions)
+  const markAsAlreadyHave = (id) => {
     setGroceryList(groceryList.map(item =>
-      item.id === id ? {...item, checked: true, alrea• true} : item
+      item.id === id ? {...item, checked: true, alreadyHave: true} : item
     ));
   };
   
@@ -2329,7 +2329,7 @@ export default function App() {
         return meal;
       }
       
-      // Store original if not alrea• stored
+      // Store original if not already stored
       if (!originalMealMacros[idx]) {
         setOriginalMealMacros(prev => ({
           ...prev,
@@ -2898,7 +2898,7 @@ export default function App() {
     // Calorie questions
     else if (query.includes('calorie') || query.includes('deficit') || query.includes('surplus')) {
       const deficit = form.goals === 'fat-loss' ? 'deficit' : form.goals === 'lean-bulk' ? 'surplus' : 'maintenance';
-      response = `You're targeting ${plan.calories} calories for ${form.goals}. This puts you in a ${deficit} based on your ${form.activity} activity level and ${form.weight}lbs bo•t. ${form.targetRate === 'aggressive' ? 'Your aggressive rate means faster results but requires strict adherence.' : form.targetRate === 'slow' ? 'Your slow & stea• approach is sustainable and easier to stick to long-term.' : 'Your moderate pace balances results with sustainability.'}`;
+      response = `You're targeting ${plan.calories} calories for ${form.goals}. This puts you in a ${deficit} based on your ${form.activity} activity level and ${form.weight}lbs body.t. ${form.targetRate === 'aggressive' ? 'Your aggressive rate means faster results but requires strict adherence.' : form.targetRate === 'slow' ? 'Your slow & stea- approach is sustainable and easier to stick to long-term.' : 'Your moderate pace balances results with sustainability.'}`;
     }
     // Meal timing
     else if (query.includes('when') && (query.includes('eat') || query.includes('meal'))) {
@@ -2909,7 +2909,7 @@ export default function App() {
       response = form.trainingType === 'strength' 
         ? "Since you're focused on strength training, keep cardio to 2-3 sessions of 20-30min weekly. Too much interferes with recovery and gains."
         : form.trainingType === 'cardio'
-        ? "You're alrea• doing cardio training! Aim for 4-5 sessions weekly. Mix stea•e and HIIT for best results."
+        ? "You're already doing cardio training! Aim for 4-5 sessions weekly. Mix stea-e and HIIT for best results."
         : "As a hybrid athlete, balance 2-3 cardio sessions with your strength work. Don't let cardio interfere with recovery!";
     }
     // Cheat meal questions
@@ -2924,7 +2924,7 @@ export default function App() {
     }
     // Water/hydration
     else if (query.includes('water') || query.includes('hydrat')) {
-      response = `Aim for ${Math.round(form.weight / 2)} oz daily (bo•t Ã· 2). More if you're training hard or it's hot. Track it in the daily tracker!`;
+      response = `Aim for ${Math.round(form.weight / 2)} oz daily (body.t Ã· 2). More if you're training hard or it's hot. Track it in the daily tracker!`;
     }
     // Sleep
     else if (query.includes('sleep')) {
@@ -2938,7 +2938,7 @@ export default function App() {
     }
     // Progress tracking
     else if (query.includes('track') || query.includes('progress') || query.includes('measure')) {
-      response = "Track weekly: bo•t (same day/time), progress photos, and how clothes fit. Scale weight fluctuates daily due to water/food. Focus on 2-4 week trends, not daily changes!";
+      response = "Track weekly: body.t (same day/time), progress photos, and how clothes fit. Scale weight fluctuates daily due to water/food. Focus on 2-4 week trends, not daily changes!";
     }
     // Meal prep
     else if (query.includes('meal prep') || query.includes('prepare')) {
@@ -3115,7 +3115,7 @@ export default function App() {
       setLoading(true);
       setLoadingStep(0);
       
-      const steps = ['Calculating nutrition...', 'Generating meals...', 'Almost rea•'];
+      const steps = ['Calculating nutrition...', 'Generating meals...', 'Almost ready'];
       for (let i = 0; i < steps.length; i++) {
         await new Promise(r => setTimeout(r, 600));
         setLoadingStep(i + 1);
@@ -3463,9 +3463,9 @@ export default function App() {
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
-    document.bo•ndChild(a);
+    document.body.appendChild(a);
     a.click();
-    document.bo•veChild(a);
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
     showToast('Downloaded!', 'success');
   };
@@ -3503,7 +3503,7 @@ export default function App() {
             quantity: itemPortion,
             category: categorizeIngredient(itemName),
             checked: false,
-            alrea• false,
+            alreadyHave: false,
             usedInMeals: 1,
             id: Math.random().toString(36).substr(2, 9)
           });
@@ -3603,9 +3603,9 @@ export default function App() {
   const toggleGroceryChecked = (index) => {
     const updated = [...groceryList];
     updated[index].checked = !updated[index].checked;
-    // When unchecking, also clear alrea• flag
+    // When unchecking, also clear already flag
     if (!updated[index].checked) {
-      updated[index].alrea• = false;
+      updated[index].already = false;
     }
     setGroceryList(updated);
   };
@@ -4234,7 +4234,7 @@ export default function App() {
       instructions: recipe.instructions || [],
       // PART 7: Use macro estimation for MealDB recipes
       nutritionPerServing: (() => {
-        // If recipe alrea• has macros, use them
+        // If recipe already has macros, use them
         if (recipe.macros) {
           return recipe.macros;
         }
@@ -4286,7 +4286,7 @@ export default function App() {
       quantity: '1 serving',
       category: categorizeIngredient(ing),
       checked: false,
-      alrea• false,
+      alreadyHave: false,
       usedInMeals: 1
     }));
     setGroceryList(prev => [...prev, ...newItems]);
@@ -4310,7 +4310,7 @@ export default function App() {
   
   // ========== INSIGHT & INTENT LOGIC (ADDITIVE) ==========
   
-  // FEATURE C: Meal Confidence Badge - • calculation
+  // FEATURE C: Meal Confidence Badge - score calculation
   const getMealConfidence = (meal) => {
     if (!meal || !plan) return null;
     
@@ -5138,7 +5138,7 @@ export default function App() {
           throw new Error('Invalid data URL format');
         }
       } else {
-        // Assume it's alrea• base64 without prefix
+        // Assume it's already base64 without prefix
         base64Data = imageDataUrl;
         mediaType = 'image/jpeg'; // Default fallback
       }
@@ -5185,7 +5185,7 @@ export default function App() {
           'x-api-key': 'sk-ant-api03-', // API key handled by Claude artifacts environment
           'anthropic-version': '2023-06-01'
         },
-        bo• JSON.stringify({
+        body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 2000,
           temperature: 0, // Deterministic - same image always gives same result
@@ -5599,7 +5599,7 @@ Return ONLY the JSON object. No explanation before or after.`
         // Get nutrition data (with caching)
         const nutritionData = await lookupUSDANutrition(item.name, item.category);
         
-        // Estimate portion if not alrea• set
+        // Estimate portion if not already set
         const portionGrams = item.portionGrams || estimatePortionGrams(item);
         const gramsLow = item.gramsLow || Math.round(portionGrams * 0.7);
         const gramsHigh = item.gramsHigh || Math.round(portionGrams * 1.3);
@@ -5797,7 +5797,7 @@ Return ONLY the JSON object. No explanation before or after.`
       return nutrient?.value || 0;
     };
     
-    // Extract nutrients (USDA values are alrea• per 100g for most entries)
+    // Extract nutrients (USDA values are already per 100g for most entries)
     const calories = findNutrient(['energy', 'calories']);
     const protein = findNutrient(['protein']);
     const carbs = findNutrient(['carbohydrate, by difference', 'carbohydrate']);
@@ -6432,7 +6432,7 @@ Return ONLY the JSON object. No explanation before or after.`
         
         try {
           const url = await generateMealImage(meal);
-          setMealImages(prev => ({...prev, [mealKey]: { status: 'rea👍, url }}));
+          setMealImages(prev => ({...prev, [mealKey]: { status: 'ready', url }}));
         } catch (e) {
           setMealImages(prev => ({...prev, [mealKey]: { status: 'error', url: null }}));
         }
@@ -6688,7 +6688,7 @@ Return ONLY the JSON object. No explanation before or after.`
       const video = videoRef.current;
       const canvas = canvasRef.current;
       
-      if (video.rea• === video.HAVE_ENOUGH_DATA) {
+      if (video.ready === video.HAVE_ENOUGH_DATA) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
@@ -7745,7 +7745,7 @@ Return ONLY the JSON object. No explanation before or after.`
         
         localStorage.setItem('plato_user_corrections', JSON.stringify(existingCorrections));
         
-        // TODO: Send to backend when DB layer rea•
+        // TODO: Send to backend when DB layer ready
         // await saveUserCorrections(correctionRecord);
       }
 
@@ -8326,11 +8326,11 @@ Return ONLY the JSON object. No explanation before or after.`
                 </div>
               )}
               
-              {/* Info when rea• to log after review */}
+              {/* Info when ready to log after review */}
               {requiresConfirmation && canLog && (
                 <div className={`p-3 rounded-lg ${dark?'bg-green-900/20 border border-green-700/30':'bg-green-50 border border-green-200'}`}>
                   <p className={`text-xs ${dark?'text-green-300':'text-green-700'}`}>
-                    <strong>âœ“ Rea• to log:</strong> You've reviewed and confirmed all items.
+                    <strong>âœ“ Ready to log:</strong> You've reviewed and confirmed all items.
                   </p>
                 </div>
               )}
@@ -9188,7 +9188,7 @@ Return ONLY the JSON object. No explanation before or after.`
                     </div>
                   )}
 
-                  {/* ========== TARGET RATE (• Filtering) ========== */}
+                  {/* ========== TARGET RATE (- filtering) ========== */}
                   {form.primaryGoal && (() => {
                     const validRates = getValidTargetRates(form.primaryGoal, form.secondaryGoals || []);
                     
@@ -9860,7 +9860,7 @@ Return ONLY the JSON object. No explanation before or after.`
         <div className="max-w-4xl mx-auto p-4">
           <div className="text-center mb-6">
             <h2 className={`text-2xl font-bold mb-2 ${dark?'text-white':'text-gray-900'}`}>
-              Find recipes using ingredients you alrea• have
+              Find recipes using ingredients you already have
             </h2>
             <p className={`text-sm ${dark?'text-slate-400':'text-gray-600'}`}>
               Take photos, choose from your gallery, or type ingredients manually
@@ -10264,7 +10264,7 @@ Return ONLY the JSON object. No explanation before or after.`
                                         quantity: ingMeasure || '1',
                                         category: categorizeIngredient(ingName),
                                         checked: false,
-                                        alrea• false
+                                        alreadyHave: false
                                       };
                                     });
                                     
@@ -10524,7 +10524,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 
                 <p className={`text-sm ${dark?'text-slate-400':'text-gray-600'}`}>
                   {forecast.energyTrend === 'improving' && 'Your calorie and carb intake are supporting consistent energy levels.'}
-                  {forecast.energyTrend === 'stable' && 'Your current intake is maintaining stea• energy availability.'}
+                  {forecast.energyTrend === 'stable' && 'Your current intake is maintaining steady energy availability.'}
                   {forecast.energyTrend === 'volatile' && 'Daily intake varies significantly, which may affect energy consistency.'}
                   {forecast.energyTrend === 'likely low' && 'Current intake may not be fully supporting energy demands.'}
                 </p>
@@ -10745,7 +10745,7 @@ Return ONLY the JSON object. No explanation before or after.`
                             onClick={() => toggleGroceryChecked(idx)}
                             className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                               item.checked
-                                ? item.alrea•
+                                ? item.already
                                   ? 'bg-blue-500 border-blue-500'
                                   : 'bg-emerald-500 border-emerald-500'
                                 : dark?'border-slate-600 hover:border-slate-500':'border-gray-300 hover:border-gray-400'
@@ -10765,7 +10765,7 @@ Return ONLY the JSON object. No explanation before or after.`
                             )}
                           </div>
                           
-                          {item.alrea• && (
+                          {item.already && (
                             <span className={`text-xs font-medium px-2 py-1 rounded-full ${dark?'bg-blue-500/20 text-blue-400':'bg-blue-100 text-blue-700'}`}>
                               Have it
                             </span>
@@ -11446,7 +11446,7 @@ Lunch
                   onChange={(e) => setTempPlanConfig({...tempPlanConfig, trainingType: e.target.value})}
                   className={`w-full px-4 py-3 rounded-xl ${dark?'bg-slate-800 text-white border-slate-700':'bg-white border-gray-300'} border-2`}
                 >
-                  <option value="bo•ing">Bo•ing</option>
+                  <option value="body.ing">body.ing</option>
                   <option value="powerlifting">Powerlifting</option>
                   <option value="endurance">Endurance</option>
                   <option value="hybrid">Hybrid</option>
@@ -11742,7 +11742,7 @@ Lunch
                 <Sparkles className="w-5 h-5" />
               </div>
               <p className={`text-sm ${dark?'text-slate-300':'text-gray-700'}`}>
-                <span className="font-semibold">Demo Mode:</span> Paste any YouTube URL to see how the AI extraction works. This demonstrates structured recipe extraction - rea• to connect to real transcript API.
+                <span className="font-semibold">Demo Mode:</span> Paste any YouTube URL to see how the AI extraction works. This demonstrates structured recipe extraction - Ready to connect to real transcript API.
               </p>
             </div>
           </div>
@@ -12640,12 +12640,12 @@ Lunch
                                     onClick={() => toggleGroceryItem(groceryItem.id)}
                                     className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                                       groceryItem.checked
-                                        ? groceryItem.alrea• 
+                                        ? groceryItem.already 
                                           ? 'bg-blue-500 border-blue-500'
                                           : 'bg-green-500 border-green-500'
                                         : dark?'border-slate-600 hover:border-slate-500':'border-gray-300 hover:border-gray-400'
                                     }`}
-                                    title={groceryItem.alrea• ? "Alrea• have" : "Check off"}
+                                    title={groceryItem.already ? "already have" : "Check off"}
                                   >
                                     {groceryItem.checked && <CheckCircle className="w-3 h-3 text-white" />}
                                   </button>
@@ -12653,7 +12653,7 @@ Lunch
                                     {ingMeasure ? `${ingMeasure} ${ingName}` : ingName}
                                   </span>
                                   <button
-                                      onClick={() => markAsAlrea•groceryItem.id)}
+                                      onClick={() => markAsAlreadyHave(groceryItem.id)}
                                       className={`opacity-0 group-hover:opacity-100 text-xs px-2 py-1 rounded transition-all ${dark?'bg-blue-600 hover:bg-blue-700 text-white':'bg-blue-500 hover:bg-blue-600 text-white'}`}
                                     >
                                       Have it
@@ -13313,7 +13313,7 @@ Lunch
                     Faster prep
                   </div>
                   <div className={`text-xs ${dark?'text-slate-400':'text-gray-600'}`}>
-                    Rea• in 15 minutes or less
+                    Rea- in 15 minutes or less
                   </div>
                 </button>
                 
@@ -14392,7 +14392,7 @@ Lunch
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          markAsAlrea•item.id);
+                          markAsAlreadyHave(item.id);
                         }}
                         className={`text-xs px-2 py-1 rounded ${dark?'bg-slate-700 text-slate-300 hover:bg-slate-600':'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                       >
