@@ -1192,28 +1192,54 @@ export default function App() {
       }
       
       .glass { 
-        background: rgba(255, 255, 255, 0.7); 
+        background: rgba(255, 255, 255, 0.85); 
         backdrop-filter: blur(24px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
       }
       
       .glass-dark { 
-        background: rgba(15, 23, 42, 0.7); 
+        background: rgba(10, 15, 30, 0.85); 
         backdrop-filter: blur(24px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
       }
       
       .gradient-mesh {
         background: 
-          radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-          radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-          radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
-          radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%);
+          radial-gradient(at 0% 0%, rgba(16, 217, 160, 0.12) 0px, transparent 50%),
+          radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(16, 217, 160, 0.08) 0px, transparent 50%),
+          radial-gradient(at 0% 100%, rgba(99, 102, 241, 0.08) 0px, transparent 50%);
       }
       
-      .shadow-premium { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
-      .shadow-premium-lg { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); }
-      .shadow-premium-xl { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); }
+      .shadow-premium { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
+      .shadow-premium-lg { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35); }
+      .shadow-premium-xl { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45); }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #10d9a0, #6366f1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .stat-num {
+        font-weight: 900;
+        letter-spacing: -1px;
+        font-variant-numeric: tabular-nums;
+        background: linear-gradient(135deg, #10d9a0, #6eb4f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+      }
     `;
     document.head.appendChild(styleElement);
     return () => document.head.removeChild(styleElement);
@@ -6865,7 +6891,7 @@ Return ONLY the JSON object. No explanation before or after.`
     };
 
     return (
-      <div className={`min-h-screen ${dark?'bg-slate-900':'bg-slate-50'} pb-20`}>
+      <div className={`min-h-screen ${dark?'app-bg-dark':'app-bg-light'} pb-20`}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className={`text-2xl font-bold ${dark?'text-white':'text-slate-900'}`}>
@@ -7030,7 +7056,7 @@ Return ONLY the JSON object. No explanation before or after.`
 
     if (capturedImage && !plateResult) {
       return (
-        <div className={`min-h-screen ${dark?'bg-slate-900':'bg-slate-50'} p-6`}>
+        <div className={`min-h-screen ${dark?'app-bg-dark':'app-bg-light'} p-6`}>
           <div className="max-w-2xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className={`text-2xl font-bold ${dark?'text-white':'text-slate-900'}`}>
@@ -7113,7 +7139,7 @@ Return ONLY the JSON object. No explanation before or after.`
     }
 
     return (
-      <div className={`min-h-screen ${dark?'bg-slate-900':'bg-slate-50'} pb-20`}>
+      <div className={`min-h-screen ${dark?'app-bg-dark':'app-bg-light'} pb-20`}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -7867,7 +7893,7 @@ Return ONLY the JSON object. No explanation before or after.`
       <div className="fixed inset-0 bg-black/50 z-[100] animate-slideUp" onClick={(e) => {
         if (e.target === e.currentTarget) setPlateResult(null);
       }}>
-        <div className={`fixed inset-x-0 bottom-0 ${dark?'bg-slate-800':'bg-white'} rounded-t-3xl flex flex-col`}
+        <div className={`fixed inset-x-0 bottom-0 ${dark?'glass-dark':'glass'} rounded-t-3xl flex flex-col`}
              style={{ height: '90vh', maxHeight: '90vh' }}>
           
           {/* FIXED HEADER */}
@@ -8113,7 +8139,7 @@ Return ONLY the JSON object. No explanation before or after.`
                     </div>
                     {food.confidence && (
                       <div className="mt-2 flex items-center gap-2">
-                        <div className={`h-1.5 flex-1 rounded-full ${dark?'bg-slate-600':'bg-slate-200'}`}>
+                        <div className={`h-1.5 flex-1 progress-bar-track`}>
                           <div 
                             className={`h-full rounded-full bg-${confidenceColor}-500`}
                             style={{ width: `${food.confidence * 100}%` }}
@@ -8484,7 +8510,7 @@ Return ONLY the JSON object. No explanation before or after.`
   // Scanning Hub Main Screen
   if (showScanning && !scanMode) {
     return (
-      <div className={`min-h-screen ${dark?'bg-slate-900':'bg-gradient-to-br from-slate-50 via-white to-blue-50'} p-6 pb-24`}>
+      <div className={`min-h-screen ${dark?'app-bg-dark':'app-bg-light'} p-6 pb-24`}>
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h1 className={`text-3xl font-bold ${dark?'text-white':'text-slate-900'}`}>
@@ -8756,7 +8782,7 @@ Return ONLY the JSON object. No explanation before or after.`
 
   if (step === 'welcome') {
     return (
-      <div className={`min-h-screen relative overflow-hidden ${dark?'bg-slate-900':'bg-gradient-to-br from-slate-50 via-white to-blue-50'} flex items-center justify-center p-6`}>
+      <div className={`min-h-screen relative overflow-hidden ${dark?'app-bg-dark':'app-bg-light'} flex items-center justify-center p-6`}>
         {/* Subtle animated background */}
         <div className="absolute inset-0 gradient-mesh opacity-40" />
         
@@ -8769,7 +8795,7 @@ Return ONLY the JSON object. No explanation before or after.`
               </div>
               
               <div>
-                <h1 className={`text-5xl font-bold mb-3 ${dark?'text-white':'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent'}`}>
+                <h1 className={`text-5xl font-extrabold mb-3 gradient-text`}>
                   Plato
                 </h1>
                 <p className={`text-lg ${dark?'text-slate-300':'text-slate-600'}`}>
@@ -8826,7 +8852,7 @@ Return ONLY the JSON object. No explanation before or after.`
   // Intent Selection Screen (NEW)
   if (step === 'intent') {
     return (
-      <div className={`min-h-screen ${dark?'bg-slate-900':'bg-gradient-to-br from-slate-50 via-white to-blue-50'} flex items-center justify-center p-6`}>
+      <div className={`min-h-screen ${dark?'app-bg-dark':'app-bg-light'} flex items-center justify-center p-6`}>
         <div className="relative z-10 max-w-4xl w-full animate-fadeIn">
           <div className={`${dark?'glass-dark':'glass'} rounded-3xl p-8 md:p-12 shadow-2xl`}>
             <div className="text-center mb-8">
@@ -10828,7 +10854,7 @@ Return ONLY the JSON object. No explanation before or after.`
               {[...new Set(groceryList.map(i => i.category))].map(category => (
                 <div key={category}>
                   <div className="flex items-center gap-2 mb-3 px-2">
-                    <h3 className={`text-xs font-bold uppercase tracking-wider ${dark?'text-slate-500':'text-gray-500'}`}>
+                    <h3 className={`section-label ${dark?'text-slate-500':'text-gray-500'}`}>
                       {category}
                     </h3>
                     <div className={`flex-1 h-px ${dark?'bg-slate-700':'bg-gray-200'}`} />
@@ -10897,7 +10923,7 @@ Return ONLY the JSON object. No explanation before or after.`
 
         {/* Bottom Action Bar */}
         {groceryList.length > 0 && (
-          <div className={`fixed bottom-0 left-0 right-0 ${dark?'bg-slate-800/95 border-slate-700':'bg-white/95 border-gray-200'} backdrop-blur-lg border-t p-4 shadow-2xl`}>
+          <div className={`fixed bottom-0 left-0 right-0 ${dark?'glass-dark border-white/10':'glass border-gray-200'} border-t p-4 shadow-2xl`}>
             <div className="max-w-3xl mx-auto">
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -12055,7 +12081,7 @@ Lunch
   // ========== END RECIPE MODALS ==========
   if (step === 'results' && plan) {
     return (
-      <div className={`min-h-screen ${dark?'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900':'bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-50'} p-4 md:p-6`}>
+      <div className={`min-h-screen ${dark?'app-bg-dark':'app-bg-light'} p-4 md:p-6`}>
         <div className="max-w-7xl mx-auto animate-fadeIn pb-24">
           <div className={`${dark?'glass-dark':'glass'} rounded-3xl shadow-premium-xl p-6 md:p-8 mb-6 relative`}>
             <button
@@ -12064,7 +12090,7 @@ Lunch
             >
               <Menu className={`w-6 h-6 ${dark?'text-white':'text-gray-900'}`} />
             </button>
-            <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${dark?'text-white':'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'}`}>
+            <h1 className={`text-3xl md:text-4xl font-extrabold mb-2 gradient-text`}>
               {plan.name}'s Meal Plan
             </h1>
             <p className={`${dark?'text-slate-400':'text-slate-600'}`}>
@@ -12077,19 +12103,19 @@ Lunch
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className={`${dark?'glass-dark':'glass'} p-6 rounded-2xl shadow-premium text-center`}>
                 <div className={`text-sm mb-1 ${dark?'text-slate-400':'text-slate-600'}`}>Calories</div>
-                <div className="text-3xl font-bold tabular-nums text-emerald-600">{plan.calories}</div>
+                <div className="stat-num text-emerald-600">{plan.calories}</div>
               </div>
               <div className={`${dark?'glass-dark':'glass'} p-6 rounded-2xl shadow-premium text-center`}>
                 <div className={`text-sm mb-1 ${dark?'text-slate-400':'text-slate-600'}`}>Protein</div>
-                <div className="text-3xl font-bold tabular-nums text-blue-600">{plan.protein}g</div>
+                <div className="stat-num text-blue-600">{plan.protein}g</div>
               </div>
               <div className={`${dark?'glass-dark':'glass'} p-6 rounded-2xl shadow-premium text-center`}>
                 <div className={`text-sm mb-1 ${dark?'text-slate-400':'text-slate-600'}`}>Carbs</div>
-                <div className="text-3xl font-bold tabular-nums text-orange-600">{plan.carbs}g</div>
+                <div className="stat-num text-orange-600">{plan.carbs}g</div>
               </div>
               <div className={`${dark?'glass-dark':'glass'} p-6 rounded-2xl shadow-premium text-center`}>
                 <div className={`text-sm mb-1 ${dark?'text-slate-400':'text-slate-600'}`}>Fat</div>
-                <div className="text-3xl font-bold tabular-nums text-purple-600">{plan.fat}g</div>
+                <div className="stat-num text-purple-600">{plan.fat}g</div>
               </div>
             </div>
           ) : !plan.isMealsOnly ? null : (
@@ -13566,7 +13592,7 @@ Lunch
                       <div className={`p-4 rounded-xl mb-4 border-2 ${trendBg}`}>
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
-                            <p className={`text-xs font-semibold uppercase tracking-wider mb-1 ${dark?'text-slate-400':'text-slate-600'}`}>
+                            <p className={`section-label mb-1 ${dark?'text-slate-400':'text-slate-600'}`}>
                               Weekly Trend
                             </p>
                             <p className={`text-2xl md:text-3xl font-black ${trendColor} mb-1`}>
@@ -13584,7 +13610,7 @@ Lunch
 
                   {/* Recent Entries */}
                   <div className="space-y-3">
-                    <p className={`text-xs font-semibold uppercase tracking-wider ${dark?'text-slate-500':'text-gray-500'}`}>
+                    <p className={`section-label ${dark?'text-slate-500':'text-gray-500'}`}>
                       Recent Entries
                     </p>
                     <div className="space-y-2">
@@ -13818,7 +13844,7 @@ Lunch
 
               {/* Nutrition & Insights - Unified Card */}
               <div className={`${dark?'bg-slate-800':'bg-white'} p-4 rounded-2xl shadow-premium mb-6`}>
-                <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${dark?'text-slate-500':'text-gray-500'}`}>
+                <h3 className={`section-label mb-3 ${dark?'text-slate-500':'text-gray-500'}`}>
                   Nutrition & Insights
                 </h3>
                 
@@ -13861,7 +13887,7 @@ Lunch
               
               {/* MEAL PLANNING Section */}
               <div className={`${dark?'bg-slate-800':'bg-white'} p-4 rounded-2xl shadow-premium mb-4`}>
-                <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${dark?'text-slate-500':'text-gray-500'}`}>Meal Planning</h3>
+                <h3 className={`section-label mb-3 ${dark?'text-slate-500':'text-gray-500'}`}>Meal Planning</h3>
                 <div className="space-y-2">
                   {/* Generate New Plan - PRIMARY ACTION */}
                   <button
@@ -13919,7 +13945,7 @@ Lunch
 
               {/* RECIPES Section */}
               <div className={`${dark?'bg-slate-800':'bg-white'} p-4 rounded-2xl shadow-premium mb-4`}>
-                <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${dark?'text-slate-500':'text-gray-500'}`}>Recipes</h3>
+                <h3 className={`section-label mb-3 ${dark?'text-slate-500':'text-gray-500'}`}>Recipes</h3>
                 <div className="space-y-2">
                   <button
                     onClick={() => {
@@ -13962,7 +13988,7 @@ Lunch
 
               {/* TRACKING Section */}
               <div className={`${dark?'bg-slate-800':'bg-white'} p-4 rounded-2xl shadow-premium mb-4`}>
-                <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${dark?'text-slate-500':'text-gray-500'}`}>Tracking</h3>
+                <h3 className={`section-label mb-3 ${dark?'text-slate-500':'text-gray-500'}`}>Tracking</h3>
                 <div className="space-y-2">
                   <button
                     onClick={() => {
@@ -14019,7 +14045,7 @@ Lunch
 
               {/* Saved Recipes & Favorite Meals */}
               <div className={`${dark?'bg-slate-800':'bg-white'} p-4 rounded-2xl shadow-premium mb-6`}>
-                <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${dark?'text-slate-500':'text-gray-500'}`}>My Collection</h3>
+                <h3 className={`section-label mb-3 ${dark?'text-slate-500':'text-gray-500'}`}>My Collection</h3>
                 <div className="space-y-2">
                   <button
                     onClick={() => {
