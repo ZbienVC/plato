@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { ChefHat, Sparkles, Loader2, RefreshCw, Star, Heart, Menu, X, TrendingUp, TrendingDown, User, Settings, Calendar, Zap, Award, Target, Bell, ChevronRight, ChevronDown, CheckCircle, Activity, Utensils, BarChart3, Flame, Camera, Scan, QrCode, Plus, Minus, Edit3, Trash2, ImagePlus, AlertCircle, Search, BookOpen, Youtube, FileText, ShoppingCart, CalendarPlus, ExternalLink, Key, Lock, Unlock, Save, Globe, Check, BookmarkPlus, Info, Dumbbell, Sun, Moon, Clock } from 'lucide-react';
 
 // ========== BUG FIX: INGREDIENT NUTRITION LOOKUP TABLE ==========
@@ -239,17 +239,17 @@ const shouldIgnoreIngredient = (parsed, nutritionData) => {
   
   // Spices: Ignore if no quantity or very small quantity
   if (matchesCategory(name, INGREDIENT_CATEGORIES.spices)) {
-    // "to taste", "pinch", or no quantity → ignore
+    // "to taste", "pinch", or no quantity â†’ ignore
     if (!qty || qty === 0) {
       return { shouldIgnore: true, reason: 'spice-negligible' };
     }
     
-    // Small amounts → ignore (<1 tsp or <5g)
+    // Small amounts â†’ ignore (<1 tsp or <5g)
     if ((unit === 'tsp' && qty < 1) || (unit === 'g' && qty < 5)) {
       return { shouldIgnore: true, reason: 'spice-small-amount' };
     }
     
-    // Estimated calorie contribution < 10 → ignore
+    // Estimated calorie contribution < 10 â†’ ignore
     if (nutritionData) {
       const estimatedCals = estimateCalories(qty, unit, nutritionData);
       if (estimatedCals < 10) {
@@ -258,14 +258,14 @@ const shouldIgnoreIngredient = (parsed, nutritionData) => {
     }
   }
   
-  // Sauces: Only count if ≥1 tbsp
+  // Sauces: Only count if â‰¥1 tbsp
   if (matchesCategory(name, INGREDIENT_CATEGORIES.sauces)) {
-    // "to taste" or no quantity → ignore
+    // "to taste" or no quantity â†’ ignore
     if (!qty || qty === 0) {
       return { shouldIgnore: true, reason: 'sauce-to-taste' };
     }
     
-    // Less than 1 tbsp → ignore
+    // Less than 1 tbsp â†’ ignore
     if (unit === 'tbsp' && qty < 1) {
       return { shouldIgnore: true, reason: 'sauce-small-amount' };
     }
@@ -336,7 +336,7 @@ const applyDefaultQuantity = (parsed, nutritionData) => {
 const calculateIngredientConfidence = (parsed, nutritionData, perUnit) => {
   let confidence = 0.5; // Base confidence
   
-  // No parsed data → very low confidence
+  // No parsed data â†’ very low confidence
   if (!parsed) return 0.4;
   
   const { qty, unit, name } = parsed;
@@ -707,7 +707,7 @@ const testMealMacroMath = () => {
     console.log(`  Ingredients: ${meal.ingredients.join(', ')}`);
     console.log(`  Computed: ${computed.protein}p / ${computed.carbs}c / ${computed.fat}f`);
     console.log(`  Calories: ${computed.calories} (4/4/9 check: ${expectedCalories}, diff: ${calorieDiff})`);
-    console.log(`  ${calorieDiff <= 5 ? '✓ PASS' : '✗ FAIL'}`);
+    console.log(`  ${calorieDiff <= 5 ? 'âœ“ PASS' : 'âœ— FAIL'}`);
   }
 };
 
@@ -732,7 +732,7 @@ const testRestrictionFiltering = () => {
     for (const item of testCase.shouldBlock) {
       const mockMeal = { name: item, ingredients: [item] };
       const allowed = isMealAllowed(mockMeal, forbidden);
-      console.log(`  "${item}": ${allowed ? '✗ FAIL (should be blocked)' : '✓ PASS (correctly blocked)'}`);
+      console.log(`  "${item}": ${allowed ? 'âœ— FAIL (should be blocked)' : 'âœ“ PASS (correctly blocked)'}`);
     }
   }
 };
@@ -742,6 +742,173 @@ const testRestrictionFiltering = () => {
 // testRestrictionFiltering();
 
 // ========== END BUG FIX ADDITIONS ==========
+
+// ========== MEAL DATABASE + PLAN GENERATOR ==========
+
+const MEAL_DATABASE = [
+  // BREAKFAST OPTIONS
+  { name: 'Greek Yogurt Parfait', type: 'breakfast', calories: 380, protein: 28, carbs: 42, fat: 10, prepTime: 5, tags: ['quick', 'high-protein', 'no-cook'], cuisines: ['any'], ingredients: ['1 cup Greek yogurt', '1/2 cup granola', '1/2 cup mixed berries', '1 tbsp honey', '1 tbsp almond butter'], instructions: ['Layer Greek yogurt in a bowl', 'Top with granola and berries', 'Drizzle with honey and almond butter', 'Serve immediately'] },
+  { name: 'Avocado Toast with Eggs', type: 'breakfast', calories: 420, protein: 22, carbs: 38, fat: 22, prepTime: 10, tags: ['quick', 'vegetarian'], cuisines: ['american'], ingredients: ['2 slices whole grain toast', '1 avocado', '2 eggs', '1 tsp olive oil', 'salt and pepper', 'red pepper flakes'], instructions: ['Toast bread until golden', 'Mash avocado with salt and lemon', 'Fry eggs in olive oil to your liking', 'Spread avocado on toast, top with eggs', 'Season with pepper flakes'] },
+  { name: 'Protein Oatmeal Bowl', type: 'breakfast', calories: 440, protein: 32, carbs: 52, fat: 10, prepTime: 10, tags: ['high-protein', 'meal-prep'], cuisines: ['any'], ingredients: ['1 cup oats', '1 scoop protein powder', '1 banana', '1 cup almond milk', '1 tbsp peanut butter', '1/2 cup berries'], instructions: ['Cook oats with almond milk for 3-4 min', 'Stir in protein powder off heat', 'Top with sliced banana and berries', 'Add peanut butter drizzle'] },
+  { name: 'Veggie Egg White Scramble', type: 'breakfast', calories: 310, protein: 28, carbs: 28, fat: 10, prepTime: 10, tags: ['low-fat', 'high-protein', 'vegetarian'], cuisines: ['american'], ingredients: ['4 egg whites', '1 whole egg', '1 cup spinach', '1/2 cup mushrooms', '1/4 cup tomatoes', '1 slice whole grain toast', '1 tsp olive oil'], instructions: ['Sauté mushrooms and spinach in olive oil', 'Add tomatoes and cook 1 min', 'Whisk eggs with egg whites and add to pan', 'Scramble until cooked through', 'Serve with toast'] },
+  { name: 'Banana Protein Smoothie', type: 'breakfast', calories: 390, protein: 35, carbs: 48, fat: 8, prepTime: 5, tags: ['quick', 'high-protein', 'no-cook'], cuisines: ['any'], ingredients: ['1 banana', '1 scoop protein powder', '1 cup almond milk', '1 tbsp almond butter', '1/2 cup Greek yogurt', 'ice'], instructions: ['Add all ingredients to blender', 'Blend until smooth', 'Add more milk if too thick', 'Serve immediately'] },
+  { name: 'Smoked Salmon Bagel', type: 'breakfast', calories: 450, protein: 30, carbs: 45, fat: 16, prepTime: 5, tags: ['quick', 'high-protein'], cuisines: ['american'], ingredients: ['1 whole grain bagel', '3oz smoked salmon', '2 tbsp cream cheese', 'capers', 'red onion', 'fresh dill'], instructions: ['Toast bagel halves', 'Spread cream cheese on each half', 'Layer salmon on top', 'Garnish with capers, onion, and dill'] },
+  { name: 'Cottage Cheese Bowl', type: 'breakfast', calories: 350, protein: 30, carbs: 35, fat: 8, prepTime: 5, tags: ['quick', 'high-protein', 'no-cook'], cuisines: ['any'], ingredients: ['1 cup cottage cheese', '1/2 cup pineapple chunks', '1/4 cup granola', '1 tbsp honey', 'cinnamon'], instructions: ['Spoon cottage cheese into bowl', 'Top with pineapple and granola', 'Drizzle with honey', 'Dust with cinnamon'] },
+  { name: 'Breakfast Burrito', type: 'breakfast', calories: 520, protein: 32, carbs: 48, fat: 20, prepTime: 15, tags: ['high-protein', 'meal-prep'], cuisines: ['mexican'], ingredients: ['1 large tortilla', '3 eggs', '2oz ground turkey', '1/4 cup black beans', '2 tbsp salsa', '1 tbsp olive oil', 'salt and pepper'], instructions: ['Cook turkey in olive oil, season well', 'Scramble eggs in same pan', 'Warm tortilla', 'Layer turkey, eggs, beans, salsa', 'Roll tightly and serve'] },
+  { name: 'Overnight Oats', type: 'breakfast', calories: 420, protein: 20, carbs: 58, fat: 12, prepTime: 5, tags: ['meal-prep', 'no-cook'], cuisines: ['any'], ingredients: ['1 cup oats', '1 cup almond milk', '1 scoop protein powder', '1 tbsp chia seeds', '1 tbsp peanut butter', '1/2 cup berries'], instructions: ['Mix oats, milk, protein powder, and chia seeds', 'Refrigerate overnight (min 4 hours)', 'Top with berries and peanut butter before serving', 'Add more milk if needed'] },
+  { name: 'Turkish Eggs (Cilbir)', type: 'breakfast', calories: 390, protein: 24, carbs: 18, fat: 26, prepTime: 15, tags: ['vegetarian', 'high-protein'], cuisines: ['mediterranean'], ingredients: ['2 eggs', '1/2 cup Greek yogurt', '1 clove garlic', '2 tbsp butter', '1 tsp paprika', '1 tsp chili flakes', '1 slice crusty bread'], instructions: ['Mix yogurt with minced garlic, salt', 'Poach eggs in simmering water', 'Melt butter with paprika and chili flakes', 'Spoon yogurt on plate, top with eggs', 'Drizzle spiced butter over top'] },
+
+  // LUNCH OPTIONS
+  { name: 'Grilled Chicken Caesar Salad', type: 'lunch', calories: 480, protein: 42, carbs: 22, fat: 26, prepTime: 20, tags: ['high-protein', 'low-carb'], cuisines: ['american', 'italian'], ingredients: ['6oz chicken breast', '3 cups romaine lettuce', '2 tbsp Caesar dressing', '2 tbsp parmesan', '1/2 cup croutons', 'black pepper'], instructions: ['Grill chicken breast seasoned with salt and pepper', 'Slice chicken and let rest', 'Toss romaine with Caesar dressing', 'Top with chicken, parmesan, and croutons'] },
+  { name: 'Turkey & Hummus Wrap', type: 'lunch', calories: 460, protein: 36, carbs: 42, fat: 16, prepTime: 5, tags: ['quick', 'meal-prep', 'no-cook'], cuisines: ['mediterranean', 'american'], ingredients: ['1 large whole wheat wrap', '4oz turkey breast', '3 tbsp hummus', '1/2 cup mixed greens', '1/4 cucumber', '1/4 cup roasted red peppers', '1 tbsp olive oil'], instructions: ['Spread hummus on wrap', 'Layer turkey, greens, cucumber, and peppers', 'Drizzle with olive oil', 'Roll tightly and cut in half'] },
+  { name: 'Asian Salmon Rice Bowl', type: 'lunch', calories: 540, protein: 40, carbs: 48, fat: 16, prepTime: 20, tags: ['high-protein', 'meal-prep'], cuisines: ['asian'], ingredients: ['5oz salmon fillet', '1 cup cooked brown rice', '1 cup edamame', '1/2 avocado', '2 tbsp soy sauce', '1 tbsp sesame oil', '1 tsp ginger'], instructions: ['Cook salmon in pan with sesame oil 4 min per side', 'Mix soy sauce and ginger for sauce', 'Assemble rice in bowl', 'Top with salmon, edamame, and avocado', 'Drizzle sauce over everything'] },
+  { name: 'Lentil Soup', type: 'lunch', calories: 380, protein: 22, carbs: 52, fat: 8, prepTime: 30, tags: ['vegetarian', 'vegan', 'meal-prep', 'high-fiber'], cuisines: ['mediterranean'], ingredients: ['1 cup red lentils', '1 can diced tomatoes', '1 onion', '3 cloves garlic', '2 carrots', '2 cups vegetable broth', '1 tsp cumin', '1 tsp turmeric', '1 tbsp olive oil'], instructions: ['Sauté onion, garlic, carrots in olive oil', 'Add lentils, tomatoes, broth, and spices', 'Simmer 25 min until lentils are soft', 'Blend partially for creamier texture', 'Season and serve with crusty bread'] },
+  { name: 'Shrimp Taco Bowl', type: 'lunch', calories: 490, protein: 38, carbs: 50, fat: 14, prepTime: 20, tags: ['high-protein', 'quick'], cuisines: ['mexican'], ingredients: ['6oz shrimp', '1 cup cooked rice', '1/2 cup black beans', '1/4 cup corn', '2 tbsp salsa', '2 tbsp Greek yogurt', '1 lime', 'cilantro', '1 tsp cumin'], instructions: ['Season and sauté shrimp with cumin 2-3 min per side', 'Build bowl with rice base', 'Add beans, corn, and shrimp', 'Top with salsa, yogurt, lime juice, and cilantro'] },
+  { name: 'Caprese Chicken Sandwich', type: 'lunch', calories: 510, protein: 40, carbs: 44, fat: 18, prepTime: 15, tags: ['high-protein'], cuisines: ['italian', 'american'], ingredients: ['5oz chicken breast', '2 slices sourdough', '2oz fresh mozzarella', '2 tomato slices', 'fresh basil', '1 tbsp balsamic glaze', '1 tsp olive oil'], instructions: ['Pound chicken thin, cook in olive oil 3-4 min per side', 'Toast bread', 'Layer chicken, mozzarella, tomato, and basil', 'Drizzle with balsamic glaze'] },
+  { name: 'Quinoa Power Bowl', type: 'lunch', calories: 500, protein: 30, carbs: 54, fat: 18, prepTime: 25, tags: ['vegetarian', 'meal-prep', 'high-protein'], cuisines: ['mediterranean', 'any'], ingredients: ['1 cup cooked quinoa', '1/2 cup chickpeas', '1 cup roasted vegetables', '2 tbsp tahini dressing', '1/4 avocado', 'handful mixed greens', '1 tbsp olive oil', 'lemon'], instructions: ['Roast vegetables with olive oil at 400F for 20 min', 'Make tahini dressing with lemon and water', 'Build bowl with quinoa base', 'Top with chickpeas, veggies, greens, avocado', 'Drizzle tahini dressing'] },
+  { name: 'BLT Chicken Salad', type: 'lunch', calories: 450, protein: 38, carbs: 20, fat: 24, prepTime: 15, tags: ['high-protein', 'low-carb', 'quick'], cuisines: ['american'], ingredients: ['5oz grilled chicken', '3 cups mixed greens', '3 strips turkey bacon', '1/2 cup cherry tomatoes', '1/4 avocado', '2 tbsp light ranch dressing'], instructions: ['Cook turkey bacon until crispy', 'Slice grilled chicken', 'Combine greens, tomatoes, and avocado', 'Top with chicken and crumbled bacon', 'Drizzle with ranch dressing'] },
+  { name: 'Spicy Tuna Poke Bowl', type: 'lunch', calories: 520, protein: 36, carbs: 52, fat: 16, prepTime: 15, tags: ['high-protein', 'quick'], cuisines: ['asian'], ingredients: ['5oz sushi-grade tuna', '1 cup sushi rice', '1/2 avocado', '1/4 cup cucumber', '2 tbsp soy sauce', '1 tbsp sriracha mayo', '1 tsp sesame seeds', 'green onions'], instructions: ['Cube tuna and marinate in soy sauce', 'Cook rice and let cool slightly', 'Build bowl with rice base', 'Add tuna, avocado, and cucumber', 'Drizzle sriracha mayo and garnish'] },
+  { name: 'Chicken Shawarma Bowl', type: 'lunch', calories: 530, protein: 42, carbs: 45, fat: 18, prepTime: 25, tags: ['high-protein', 'meal-prep'], cuisines: ['mediterranean'], ingredients: ['6oz chicken thigh', '1 cup brown rice', '1/2 cup cucumber', '1/2 cup tomatoes', '3 tbsp hummus', '2 tbsp tzatziki', '1 tsp cumin', '1 tsp paprika', 'lemon'], instructions: ['Marinate chicken in cumin, paprika, and lemon', 'Cook chicken in pan until cooked through', 'Slice and serve over rice', 'Add cucumber, tomatoes, hummus', 'Top with tzatziki'] },
+
+  // DINNER OPTIONS
+  { name: 'Grilled Salmon with Asparagus', type: 'dinner', calories: 520, protein: 44, carbs: 30, fat: 22, prepTime: 25, tags: ['high-protein', 'low-carb'], cuisines: ['american', 'mediterranean'], ingredients: ['6oz salmon fillet', '1 cup asparagus', '1 cup quinoa cooked', '1 lemon', '2 tbsp olive oil', '2 cloves garlic', 'fresh dill', 'salt and pepper'], instructions: ['Preheat grill or grill pan to medium-high', 'Season salmon with garlic, dill, salt, pepper', 'Toss asparagus with olive oil and salt', 'Grill salmon 4-5 min per side', 'Grill asparagus 3-4 min', 'Serve with quinoa and lemon wedges'] },
+  { name: 'Chicken Teriyaki with Rice', type: 'dinner', calories: 560, protein: 45, carbs: 58, fat: 14, prepTime: 25, tags: ['high-protein', 'meal-prep'], cuisines: ['asian'], ingredients: ['6oz chicken breast', '1 cup brown rice cooked', '1 cup stir fry vegetables', '3 tbsp teriyaki sauce', '1 tbsp sesame oil', '1 tsp ginger', 'green onions', 'sesame seeds'], instructions: ['Cook rice per package instructions', 'Slice chicken and cook in sesame oil', 'Add ginger and teriyaki sauce', 'Stir-fry vegetables separately', 'Combine and garnish with onions and sesame seeds'] },
+  { name: 'Beef and Broccoli', type: 'dinner', calories: 540, protein: 42, carbs: 44, fat: 18, prepTime: 25, tags: ['high-protein'], cuisines: ['asian'], ingredients: ['5oz lean beef strips', '2 cups broccoli', '1 cup brown rice', '3 tbsp soy sauce', '1 tbsp oyster sauce', '1 tbsp sesame oil', '3 cloves garlic', '1 tsp cornstarch'], instructions: ['Cook rice per instructions', 'Marinate beef in soy sauce and cornstarch', 'Stir-fry garlic in sesame oil', 'Add beef, cook 3-4 min', 'Add broccoli and sauces', 'Toss until coated and broccoli tender'] },
+  { name: 'Pasta Primavera with Shrimp', type: 'dinner', calories: 550, protein: 38, carbs: 62, fat: 14, prepTime: 25, tags: ['high-protein'], cuisines: ['italian'], ingredients: ['6oz shrimp', '2oz pasta', '1 cup mixed vegetables', '2 cloves garlic', '1/4 cup white wine', '1 tbsp olive oil', '2 tbsp parmesan', 'fresh basil', 'cherry tomatoes'], instructions: ['Cook pasta al dente', 'Sauté garlic in olive oil', 'Add shrimp and cook 2 min per side', 'Add vegetables and wine, simmer 3 min', 'Toss with pasta and tomatoes', 'Top with parmesan and basil'] },
+  { name: 'Turkey Meatballs with Marinara', type: 'dinner', calories: 510, protein: 40, carbs: 50, fat: 16, prepTime: 35, tags: ['high-protein', 'meal-prep'], cuisines: ['italian'], ingredients: ['6oz ground turkey', '2oz pasta', '1/2 cup marinara sauce', '1 egg', '2 tbsp breadcrumbs', '2 cloves garlic', 'fresh parsley', '2 tbsp parmesan', '1 tsp olive oil'], instructions: ['Mix turkey with egg, breadcrumbs, garlic, parsley', 'Form into 1.5 inch meatballs', 'Brown in olive oil 2 min per side', 'Simmer in marinara 15 min', 'Cook pasta, serve topped with meatballs and sauce'] },
+  { name: 'Baked Lemon Herb Chicken', type: 'dinner', calories: 490, protein: 46, carbs: 28, fat: 18, prepTime: 35, tags: ['high-protein', 'meal-prep'], cuisines: ['mediterranean', 'american'], ingredients: ['6oz chicken breast', '1 cup roasted vegetables', '1 cup quinoa cooked', '1 lemon', '3 cloves garlic', '2 tbsp olive oil', 'fresh rosemary', 'fresh thyme', 'salt and pepper'], instructions: ['Preheat oven to 400F', 'Marinate chicken with lemon, garlic, herbs, and olive oil', 'Roast vegetables with olive oil for 20 min', 'Bake chicken 22-25 min until cooked through', 'Serve with quinoa and roasted vegetables'] },
+  { name: 'Pork Tenderloin with Sweet Potato', type: 'dinner', calories: 530, protein: 40, carbs: 46, fat: 18, prepTime: 40, tags: ['high-protein', 'meal-prep'], cuisines: ['american'], ingredients: ['5oz pork tenderloin', '1 medium sweet potato', '1 cup Brussels sprouts', '2 tbsp olive oil', '2 cloves garlic', 'fresh rosemary', 'apple cider vinegar', 'salt and pepper'], instructions: ['Preheat oven to 425F', 'Season pork with garlic, rosemary, salt, pepper', 'Cube sweet potato and halve Brussels sprouts', 'Roast veggies with olive oil 25 min', 'Sear pork 2 min per side, finish in oven 15 min', 'Rest pork 5 min before slicing'] },
+  { name: 'Thai Green Curry', type: 'dinner', calories: 510, protein: 36, carbs: 48, fat: 18, prepTime: 30, tags: ['high-protein'], cuisines: ['asian'], ingredients: ['5oz chicken breast', '1 cup jasmine rice', '1 cup mixed vegetables', '1/2 cup coconut milk', '2 tbsp green curry paste', '1 tbsp fish sauce', 'fresh Thai basil', 'lime'], instructions: ['Cook rice per package', 'Cook chicken pieces in curry paste 3-4 min', 'Add coconut milk and vegetables', 'Simmer 10 min until vegetables tender', 'Season with fish sauce and lime juice', 'Serve over rice with fresh basil'] },
+  { name: 'Stuffed Bell Peppers', type: 'dinner', calories: 490, protein: 34, carbs: 48, fat: 16, prepTime: 45, tags: ['meal-prep', 'high-protein'], cuisines: ['american', 'mediterranean'], ingredients: ['2 bell peppers', '4oz ground turkey', '1/2 cup brown rice cooked', '1/2 cup black beans', '1/2 cup marinara sauce', '2oz shredded cheese', '1 tsp cumin', '1 tsp paprika'], instructions: ['Preheat oven to 375F', 'Halve and deseed peppers', 'Cook turkey with spices', 'Mix with rice, beans, and marinara', 'Fill peppers with mixture', 'Top with cheese', 'Bake 25-30 min'] },
+  { name: 'Moroccan Chicken Tagine', type: 'dinner', calories: 520, protein: 38, carbs: 50, fat: 16, prepTime: 40, tags: ['high-protein', 'meal-prep'], cuisines: ['mediterranean'], ingredients: ['6oz chicken thigh', '1 cup couscous', '1 can chickpeas', '1 cup diced tomatoes', '1/2 cup raisins', '1 tsp cinnamon', '1 tsp cumin', '1 tsp turmeric', '2 tbsp olive oil', 'fresh cilantro'], instructions: ['Brown chicken in olive oil', 'Add spices and toast 1 min', 'Add tomatoes, chickpeas, raisins, and water', 'Simmer 25 min until chicken is tender', 'Prepare couscous per package', 'Serve stew over couscous with cilantro'] },
+
+  // SNACK OPTIONS
+  { name: 'Protein Shake', type: 'snack', calories: 280, protein: 30, carbs: 22, fat: 6, prepTime: 5, tags: ['quick', 'high-protein', 'no-cook'], cuisines: ['any'], ingredients: ['1 scoop protein powder', '1 cup almond milk', '1/2 banana', '1 tbsp almond butter', 'ice'], instructions: ['Add all ingredients to blender', 'Blend until smooth', 'Serve immediately'] },
+  { name: 'Apple & Almond Butter', type: 'snack', calories: 220, protein: 6, carbs: 30, fat: 10, prepTime: 2, tags: ['quick', 'vegetarian', 'no-cook'], cuisines: ['any'], ingredients: ['1 large apple', '2 tbsp almond butter'], instructions: ['Core and slice apple', 'Serve with almond butter for dipping'] },
+  { name: 'Greek Yogurt & Honey', type: 'snack', calories: 200, protein: 18, carbs: 22, fat: 3, prepTime: 2, tags: ['quick', 'high-protein', 'no-cook'], cuisines: ['any'], ingredients: ['1 cup Greek yogurt', '1 tbsp honey', '1/4 cup berries', 'cinnamon'], instructions: ['Spoon yogurt into bowl', 'Top with berries and honey', 'Dust with cinnamon'] },
+  { name: 'Rice Cakes with Tuna', type: 'snack', calories: 200, protein: 22, carbs: 18, fat: 3, prepTime: 5, tags: ['quick', 'high-protein', 'low-fat', 'no-cook'], cuisines: ['any'], ingredients: ['2 rice cakes', '3oz canned tuna', '1 tbsp light mayo', 'cucumber slices', 'salt and pepper'], instructions: ['Mix tuna with mayo, salt, and pepper', 'Top rice cakes with tuna mixture', 'Add cucumber slices on top'] },
+  { name: 'Trail Mix', type: 'snack', calories: 260, protein: 8, carbs: 24, fat: 16, prepTime: 2, tags: ['quick', 'no-cook', 'vegan'], cuisines: ['any'], ingredients: ['2 tbsp almonds', '2 tbsp cashews', '2 tbsp dark chocolate chips', '2 tbsp dried cranberries', '1 tbsp pumpkin seeds'], instructions: ['Mix all ingredients together', 'Store in airtight container', 'Serve as needed'] },
+  { name: 'Cottage Cheese & Pineapple', type: 'snack', calories: 190, protein: 20, carbs: 20, fat: 2, prepTime: 2, tags: ['quick', 'high-protein', 'low-fat', 'no-cook'], cuisines: ['any'], ingredients: ['1/2 cup cottage cheese', '1/2 cup pineapple chunks', 'cinnamon'], instructions: ['Scoop cottage cheese into bowl', 'Top with pineapple', 'Dust with cinnamon'] },
+  { name: 'Edamame with Sea Salt', type: 'snack', calories: 180, protein: 16, carbs: 14, fat: 8, prepTime: 5, tags: ['vegetarian', 'vegan', 'high-protein'], cuisines: ['asian', 'any'], ingredients: ['1 cup edamame in pods', 'sea salt', '1 tsp sesame oil'], instructions: ['Microwave edamame 2-3 minutes', 'Toss with sesame oil and sea salt', 'Serve warm or at room temperature'] },
+  { name: 'Beef Jerky & Cheese', type: 'snack', calories: 230, protein: 22, carbs: 6, fat: 12, prepTime: 2, tags: ['quick', 'high-protein', 'no-cook', 'low-carb'], cuisines: ['american'], ingredients: ['1.5oz beef jerky', '1oz cheddar cheese', '5-6 whole grain crackers'], instructions: ['Arrange jerky, cheese, and crackers on plate', 'Serve immediately'] },
+];
+
+const generateMealPlan = (targetCalories, macros, mealsPerDay, form) => {
+  const mealDistributions = {
+    1: [{ type: 'dinner', ratio: 1.0, label: 'Main Meal' }],
+    2: [{ type: 'breakfast', ratio: 0.40, label: 'Breakfast' }, { type: 'dinner', ratio: 0.60, label: 'Dinner' }],
+    3: [{ type: 'breakfast', ratio: 0.28, label: 'Breakfast' }, { type: 'lunch', ratio: 0.35, label: 'Lunch' }, { type: 'dinner', ratio: 0.37, label: 'Dinner' }],
+    4: [{ type: 'breakfast', ratio: 0.22, label: 'Breakfast' }, { type: 'lunch', ratio: 0.28, label: 'Lunch' }, { type: 'dinner', ratio: 0.32, label: 'Dinner' }, { type: 'snack', ratio: 0.18, label: 'Snack' }],
+    5: [{ type: 'breakfast', ratio: 0.20, label: 'Breakfast' }, { type: 'snack', ratio: 0.12, label: 'Morning Snack' }, { type: 'lunch', ratio: 0.25, label: 'Lunch' }, { type: 'dinner', ratio: 0.30, label: 'Dinner' }, { type: 'snack', ratio: 0.13, label: 'Evening Snack' }],
+    6: [{ type: 'breakfast', ratio: 0.18, label: 'Breakfast' }, { type: 'snack', ratio: 0.11, label: 'Snack 1' }, { type: 'lunch', ratio: 0.22, label: 'Lunch' }, { type: 'snack', ratio: 0.11, label: 'Snack 2' }, { type: 'dinner', ratio: 0.27, label: 'Dinner' }, { type: 'snack', ratio: 0.11, label: 'Snack 3' }],
+  };
+
+  const distribution = mealDistributions[Math.min(6, Math.max(1, mealsPerDay))] || mealDistributions[3];
+
+  const forbiddenKeywords = parseRestrictions(form.restrictions || form.allergies || '');
+
+  const scoreMeal = (meal) => {
+    let score = Math.random() * 0.3;
+    if ((form.secondaryGoals || []).includes('build-muscle') || form.trainingType === 'strength') {
+      score += (meal.protein / meal.calories) * 200;
+    }
+    if (form.dietStyle === 'low-carb' || form.dietStyle === 'keto') {
+      score += meal.tags.includes('low-carb') ? 1.5 : 0;
+    }
+    if (form.dietStyle === 'plant-based') {
+      score += meal.tags.includes('vegetarian') ? 2 : (meal.tags.includes('vegan') ? 3 : -1);
+    }
+    if (form.cookTime === 'quick') {
+      score += meal.prepTime <= 15 ? 1 : 0;
+    }
+    if (form.cuisines && form.cuisines.length > 0) {
+      const hasMatch = meal.cuisines.some(c => form.cuisines.includes(c) || c === 'any');
+      score += hasMatch ? 0.8 : 0;
+    }
+    return score;
+  };
+
+  const usedMealNames = new Set();
+
+  return distribution.map((slot) => {
+    const targetSlotCalories = Math.round(targetCalories * slot.ratio);
+
+    const eligible = MEAL_DATABASE.filter(meal => {
+      if (meal.type !== slot.type) return false;
+      if (usedMealNames.has(meal.name)) return false;
+      return isMealAllowed(meal, forbiddenKeywords);
+    });
+
+    let selectedMeal = null;
+
+    if (eligible.length >= 2) {
+      const scored = eligible.map(m => ({ ...m, score: scoreMeal(m) })).sort((a, b) => b.score - a.score);
+      const pool = scored.slice(0, Math.min(5, scored.length));
+      selectedMeal = pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    if (!selectedMeal) {
+      const proteins = ['chicken breast', 'salmon', 'turkey breast', 'eggs', 'lean beef', 'shrimp', 'tuna', 'greek yogurt'];
+      const carbs = ['brown rice', 'quinoa', 'sweet potato', 'oats', 'pasta', 'whole grain toast'];
+      const veggies = ['broccoli', 'spinach', 'mixed vegetables', 'asparagus', 'stir fry vegetables'];
+      const fats = ['olive oil', 'avocado', 'almond butter', 'peanut butter'];
+      const cookMethods = ['Grilled', 'Baked', 'Pan-Seared', 'Roasted', 'Steamed'];
+
+      const protein = proteins[Math.floor(Math.random() * proteins.length)];
+      const carb = slot.type === 'snack' ? null : carbs[Math.floor(Math.random() * carbs.length)];
+      const veggie = slot.type === 'snack' ? null : veggies[Math.floor(Math.random() * veggies.length)];
+      const fat = fats[Math.floor(Math.random() * fats.length)];
+      const cookMethod = cookMethods[Math.floor(Math.random() * cookMethods.length)];
+
+      const mealName = slot.type === 'snack'
+        ? `${protein.charAt(0).toUpperCase() + protein.slice(1)} Snack`
+        : `${cookMethod} ${protein.charAt(0).toUpperCase() + protein.slice(1)}`;
+
+      const ingredients = [
+        slot.type !== 'snack' ? `6oz ${protein}` : `3oz ${protein}`,
+        carb ? `1 cup ${carb}` : null,
+        veggie ? `1 cup ${veggie}` : null,
+        `1 tbsp ${fat}`,
+        'salt and pepper',
+        'garlic and herbs'
+      ].filter(Boolean);
+
+      selectedMeal = {
+        name: mealName,
+        type: slot.type,
+        calories: targetSlotCalories,
+        protein: Math.round(macros.protein * slot.ratio),
+        carbs: Math.round(macros.carbs * slot.ratio),
+        fat: Math.round(macros.fat * slot.ratio),
+        prepTime: 20,
+        tags: ['balanced'],
+        cuisines: ['any'],
+        ingredients,
+        instructions: [
+          `Prepare ${protein} using your preferred method`,
+          carb ? `Cook ${carb} per package instructions` : null,
+          veggie ? `Steam or sauté ${veggie} until tender` : null,
+          'Season with salt, pepper, and herbs',
+          'Combine and serve hot'
+        ].filter(Boolean)
+      };
+    }
+
+    const scale = targetSlotCalories / selectedMeal.calories;
+    const scaledMeal = {
+      ...selectedMeal,
+      calories: targetSlotCalories,
+      protein: Math.round(selectedMeal.protein * scale),
+      carbs: Math.round(selectedMeal.carbs * scale),
+      fat: Math.round(selectedMeal.fat * scale),
+    };
+
+    usedMealNames.add(selectedMeal.name);
+    return scaledMeal;
+  });
+};
+
+// ========== END MEAL DATABASE + PLAN GENERATOR ==========
 
 export default function App() {
   // ========== API CONFIGURATION ==========
@@ -993,7 +1160,7 @@ export default function App() {
    */
   
   /**
-   * Migration map: Old goal format → New two-layer format
+   * Migration map: Old goal format â†’ New two-layer format
    */
   const GOAL_MIGRATION_MAP = {
     'fat-loss': { primaryGoal: 'lose', secondaryGoals: [] },
@@ -1174,9 +1341,9 @@ export default function App() {
 
   // Achievement System
   const [achievements, setAchievements] = useState([
-    {id: 'first-plan', name: 'First Steps', desc: 'Generate your first meal plan', icon: '🎯', unlocked: false, progress: 0, target: 1},
-    {id: 'week-streak', name: 'Week Warrior', desc: 'Track meals for 7 days', icon: '🔥', unlocked: false, progress: 0, target: 7},
-    {id: 'macro-master', name: 'Macro Master', desc: 'Hit your macros 5 times', icon: '🎯', unlocked: false, progress: 0, target: 5},
+    {id: 'first-plan', name: 'First Steps', desc: 'Generate your first meal plan', icon: 'ðŸŽ¯', unlocked: false, progress: 0, target: 1},
+    {id: 'week-streak', name: 'Week Warrior', desc: 'Track meals for 7 days', icon: 'ðŸ”¥', unlocked: false, progress: 0, target: 7},
+    {id: 'macro-master', name: 'Macro Master', desc: 'Hit your macros 5 times', icon: 'ðŸŽ¯', unlocked: false, progress: 0, target: 5},
   ]);
   const [showAchievement, setShowAchievement] = useState(null);
   const [toasts, setToasts] = useState([]);
@@ -1790,7 +1957,7 @@ export default function App() {
     if (Math.abs(variance) < 0.15) {
       return {
         status: 'on-track',
-        message: '🎯 Perfect! Your progress is right on target.',
+        message: 'ðŸŽ¯ Perfect! Your progress is right on target.',
         adjustment: 0,
         confidence: 'high'
       };
@@ -1901,7 +2068,7 @@ export default function App() {
       showToast('Removed from favorites', 'info');
     } else {
       setFavs([...favs, {...meal, key: mealKey, savedAt: new Date()}]);
-      showToast('Added to favorites! ❤️', 'success');
+      showToast('Added to favorites! â¤ï¸', 'success');
     }
   };
 
@@ -2224,7 +2391,7 @@ export default function App() {
   const addWater = () => {
     setDailyLog({...dailyLog, water: dailyLog.water + 1});
     if ((dailyLog.water + 1) >= 8) {
-      showToast('Water goal reached! 💧', 'success');
+      showToast('Water goal reached! ðŸ’§', 'success');
     }
   };
 
@@ -2244,7 +2411,7 @@ export default function App() {
       totalCarbs: 0,
       totalFat: 0
     });
-    showToast('Day logged! Great job! 🎉', 'success');
+    showToast('Day logged! Great job! ðŸŽ‰', 'success');
   };
 
   // ========== MICRONUTRIENT ANALYSIS ENGINE (ADDITIVE, ISOLATED) ==========
@@ -2521,7 +2688,7 @@ export default function App() {
         prepTime: 25,
         microStrengths: ['vitaminB12', 'iron', 'magnesium'],
         ingredients: ['shrimp', 'brown rice', 'black beans', 'salsa', 'cilantro'],
-        instructions: ['Cook rice and beans', 'Sauté shrimp', 'Assemble bowl', 'Top with salsa']
+        instructions: ['Cook rice and beans', 'SautÃ© shrimp', 'Assemble bowl', 'Top with salsa']
       },
       
       // Lighter Options
@@ -2541,7 +2708,7 @@ export default function App() {
         prepTime: 10,
         microStrengths: ['vitaminA', 'vitaminC', 'potassium'],
         ingredients: ['egg whites', 'spinach', 'mushrooms', 'tomatoes', 'whole grain toast'],
-        instructions: ['Sauté vegetables', 'Add egg whites', 'Scramble until cooked', 'Serve with toast']
+        instructions: ['SautÃ© vegetables', 'Add egg whites', 'Scramble until cooked', 'Serve with toast']
       },
       
       // Faster Prep
@@ -2712,7 +2879,7 @@ export default function App() {
     }
     // Water/hydration
     else if (query.includes('water') || query.includes('hydrat')) {
-      response = `Aim for ${Math.round(form.weight / 2)} oz daily (bodyweight ÷ 2). More if you're training hard or it's hot. Track it in the daily tracker!`;
+      response = `Aim for ${Math.round(form.weight / 2)} oz daily (bodyweight Ã· 2). More if you're training hard or it's hot. Track it in the daily tracker!`;
     }
     // Sleep
     else if (query.includes('sleep')) {
@@ -2750,7 +2917,7 @@ export default function App() {
       response = `Welcome! You're set up for ${form.goals} with ${plan.calories} calories and ${plan.protein}g protein daily. Start by following your meal plan, use the grocery list feature, and track daily in the tracker. Questions? Just ask!`;
     }
     else if (query.includes('thanks') || query.includes('thank')) {
-      response = "You're welcome! Remember, consistency beats perfection. You've got this! 💪";
+      response = "You're welcome! Remember, consistency beats perfection. You've got this! ðŸ’ª";
     }
     // Default intelligent response
     else {
@@ -2982,7 +3149,7 @@ export default function App() {
       const daysToExport = 7; // Export 7 days
       let text = `MEAL PLAN\n`;
       text += `Calories: ${Math.round(planToExport.calories || 0).toLocaleString()} / day\n`;
-      text += `Macros: ${Math.round(planToExport.protein || 0)}g Protein • ${Math.round(planToExport.carbs || 0)}g Carbs • ${Math.round(planToExport.fat || 0)}g Fat\n\n`;
+      text += `Macros: ${Math.round(planToExport.protein || 0)}g Protein â€¢ ${Math.round(planToExport.carbs || 0)}g Carbs â€¢ ${Math.round(planToExport.fat || 0)}g Fat\n\n`;
       
       if (!planToExport.meals || planToExport.meals.length === 0) {
         text += `No meals in plan.\n`;
@@ -3073,9 +3240,9 @@ export default function App() {
           confidence: 'high'
         };
       }
-      // Check if this is a food item (starts with -, •, or number)
-      else if (currentMeal && (line.startsWith('-') || line.startsWith('•') || /^\d/.test(line))) {
-        let foodName = line.replace(/^[-•\d.)\s]+/, '').trim();
+      // Check if this is a food item (starts with -, â€¢, or number)
+      else if (currentMeal && (line.startsWith('-') || line.startsWith('â€¢') || /^\d/.test(line))) {
+        let foodName = line.replace(/^[-â€¢\d.)\s]+/, '').trim();
         let portion = '';
         
         // Try to extract portion
@@ -3417,7 +3584,7 @@ export default function App() {
       case 'copy':
       default:
         // Checklist format
-        formatted = '🛒 GROCERY LIST\n\n';
+        formatted = 'ðŸ›’ GROCERY LIST\n\n';
         
         const categories = [...new Set(groceryList.map(i => i.category))];
         categories.forEach(category => {
@@ -3425,7 +3592,7 @@ export default function App() {
           groceryList
             .filter(i => i.category === category && !i.checked)
             .forEach(item => {
-              formatted += `☐ ${item.name} - ${item.quantity}\n`;
+              formatted += `â˜ ${item.name} - ${item.quantity}\n`;
             });
           formatted += '\n';
         });
@@ -3496,7 +3663,7 @@ export default function App() {
       time: 30,
       difficulty: 'Easy',
       ingredients: ['chicken breast', 'broccoli', 'garlic', 'olive oil', 'herbs'],
-      instructions: ['Preheat oven to 400°F', 'Season chicken with garlic and herbs', 'Roast chicken and broccoli for 25 minutes', 'Serve hot'],
+      instructions: ['Preheat oven to 400Â°F', 'Season chicken with garlic and herbs', 'Roast chicken and broccoli for 25 minutes', 'Serve hot'],
       macros: { calories: 380, protein: 42, carbs: 12, fat: 18 }
     },
     {
@@ -3512,7 +3679,7 @@ export default function App() {
       time: 25,
       difficulty: 'Medium',
       ingredients: ['chicken breast', 'pasta', 'cheese', 'garlic', 'cream'],
-      instructions: ['Cook pasta according to package', 'Sauté chicken until golden', 'Add cream and cheese', 'Toss with pasta', 'Garnish and serve'],
+      instructions: ['Cook pasta according to package', 'SautÃ© chicken until golden', 'Add cream and cheese', 'Toss with pasta', 'Garnish and serve'],
       macros: { calories: 520, protein: 38, carbs: 52, fat: 18 }
     },
     // Egg recipes
@@ -3521,7 +3688,7 @@ export default function App() {
       time: 15,
       difficulty: 'Easy',
       ingredients: ['eggs', 'broccoli', 'cheese', 'onions', 'tomatoes'],
-      instructions: ['Whisk eggs with cheese', 'Sauté vegetables', 'Pour eggs over vegetables', 'Cook until set', 'Slice and serve'],
+      instructions: ['Whisk eggs with cheese', 'SautÃ© vegetables', 'Pour eggs over vegetables', 'Cook until set', 'Slice and serve'],
       macros: { calories: 280, protein: 22, carbs: 8, fat: 18 }
     },
     {
@@ -3538,7 +3705,7 @@ export default function App() {
       time: 20,
       difficulty: 'Easy',
       ingredients: ['pasta', 'tomatoes', 'garlic', 'olive oil', 'cheese'],
-      instructions: ['Boil pasta', 'Sauté garlic in olive oil', 'Add diced tomatoes', 'Toss with pasta', 'Top with cheese'],
+      instructions: ['Boil pasta', 'SautÃ© garlic in olive oil', 'Add diced tomatoes', 'Toss with pasta', 'Top with cheese'],
       macros: { calories: 420, protein: 14, carbs: 68, fat: 12 }
     },
     {
@@ -3563,7 +3730,7 @@ export default function App() {
       time: 35,
       difficulty: 'Medium',
       ingredients: ['rice', 'cheese', 'broccoli', 'onions', 'cream'],
-      instructions: ['Cook rice', 'Mix with cheese and cream', 'Add vegetables', 'Bake at 375°F for 20 minutes', 'Let cool slightly'],
+      instructions: ['Cook rice', 'Mix with cheese and cream', 'Add vegetables', 'Bake at 375Â°F for 20 minutes', 'Let cool slightly'],
       macros: { calories: 420, protein: 18, carbs: 48, fat: 18 }
     },
     // Simple quick meals
@@ -3576,11 +3743,11 @@ export default function App() {
       macros: { calories: 220, protein: 12, carbs: 8, fat: 16 }
     },
     {
-      title: 'Garlic Sautéed Broccoli',
+      title: 'Garlic SautÃ©ed Broccoli',
       time: 10,
       difficulty: 'Easy',
       ingredients: ['broccoli', 'garlic', 'olive oil'],
-      instructions: ['Cut broccoli into florets', 'Heat olive oil', 'Add garlic and broccoli', 'Sauté until tender', 'Season and serve'],
+      instructions: ['Cut broccoli into florets', 'Heat olive oil', 'Add garlic and broccoli', 'SautÃ© until tender', 'Season and serve'],
       macros: { calories: 120, protein: 4, carbs: 12, fat: 7 }
     },
     {
@@ -3916,7 +4083,7 @@ export default function App() {
             }
             
             // Step 3: Apply allergen/restriction filtering (hard filter)
-            const restrictionString = preferences.restrictions || preferences.allergies || '';
+            const restrictionString = form.restrictions || form.allergies || '';
             const forbiddenKeywords = parseRestrictions(restrictionString);
             
             // Check if recipe contains any allergen/restriction
@@ -4068,13 +4235,16 @@ export default function App() {
       showToast('No missing ingredients!', 'info');
       return;
     }
-    
-    // Add recipe header to grocery list
-    const recipeHeader = `--- ${recipe.title} ---`;
-    const updatedList = groceryList + '\n\n' + recipeHeader + '\n' + 
-      recipe.missingIngredients.map(ing => `• ${ing}`).join('\n');
-    
-    setGroceryList(updatedList);
+    const newItems = recipe.missingIngredients.map(ing => ({
+      id: Math.random().toString(36).substr(2, 9),
+      name: ing,
+      quantity: '1 serving',
+      category: categorizeIngredient(ing),
+      checked: false,
+      alreadyHave: false,
+      usedInMeals: 1
+    }));
+    setGroceryList(prev => [...prev, ...newItems]);
     showToast(`Added ${recipe.missingIngredients.length} items to grocery list!`, 'success');
   };
   
@@ -4197,7 +4367,7 @@ export default function App() {
     const targetCalories = plan?.calories || actualTDEE;
     const avgDailyBalance = avgDailyIntake - targetCalories;
     
-    // Weight change forecast using 3500 cal ≈ 1 lb rule
+    // Weight change forecast using 3500 cal â‰ˆ 1 lb rule
     const forecastDays = 14;
     const totalBalanceOver14Days = avgDailyBalance * forecastDays;
     const expectedWeightChange = totalBalanceOver14Days / 3500; // in lbs
@@ -4296,7 +4466,7 @@ export default function App() {
   
   // ========== NUTRIENT SUPPORT SUGGESTIONS (ADDITIVE) ==========
   
-  // Nutrient → Food sources mapping
+  // Nutrient â†’ Food sources mapping
   const NUTRIENT_FOOD_SOURCES = {
     vitaminC: {
       name: 'Vitamin C',
@@ -4480,209 +4650,6 @@ export default function App() {
   
   // ========== END NUTRIENT SUPPORT SUGGESTIONS ==========
   
-  // Generate meal plan
-  // ========== BUG FIX: INGREDIENT-BASED MACRO CALCULATIONS ==========
-  
-  /**
-   * Ingredient nutrition lookup table
-   * Values are per standard serving size indicated
-   */
-  const INGREDIENT_NUTRITION = {
-    // Proteins (per oz cooked unless noted)
-    'lean beef, cooked': { protein: 7, carbs: 0, fat: 3, unit: 'oz' },
-    'chicken breast, cooked': { protein: 8, carbs: 0, fat: 1.5, unit: 'oz' },
-    'turkey breast, cooked': { protein: 8, carbs: 0, fat: 1, unit: 'oz' },
-    'salmon, cooked': { protein: 7, carbs: 0, fat: 4, unit: 'oz' },
-    'ground turkey': { protein: 7, carbs: 0, fat: 3, unit: 'oz' },
-    
-    // Eggs & Dairy
-    'eggs': { protein: 6, carbs: 0.5, fat: 5, unit: 'egg' },
-    'greek yogurt': { protein: 10, carbs: 6, fat: 0, unit: 'cup' },
-    'milk': { protein: 8, carbs: 12, fat: 8, unit: 'cup' },
-    'yogurt': { protein: 6, carbs: 9, fat: 0.5, unit: 'cup' },
-    'parmesan': { protein: 2, carbs: 0, fat: 1.5, unit: 'tbsp' },
-    
-    // Grains & Carbs (per cup cooked unless noted)
-    'brown rice, cooked': { protein: 5, carbs: 45, fat: 2, unit: 'cup' },
-    'white rice, cooked': { protein: 4, carbs: 45, fat: 0.5, unit: 'cup' },
-    'rice, cooked': { protein: 4, carbs: 45, fat: 0.5, unit: 'cup' },
-    'quinoa, cooked': { protein: 8, carbs: 39, fat: 4, unit: 'cup' },
-    'pasta, cooked': { protein: 8, carbs: 43, fat: 1, unit: 'cup' },
-    'oats, dry': { protein: 5, carbs: 27, fat: 3, unit: 'cup' },
-    'sweet potato': { protein: 2, carbs: 27, fat: 0, unit: 'potato' },
-    'toast': { protein: 3, carbs: 15, fat: 1, unit: 'slice' },
-    'tortilla': { protein: 3, carbs: 25, fat: 3, unit: 'tortilla' },
-    'granola': { protein: 3, carbs: 30, fat: 7, unit: 'cup' },
-    
-    // Vegetables (per cup)
-    'vegetables': { protein: 2, carbs: 10, fat: 0, unit: 'cup' },
-    'stir fry vegetables': { protein: 2, carbs: 10, fat: 0, unit: 'cup' },
-    'mixed vegetables': { protein: 2, carbs: 10, fat: 0, unit: 'cup' },
-    'asparagus': { protein: 3, carbs: 5, fat: 0, unit: 'cup' },
-    'broccoli': { protein: 3, carbs: 6, fat: 0, unit: 'cup' },
-    'roasted vegetables': { protein: 2, carbs: 12, fat: 2, unit: 'cup' },
-    'lettuce, tomato': { protein: 1, carbs: 3, fat: 0, unit: 'cup' },
-    
-    // Fruits
-    'banana': { protein: 1, carbs: 27, fat: 0, unit: 'banana' },
-    'berries': { protein: 1, carbs: 15, fat: 0, unit: 'cup' },
-    'apple': { protein: 0, carbs: 25, fat: 0, unit: 'apple' },
-    
-    // Fats & Oils
-    'avocado': { protein: 1, carbs: 4, fat: 7, unit: 'avocado' },
-    'olive oil': { protein: 0, carbs: 0, fat: 14, unit: 'tbsp' },
-    'almond butter': { protein: 3, carbs: 3, fat: 9, unit: 'tbsp' },
-    'peanut butter': { protein: 4, carbs: 4, fat: 8, unit: 'tbsp' },
-    
-    // Protein Supplements
-    'protein powder': { protein: 25, carbs: 3, fat: 2, unit: 'scoop' },
-    'protein': { protein: 25, carbs: 3, fat: 2, unit: 'scoop' },
-    
-    // Sauces & Condiments (negligible - assign minimal values)
-    'teriyaki sauce': { protein: 1, carbs: 3, fat: 0, unit: 'tbsp' },
-    'soy sauce': { protein: 1, carbs: 1, fat: 0, unit: 'tbsp' },
-    'marinara sauce': { protein: 1, carbs: 6, fat: 1, unit: 'cup' },
-    'tahini dressing': { protein: 3, carbs: 4, fat: 8, unit: 'tbsp' },
-    'mustard': { protein: 0, carbs: 1, fat: 0, unit: 'tbsp' },
-    'honey drizzle': { protein: 0, carbs: 17, fat: 0, unit: 'tbsp' },
-    'lemon': { protein: 0, carbs: 3, fat: 0, unit: 'lemon' },
-    
-    // Misc
-    'ice': { protein: 0, carbs: 0, fat: 0, unit: 'cup' },
-    'meatballs': { protein: 7, carbs: 2, fat: 5, unit: 'oz' }
-  };
-  
-  /**
-   * Parse ingredient line to extract quantity, unit, and name
-   * Handles formats like: "6oz chicken breast", "1 cup rice", "2 tbsp almond butter"
-   */
-  const parseIngredientLine = (line) => {
-    if (!line || typeof line !== 'string') {
-      return { qty: 1, unit: '', name: line || '' };
-    }
-    
-    const normalized = line.toLowerCase().trim();
-    
-    // Pattern 1: "6oz lean beef" or "170g yogurt"
-    const pattern1 = /^(\d+\.?\d*)\s*(oz|g|kg|lb|lbs)\s+(.+)$/;
-    const match1 = normalized.match(pattern1);
-    if (match1) {
-      let qty = parseFloat(match1[1]);
-      const unit = match1[2];
-      const name = match1[3];
-      
-      // Convert g to oz for consistency (28g = 1oz)
-      if (unit === 'g' && qty > 10) {
-        qty = qty / 28.35;
-      }
-      
-      return { qty, unit: 'oz', name };
-    }
-    
-    // Pattern 2: "1 cup rice", "2 scoops protein"
-    const pattern2 = /^(\d+\.?\d*)\s+(cup|cups|scoop|scoops|slice|slices|tbsp|tablespoon|tablespoons|egg|eggs|banana|bananas|apple|apples|potato|potatoes|tortilla|tortillas|avocado|avocados|lemon|lemons)\s+(.+)$/;
-    const match2 = normalized.match(pattern2);
-    if (match2) {
-      const qty = parseFloat(match2[1]);
-      let unit = match2[2];
-      const name = match2[3];
-      
-      // Normalize plural units
-      const unitMap = {
-        'cups': 'cup',
-        'scoops': 'scoop',
-        'slices': 'slice',
-        'tablespoons': 'tbsp',
-        'tablespoon': 'tbsp',
-        'eggs': 'egg',
-        'bananas': 'banana',
-        'apples': 'apple',
-        'potatoes': 'potato',
-        'tortillas': 'tortilla',
-        'avocados': 'avocado',
-        'lemons': 'lemon'
-      };
-      unit = unitMap[unit] || unit;
-      
-      return { qty, unit, name };
-    }
-    
-    // Pattern 3: "1.5 cups Greek yogurt" (number with decimal and space)
-    const pattern3 = /^(\d+\.?\d*)\s+(.+)$/;
-    const match3 = normalized.match(pattern3);
-    if (match3) {
-      const qty = parseFloat(match3[1]);
-      const rest = match3[2];
-      
-      // Check if rest starts with a unit
-      const units = ['cup', 'cups', 'scoop', 'scoops', 'oz', 'g', 'slice', 'slices', 'tbsp', 'tablespoon', 'tablespoons'];
-      for (const unit of units) {
-        if (rest.startsWith(unit + ' ')) {
-          const name = rest.substring(unit.length + 1);
-          const normalizedUnit = unit === 'cups' ? 'cup' : unit === 'scoops' ? 'scoop' : unit === 'slices' ? 'slice' : unit === 'tablespoons' || unit === 'tablespoon' ? 'tbsp' : unit;
-          return { qty, unit: normalizedUnit, name };
-        }
-      }
-      
-      // No unit found, treat whole rest as name with qty
-      return { qty, unit: '', name: rest };
-    }
-    
-    // Default: treat entire line as ingredient name with qty=1
-    return { qty: 1, unit: '', name: normalized };
-  };
-  
-  /**
-   * Find best matching ingredient in nutrition database
-   * Uses fuzzy matching for ingredient names
-   */
-  const findIngredientNutrition = (parsedName) => {
-    const name = parsedName.toLowerCase().trim();
-    
-    // Exact match first
-    if (INGREDIENT_NUTRITION[name]) {
-      return { ...INGREDIENT_NUTRITION[name], matchedKey: name };
-    }
-    
-    // Partial match - check if any key contains the search term or vice versa
-    const keys = Object.keys(INGREDIENT_NUTRITION);
-    
-    // Try to find key that contains the name
-    for (const key of keys) {
-      if (key.includes(name) || name.includes(key.split(',')[0])) {
-        return { ...INGREDIENT_NUTRITION[key], matchedKey: key };
-      }
-    }
-    
-    // Check for common synonyms
-    const synonyms = {
-      'chicken': 'chicken breast, cooked',
-      'turkey': 'turkey breast, cooked',
-      'beef': 'lean beef, cooked',
-      'fish': 'salmon, cooked',
-      'rice': 'rice, cooked',
-      'bread': 'toast',
-      'veggies': 'vegetables',
-      'veggie': 'vegetables',
-      'fruit': 'berries'
-    };
-    
-    for (const [syn, target] of Object.entries(synonyms)) {
-      if (name.includes(syn)) {
-        return { ...INGREDIENT_NUTRITION[target], matchedKey: target };
-      }
-    }
-    
-    // No match found - return null
-    return null;
-  };
-  
-  /**
-   * Compute meal macros by summing ingredient contributions
-   * Returns { protein, carbs, fat, calories }
-   */
-  // Duplicate removed - using confidence-aware version above
-  
   // ========== BUG FIX: RESTRICTION FILTERING ==========
   
   /**
@@ -4811,7 +4778,7 @@ export default function App() {
       console.log(`\n${meal.name}:`);
       console.log(`  Ingredients: ${meal.ingredients.join(', ')}`);
       console.log(`  Computed: ${computed.protein}p / ${computed.carbs}c / ${computed.fat}f = ${computed.calories} cal`);
-      console.log(`  4/4/9 Check: ${calorieCheck} cal (${calorieMatch ? '✓ PASS' : '✗ FAIL'})`);
+      console.log(`  4/4/9 Check: ${calorieCheck} cal (${calorieMatch ? 'âœ“ PASS' : 'âœ— FAIL'})`);
     });
     
     console.log('\n=== END TEST ===');
@@ -4849,7 +4816,7 @@ export default function App() {
       
       testCase.meals.forEach(meal => {
         const allowed = isMealAllowed(meal, forbidden);
-        console.log(`  ${meal.name}: ${allowed ? '✓ ALLOWED' : '✗ BLOCKED'}`);
+        console.log(`  ${meal.name}: ${allowed ? 'âœ“ ALLOWED' : 'âœ— BLOCKED'}`);
       });
     });
     
@@ -4864,412 +4831,6 @@ export default function App() {
   
   // ========== END BUG FIXES ==========
 
-  const generateMealPlan = (calories, macros, mealsPerDay, preferences) => {
-    // Distribute calories across meals
-    const caloriesPerMeal = Math.round(calories / mealsPerDay);
-    const proteinPerMeal = Math.round(macros.protein / mealsPerDay);
-    const carbsPerMeal = Math.round(macros.carbs / mealsPerDay);
-    const fatPerMeal = Math.round(macros.fat / mealsPerDay);
-    
-    // BUGFIX: Parse and expand restrictions
-    const restrictionString = preferences.restrictions || preferences.allergies || '';
-    const forbiddenKeywords = parseRestrictions(restrictionString);
-    
-    // Meal templates with personalization metadata
-    const mealDatabase = {
-      breakfast: [
-        {
-          name: 'Protein Pancakes',
-          base: { calories: 450, protein: 35, carbs: 52, fat: 12 },
-          ingredients: ['2 scoops protein powder', '2 eggs', '1 banana', '1/4 cup oats'],
-          instructions: ['Mix all ingredients', 'Cook on griddle', 'Top with berries'],
-          prepTime: 15,
-          tags: ['high-protein', 'vegetarian'],
-          bestFor: ['build-muscle', 'gain']
-        },
-        {
-          name: 'Greek Yogurt Bowl',
-          base: { calories: 380, protein: 30, carbs: 45, fat: 8 },
-          ingredients: ['1.5 cups Greek yogurt', '1/2 cup granola', '1 cup berries', 'Honey drizzle'],
-          instructions: ['Layer yogurt in bowl', 'Top with granola and berries', 'Drizzle honey'],
-          prepTime: 5,
-          tags: ['quick', 'high-protein', 'vegetarian'],
-          bestFor: ['lose', 'maintain', 'general-health']
-        },
-        {
-          name: 'Veggie Egg Scramble',
-          base: { calories: 420, protein: 32, carbs: 38, fat: 15 },
-          ingredients: ['4 eggs', '1 cup vegetables', '2 slices toast', '1/4 avocado'],
-          instructions: ['Scramble eggs with vegetables', 'Serve with toast', 'Add avocado'],
-          prepTime: 12,
-          tags: ['balanced', 'vegetarian', 'nutrient-dense'],
-          bestFor: ['lose', 'maintain', 'general-health']
-        },
-        {
-          name: 'Egg White Omelet',
-          base: { calories: 320, protein: 28, carbs: 30, fat: 8 },
-          ingredients: ['6 egg whites', '1 cup vegetables', '2 slices whole wheat toast', '1 tsp olive oil'],
-          instructions: ['Whisk egg whites', 'Cook with vegetables', 'Serve with toast'],
-          prepTime: 10,
-          tags: ['high-protein', 'low-fat', 'low-calorie'],
-          bestFor: ['lose', 'improve-performance']
-        },
-        {
-          name: 'Oatmeal with Protein',
-          base: { calories: 480, protein: 32, carbs: 62, fat: 12 },
-          ingredients: ['1 cup oats', '1 scoop protein powder', '1/2 cup berries', '1 tbsp almond butter'],
-          instructions: ['Cook oats', 'Mix in protein powder', 'Top with berries and almond butter'],
-          prepTime: 8,
-          tags: ['high-carb', 'moderate-protein', 'endurance'],
-          bestFor: ['improve-endurance', 'improve-performance', 'gain']
-        },
-        {
-          name: 'Breakfast Burrito',
-          base: { calories: 580, protein: 38, carbs: 58, fat: 20 },
-          ingredients: ['3 eggs', '1 large tortilla', '2oz turkey sausage', '1/4 cup cheese', 'Salsa'],
-          instructions: ['Scramble eggs', 'Cook sausage', 'Wrap in tortilla with cheese', 'Top with salsa'],
-          prepTime: 15,
-          tags: ['high-protein', 'high-calorie', 'filling'],
-          bestFor: ['gain', 'build-muscle']
-        }
-      ],
-      lunch: [
-        {
-          name: 'Chicken & Rice Bowl',
-          base: { calories: 650, protein: 55, carbs: 75, fat: 15 },
-          ingredients: ['6oz chicken breast', '1 cup brown rice', 'Mixed vegetables', 'Teriyaki sauce'],
-          instructions: ['Grill chicken', 'Cook rice', 'Steam vegetables', 'Combine with sauce'],
-          prepTime: 30,
-          tags: ['high-protein', 'high-carb', 'balanced'],
-          bestFor: ['gain', 'build-muscle', 'improve-endurance']
-        },
-        {
-          name: 'Turkey Wrap',
-          base: { calories: 480, protein: 42, carbs: 48, fat: 12 },
-          ingredients: ['5oz turkey breast', 'Large tortilla', 'Lettuce, tomato', 'Mustard'],
-          instructions: ['Layer turkey and vegetables', 'Add condiments', 'Roll tightly'],
-          prepTime: 8,
-          tags: ['quick', 'high-protein', 'low-fat'],
-          bestFor: ['lose', 'maintain', 'improve-performance']
-        },
-        {
-          name: 'Quinoa Power Bowl',
-          base: { calories: 620, protein: 42, carbs: 70, fat: 18 },
-          ingredients: ['1.5 cups quinoa', 'Grilled chicken', 'Roasted vegetables', 'Tahini dressing'],
-          instructions: ['Cook quinoa', 'Grill chicken', 'Roast vegetables', 'Drizzle dressing'],
-          prepTime: 25,
-          tags: ['balanced', 'nutrient-dense', 'plant-forward'],
-          bestFor: ['maintain', 'general-health']
-        },
-        {
-          name: 'Grilled Chicken Salad',
-          base: { calories: 420, protein: 48, carbs: 28, fat: 14 },
-          ingredients: ['6oz grilled chicken', 'Mixed greens', 'Cherry tomatoes', 'Balsamic vinaigrette'],
-          instructions: ['Grill chicken', 'Toss greens and vegetables', 'Top with chicken', 'Dress lightly'],
-          prepTime: 15,
-          tags: ['high-protein', 'low-calorie', 'low-carb'],
-          bestFor: ['lose', 'improve-performance']
-        },
-        {
-          name: 'Tuna Salad Bowl',
-          base: { calories: 380, protein: 42, carbs: 32, fat: 10 },
-          ingredients: ['1 can tuna', 'Mixed greens', 'Cucumber', 'Light mayo', 'Whole grain crackers'],
-          instructions: ['Mix tuna with mayo', 'Serve over greens', 'Add vegetables', 'Side crackers'],
-          prepTime: 5,
-          tags: ['quick', 'high-protein', 'low-calorie'],
-          bestFor: ['lose', 'maintain']
-        },
-        {
-          name: 'Beef Burrito Bowl',
-          base: { calories: 720, protein: 52, carbs: 78, fat: 22 },
-          ingredients: ['6oz lean beef', '1 cup rice', 'Black beans', 'Cheese', 'Guacamole'],
-          instructions: ['Cook beef', 'Prepare rice', 'Layer ingredients', 'Top with guacamole'],
-          prepTime: 20,
-          tags: ['high-protein', 'high-calorie', 'high-carb'],
-          bestFor: ['gain', 'build-muscle']
-        }
-      ],
-      dinner: [
-        {
-          name: 'Salmon & Sweet Potato',
-          base: { calories: 550, protein: 45, carbs: 48, fat: 18 },
-          ingredients: ['6oz salmon', '1 sweet potato', 'Asparagus', 'Lemon'],
-          instructions: ['Bake salmon 400°F for 15min', 'Roast sweet potato', 'Sauté asparagus'],
-          prepTime: 35,
-          tags: ['balanced', 'omega-3', 'nutrient-dense'],
-          bestFor: ['maintain', 'general-health', 'improve-performance']
-        },
-        {
-          name: 'Lean Beef Stir Fry',
-          base: { calories: 590, protein: 52, carbs: 55, fat: 16 },
-          ingredients: ['6oz lean beef', '1 cup rice', 'Stir fry vegetables', 'Soy sauce'],
-          instructions: ['Cook rice', 'Stir fry beef and vegetables', 'Season with sauce'],
-          prepTime: 25,
-          tags: ['high-protein', 'balanced'],
-          bestFor: ['gain', 'build-muscle', 'maintain']
-        },
-        {
-          name: 'Turkey Meatballs & Pasta',
-          base: { calories: 610, protein: 48, carbs: 68, fat: 14 },
-          ingredients: ['Ground turkey meatballs', '2 cups pasta', 'Marinara sauce', 'Parmesan'],
-          instructions: ['Bake meatballs', 'Cook pasta', 'Combine with sauce', 'Top with cheese'],
-          prepTime: 30,
-          tags: ['high-protein', 'high-carb'],
-          bestFor: ['gain', 'improve-endurance']
-        },
-        {
-          name: 'Grilled Chicken & Vegetables',
-          base: { calories: 460, protein: 52, carbs: 38, fat: 12 },
-          ingredients: ['7oz chicken breast', 'Broccoli', 'Bell peppers', '1/2 cup quinoa'],
-          instructions: ['Grill chicken', 'Roast vegetables', 'Cook quinoa', 'Serve together'],
-          prepTime: 25,
-          tags: ['high-protein', 'low-calorie', 'nutrient-dense'],
-          bestFor: ['lose', 'improve-performance', 'general-health']
-        },
-        {
-          name: 'Shrimp & Cauliflower Rice',
-          base: { calories: 380, protein: 42, carbs: 28, fat: 12 },
-          ingredients: ['8oz shrimp', '2 cups cauliflower rice', 'Garlic', 'Lemon', 'Olive oil'],
-          instructions: ['Sauté shrimp with garlic', 'Cook cauliflower rice', 'Combine', 'Finish with lemon'],
-          prepTime: 15,
-          tags: ['quick', 'low-carb', 'low-calorie', 'high-protein'],
-          bestFor: ['lose', 'improve-performance']
-        },
-        {
-          name: 'Pasta Carbonara',
-          base: { calories: 680, protein: 38, carbs: 72, fat: 26 },
-          ingredients: ['3 cups pasta', '3 eggs', '2oz bacon', 'Parmesan cheese', 'Black pepper'],
-          instructions: ['Cook pasta', 'Crisp bacon', 'Mix eggs and cheese', 'Toss hot pasta with egg mixture'],
-          prepTime: 20,
-          tags: ['high-calorie', 'high-carb', 'comfort-food'],
-          bestFor: ['gain', 'improve-endurance']
-        }
-      ],
-      snack: [
-        {
-          name: 'Protein Shake',
-          base: { calories: 280, protein: 30, carbs: 28, fat: 6 },
-          ingredients: ['1 scoop protein', '1 cup milk', '1 banana', 'Ice'],
-          instructions: ['Blend all ingredients', 'Serve immediately'],
-          prepTime: 3,
-          tags: ['quick', 'high-protein', 'post-workout'],
-          bestFor: ['build-muscle', 'gain', 'lose']
-        },
-        {
-          name: 'Apple & Almond Butter',
-          base: { calories: 260, protein: 8, carbs: 32, fat: 12 },
-          ingredients: ['1 large apple', '2 tbsp almond butter'],
-          instructions: ['Slice apple', 'Serve with almond butter'],
-          prepTime: 2,
-          tags: ['quick', 'balanced', 'natural'],
-          bestFor: ['maintain', 'general-health']
-        },
-        {
-          name: 'Greek Yogurt & Berries',
-          base: { calories: 220, protein: 20, carbs: 28, fat: 4 },
-          ingredients: ['1 cup Greek yogurt', '1/2 cup mixed berries', '1 tsp honey'],
-          instructions: ['Mix yogurt and berries', 'Drizzle honey'],
-          prepTime: 2,
-          tags: ['quick', 'high-protein', 'low-fat'],
-          bestFor: ['lose', 'maintain', 'improve-performance']
-        },
-        {
-          name: 'Trail Mix',
-          base: { calories: 320, protein: 12, carbs: 38, fat: 16 },
-          ingredients: ['1/4 cup nuts', '2 tbsp dried fruit', '1 tbsp dark chocolate chips'],
-          instructions: ['Mix ingredients', 'Portion into container'],
-          prepTime: 1,
-          tags: ['quick', 'portable', 'energy'],
-          bestFor: ['gain', 'improve-endurance', 'maintain']
-        }
-      ]
-    };
-    
-    // Select meals based on meals per day
-    const mealTypes = mealsPerDay === 3 ? ['breakfast', 'lunch', 'dinner'] :
-                      mealsPerDay === 4 ? ['breakfast', 'lunch', 'snack', 'dinner'] :
-                      mealsPerDay === 2 ? ['breakfast', 'dinner'] :
-                      ['breakfast', 'snack', 'lunch', 'snack', 'dinner'];
-    
-    // PERSONALIZATION: Smart meal scoring function
-    const scoreMeal = (meal, userPreferences, previousMeals = []) => {
-      let score = 0;
-      
-      // 1. PRIMARY GOAL ALIGNMENT (30% weight)
-      const primaryGoal = userPreferences.primaryGoal || userPreferences.goals;
-      if (meal.bestFor && meal.bestFor.includes(primaryGoal)) {
-        score += 0.30;
-      } else if (primaryGoal) {
-        // Partial credit based on calorie density
-        const calorieDensity = meal.base.calories / (meal.base.protein + meal.base.carbs + meal.base.fat);
-        if (primaryGoal === 'lose' && calorieDensity < 2.0) score += 0.15;
-        if (primaryGoal === 'gain' && calorieDensity > 2.5) score += 0.15;
-        if (primaryGoal === 'maintain') score += 0.15;
-      }
-      
-      // 2. SECONDARY GOALS (15% weight)
-      const secondaryGoals = userPreferences.secondaryGoals || [];
-      if (secondaryGoals.length > 0) {
-        const matchCount = secondaryGoals.filter(goal => 
-          meal.bestFor && meal.bestFor.includes(goal)
-        ).length;
-        score += (matchCount / secondaryGoals.length) * 0.15;
-      } else {
-        score += 0.075; // Neutral if no secondary goals
-      }
-      
-      // 3. COOK TIME PREFERENCE (20% weight)
-      const cookTimePreference = userPreferences.cookTime;
-      if (cookTimePreference === 'quick' && meal.prepTime <= 10) {
-        score += 0.20;
-      } else if (cookTimePreference === 'quick' && meal.prepTime <= 15) {
-        score += 0.10;
-      } else if (cookTimePreference === 'moderate' && meal.prepTime <= 30) {
-        score += 0.20;
-      } else if (cookTimePreference === 'any') {
-        score += 0.10;
-      }
-      
-      // 4. MACRO PHILOSOPHY (20% weight)
-      const macroPhil = userPreferences.macroPhilosophy;
-      const proteinRatio = (meal.base.protein * 4) / meal.base.calories;
-      const carbRatio = (meal.base.carbs * 4) / meal.base.calories;
-      const fatRatio = (meal.base.fat * 9) / meal.base.calories;
-      
-      if (macroPhil === 'high-protein' && meal.tags.includes('high-protein')) {
-        score += 0.20;
-      } else if (macroPhil === 'high-protein' && proteinRatio > 0.30) {
-        score += 0.10;
-      }
-      
-      if (macroPhil === 'low-carb' && meal.tags.includes('low-carb')) {
-        score += 0.20;
-      } else if (macroPhil === 'low-carb' && carbRatio < 0.30) {
-        score += 0.10;
-      }
-      
-      if (macroPhil === 'balanced' && meal.tags.includes('balanced')) {
-        score += 0.20;
-      } else if (macroPhil === 'balanced') {
-        score += 0.10;
-      }
-      
-      if (macroPhil === 'keto' && meal.tags.includes('low-carb') && fatRatio > 0.50) {
-        score += 0.20;
-      }
-      
-      // 5. VARIETY BONUS (15% weight)
-      const recentNames = previousMeals.map(m => m.name);
-      if (!recentNames.includes(meal.name)) {
-        score += 0.15;
-      } else {
-        score += 0; // Penalty for repetition
-      }
-      
-      return Math.min(1.0, score); // Cap at 1.0
-    };
-    
-    let restrictionWarningShown = false;
-    const selectedMeals = []; // Track for variety
-    
-    return mealTypes.map((type, idx) => {
-      const options = mealDatabase[type] || mealDatabase.lunch;
-      
-      // BUGFIX: Apply restriction filtering
-      const allowedOptions = options.filter(meal => isMealAllowed(meal, forbiddenKeywords));
-      
-      // Handle case where all options are filtered out
-      let finalOptions = allowedOptions;
-      if (allowedOptions.length === 0) {
-        // Fallback to any safe option from other meal types
-        const allMeals = Object.values(mealDatabase).flat();
-        const safeFallback = allMeals.filter(meal => isMealAllowed(meal, forbiddenKeywords));
-        
-        if (safeFallback.length > 0) {
-          finalOptions = safeFallback;
-          if (!restrictionWarningShown) {
-            // Show toast warning (defer to avoid blocking)
-            setTimeout(() => {
-              showToast('Restrictions limited options. Showing closest safe alternatives.', 'info');
-            }, 100);
-            restrictionWarningShown = true;
-          }
-        } else {
-          // No safe options at all - use original but log warning
-          finalOptions = options;
-          console.warn('WARNING: No meals available that satisfy all restrictions');
-        }
-      }
-      
-      // PERSONALIZATION: Score all available meals and select best match
-      const scoredMeals = finalOptions.map(meal => ({
-        meal,
-        score: scoreMeal(meal, preferences, selectedMeals)
-      }));
-      
-      // Sort by score (highest first)
-      scoredMeals.sort((a, b) => b.score - a.score);
-      
-      // Select the highest-scoring meal
-      const selected = scoredMeals[0]?.meal || finalOptions[0];
-      
-      // Track for variety in subsequent selections
-      selectedMeals.push(selected);
-      
-      // BUGFIX: Compute macros from ingredients first (now with confidence)
-      const ingredientMacros = computeMealMacrosFromIngredients(selected.ingredients);
-      
-      // Use ingredient-based macros as the base instead of arbitrary "base" values
-      // If ingredient computation failed (all zeros), fall back to original base
-      const baseMacros = (ingredientMacros.calories > 0) 
-        ? ingredientMacros 
-        : selected.base;
-      
-      // Extract confidence (internal recipes implicitly high confidence)
-      const macroConfidence = ingredientMacros.macroConfidence || 0.9; // Default high for internal
-      
-      // Scale to match target macros per meal
-      const targetScale = caloriesPerMeal / baseMacros.calories;
-      
-      // BUGFIX: Clamp scaling to reasonable bounds [0.6, 1.6]
-      // If outside bounds, don't scale (let daily totals be slightly off)
-      const clampedScale = Math.max(0.6, Math.min(1.6, targetScale));
-      const shouldScale = (targetScale >= 0.6 && targetScale <= 1.6);
-      
-      const finalScale = shouldScale ? clampedScale : 1.0;
-      
-      // Apply scaling
-      const scaledProtein = Math.round(baseMacros.protein * finalScale);
-      const scaledCarbs = Math.round(baseMacros.carbs * finalScale);
-      const scaledFat = Math.round(baseMacros.fat * finalScale);
-      
-      // BUGFIX: Compute calories from scaled macros (4/4/9 formula)
-      const scaledCalories = Math.round((scaledProtein * 4) + (scaledCarbs * 4) + (scaledFat * 9));
-      
-      // BUGFIX: Update displayed ingredients if scaled
-      let displayIngredients = selected.ingredients;
-      if (shouldScale && Math.abs(finalScale - 1.0) > 0.05) {
-        // Add portion adjustment note
-        displayIngredients = [
-          `Portions adjusted (~${Math.round(finalScale * 100)}%)`,
-          ...selected.ingredients
-        ];
-      }
-      
-      return {
-        ...selected,
-        ingredients: displayIngredients,
-        protein: scaledProtein,
-        carbs: scaledCarbs,
-        fat: scaledFat,
-        calories: scaledCalories,
-        macroConfidence, // NEW: Store confidence score
-        source: selected.source || 'internal', // NEW: Tag source
-        _scaledBy: finalScale,
-        _baseIngredientMacros: ingredientMacros
-      };
-    });
-  };
 
   // ========== SCANNING FEATURE ==========
   
@@ -5389,7 +4950,7 @@ export default function App() {
   const analyzePlate = async (imageDataUrl, sizeContext = {}) => {
     setAnalyzing(true);
     
-    // Deterministic pipeline: Vision → Portion → Nutrition → Scoring
+    // Deterministic pipeline: Vision â†’ Portion â†’ Nutrition â†’ Scoring
     const errors = [];
     const debugInfo = {
       sizeContext: sizeContext // Store user-provided size context
@@ -6296,7 +5857,7 @@ Return ONLY the JSON object. No explanation before or after.`
       }
     }
     
-    return portions.join(' • ');
+    return portions.join(' â€¢ ');
   };
   
   /**
@@ -6368,7 +5929,7 @@ Return ONLY the JSON object. No explanation before or after.`
           { name: 'honey', quantity: '1/3', unit: 'cup', optional: false }
         ],
         steps: [
-          'Preheat oven to 350°F and grease an 8x8 baking pan',
+          'Preheat oven to 350Â°F and grease an 8x8 baking pan',
           'Drain and rinse black beans thoroughly',
           'Blend beans, eggs, honey, and vanilla until smooth',
           'Mix in protein powder and cocoa powder',
@@ -6595,7 +6156,7 @@ Return ONLY the JSON object. No explanation before or after.`
         nutritionPerServing: { calories: 420, protein: 38, carbs: 28, fat: 18 },
         servings: 2,
         ingredients: ['12oz salmon', 'Broccoli', 'Sweet potato', 'Olive oil', 'Lemon', 'Garlic'],
-        instructions: ['Preheat oven to 400°F', 'Arrange on sheet pan', 'Drizzle with oil', 'Bake 20 minutes']
+        instructions: ['Preheat oven to 400Â°F', 'Arrange on sheet pan', 'Drizzle with oil', 'Bake 20 minutes']
       },
       {
         id: 'rec-5',
@@ -6639,7 +6200,7 @@ Return ONLY the JSON object. No explanation before or after.`
         nutritionPerServing: { calories: 320, protein: 28, carbs: 2, fat: 22 },
         servings: 4,
         ingredients: ['2lbs chicken wings', 'Olive oil', 'Paprika', 'Garlic powder', 'Salt'],
-        instructions: ['Toss wings with oil and seasonings', 'Air fry at 400°F for 20 minutes', 'Flip halfway through']
+        instructions: ['Toss wings with oil and seasonings', 'Air fry at 400Â°F for 20 minutes', 'Flip halfway through']
       }
     ];
   };
@@ -6805,7 +6366,7 @@ Return ONLY the JSON object. No explanation before or after.`
         <rect fill='url(%23grad${hash})' width='400' height='300'/>
         <circle cx='200' cy='150' r='80' fill='white' opacity='0.2'/>
         <text x='50%' y='45%' font-family='Arial' font-size='28' font-weight='bold' fill='white' text-anchor='middle' opacity='0.9'>${meal.name}</text>
-        <text x='50%' y='60%' font-family='Arial' font-size='16' fill='white' text-anchor='middle' opacity='0.7'>${meal.calories || 0} cal • ${meal.protein || 0}g protein</text>
+        <text x='50%' y='60%' font-family='Arial' font-size='16' fill='white' text-anchor='middle' opacity='0.7'>${meal.calories || 0} cal â€¢ ${meal.protein || 0}g protein</text>
       </svg>
     `.trim();
     
@@ -7031,7 +6592,7 @@ Return ONLY the JSON object. No explanation before or after.`
     setBaselineTDEE(newTDEE);
     setActualTDEE(newTDEE);
     
-    console.log('🔄 Nutrition targets recalculated due to weight change:', {
+    console.log('ðŸ”„ Nutrition targets recalculated due to weight change:', {
       oldWeight: plan.calculationData.weight,
       newWeight: userProfile.weight,
       oldCalories: plan.calories,
@@ -7508,10 +7069,10 @@ Return ONLY the JSON object. No explanation before or after.`
                       </label>
                       <div className="grid grid-cols-4 gap-2">
                         {[
-                          { value: 'small', label: 'Small', icon: '🍽️' },
-                          { value: 'medium', label: 'Medium', icon: '🍽️' },
-                          { value: 'large', label: 'Large', icon: '🍽️' },
-                          { value: 'unknown', label: "Don't know", icon: '🤷' }
+                          { value: 'small', label: 'Small', icon: 'ðŸ½ï¸' },
+                          { value: 'medium', label: 'Medium', icon: 'ðŸ½ï¸' },
+                          { value: 'large', label: 'Large', icon: 'ðŸ½ï¸' },
+                          { value: 'unknown', label: "Don't know", icon: 'ðŸ¤·' }
                         ].map(option => (
                           <button
                             key={option.value}
@@ -8215,7 +7776,7 @@ Return ONLY the JSON object. No explanation before or after.`
                     </p>
                     <ul className={`text-xs space-y-1 ${dark?'text-orange-300':'text-orange-600'}`}>
                       {plateResult.errors.map((error, idx) => (
-                        <li key={idx}>• {error}</li>
+                        <li key={idx}>â€¢ {error}</li>
                       ))}
                     </ul>
                     <p className={`text-xs mt-2 ${dark?'text-orange-300':'text-orange-600'}`}>
@@ -8607,7 +8168,7 @@ Return ONLY the JSON object. No explanation before or after.`
             {plateResult.debug && Object.keys(plateResult.debug).length > 0 && (
               <details className={`p-4 rounded-xl ${dark?'bg-slate-700':'bg-slate-100'}`}>
                 <summary className={`cursor-pointer font-semibold text-sm ${dark?'text-slate-300':'text-slate-700'} flex items-center gap-2`}>
-                  <code className="text-xs">🔍 Debug Info</code>
+                  <code className="text-xs">ðŸ” Debug Info</code>
                   <span className="text-xs opacity-60">(Click to expand)</span>
                 </summary>
                 <div className="mt-3 space-y-3">
@@ -8713,7 +8274,7 @@ Return ONLY the JSON object. No explanation before or after.`
               {needsReview && !canLog && (
                 <div className={`p-3 rounded-lg ${dark?'bg-yellow-900/20 border border-yellow-700/30':'bg-yellow-50 border border-yellow-200'}`}>
                   <p className={`text-xs ${dark?'text-yellow-300':'text-yellow-700'}`}>
-                    <strong>⚠️ Review Required:</strong> {lowConfidenceItems.length > 0 
+                    <strong>âš ï¸ Review Required:</strong> {lowConfidenceItems.length > 0 
                       ? `${lowConfidenceItems.length} item${lowConfidenceItems.length > 1 ? 's' : ''} need${lowConfidenceItems.length === 1 ? 's' : ''} confirmation. Check the boxes to confirm.`
                       : 'Low confidence detection. Please verify all items and portions before saving.'}
                   </p>
@@ -8724,7 +8285,7 @@ Return ONLY the JSON object. No explanation before or after.`
               {requiresConfirmation && canLog && (
                 <div className={`p-3 rounded-lg ${dark?'bg-green-900/20 border border-green-700/30':'bg-green-50 border border-green-200'}`}>
                   <p className={`text-xs ${dark?'text-green-300':'text-green-700'}`}>
-                    <strong>✓ Ready to log:</strong> You've reviewed and confirmed all items.
+                    <strong>âœ“ Ready to log:</strong> You've reviewed and confirmed all items.
                   </p>
                 </div>
               )}
@@ -8798,7 +8359,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 <CheckCircle className="w-6 h-6 opacity-80" />
               </div>
               <h3 className="text-2xl font-bold mb-2">Scan Packaged Food</h3>
-              <p className="text-blue-100">Barcode & QR codes • High accuracy</p>
+              <p className="text-blue-100">Barcode & QR codes â€¢ High accuracy</p>
             </button>
 
             {/* Plate AI */}
@@ -8815,7 +8376,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 </div>
               </div>
               <h3 className="text-2xl font-bold mb-2">Analyze My Plate</h3>
-              <p className="text-purple-100">Photo-based estimates • Quick logging</p>
+              <p className="text-purple-100">Photo-based estimates â€¢ Quick logging</p>
             </button>
           </div>
 
@@ -9153,7 +8714,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 </p>
                 <p className={`text-sm font-medium flex items-center gap-2 ${dark?'text-slate-400':'text-slate-500'}`}>
                   <Zap className="w-4 h-4" />
-                  <span>Fastest setup • Focus on food</span>
+                  <span>Fastest setup â€¢ Focus on food</span>
                 </p>
               </button>
 
@@ -9181,7 +8742,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 </p>
                 <p className="text-sm text-blue-200 font-medium flex items-center gap-2">
                   <Sparkles className="w-4 h-4" />
-                  <span>Complete experience • Adaptive learning</span>
+                  <span>Complete experience â€¢ Adaptive learning</span>
                 </p>
               </button>
             </div>
@@ -9192,7 +8753,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 dark ? 'text-slate-400 hover:text-slate-300' : 'text-slate-600 hover:text-slate-700'
               }`}
             >
-              ← Back
+              â† Back
             </button>
           </div>
         </div>
@@ -9248,7 +8809,7 @@ Return ONLY the JSON object. No explanation before or after.`
                   </h2>
                 </div>
                 <p className={`text-sm ${dark?'text-slate-400':'text-slate-600'}`}>
-                  {currentPhase.subtitle} • Step {currentPhase.progress}
+                  {currentPhase.subtitle} â€¢ Step {currentPhase.progress}
                 </p>
               </div>
               <button
@@ -9576,7 +9137,7 @@ Return ONLY the JSON object. No explanation before or after.`
                       {/* Helper text for multi-select */}
                       {(form.secondaryGoals || []).length > 0 && (
                         <p className={`text-xs mt-3 ${dark?'text-blue-400':'text-blue-600'}`}>
-                          ✓ {(form.secondaryGoals || []).length} emphasis area{(form.secondaryGoals || []).length > 1 ? 's' : ''} selected
+                          âœ“ {(form.secondaryGoals || []).length} emphasis area{(form.secondaryGoals || []).length > 1 ? 's' : ''} selected
                         </p>
                       )}
                     </div>
@@ -9611,12 +9172,12 @@ Return ONLY the JSON object. No explanation before or after.`
                         {/* Show context-aware helper text */}
                         {(form.secondaryGoals || []).includes('build-muscle') && form.primaryGoal === 'lose' && (
                           <p className={`text-xs mb-3 ${dark?'text-blue-400':'text-blue-600'}`}>
-                            💡 Slower pace recommended for muscle retention during fat loss
+                            ðŸ’¡ Slower pace recommended for muscle retention during fat loss
                           </p>
                         )}
                         {(form.secondaryGoals || []).includes('improve-performance') && form.primaryGoal === 'gain' && (
                           <p className={`text-xs mb-3 ${dark?'text-blue-400':'text-blue-600'}`}>
-                            💡 Leaner gains recommended for performance optimization
+                            ðŸ’¡ Leaner gains recommended for performance optimization
                           </p>
                         )}
                         
@@ -10052,7 +9613,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 ) : (
                   /* Empty State */
                   <div className="text-center py-12">
-                    <div className={`text-6xl mb-4`}>🔍</div>
+                    <div className={`text-6xl mb-4`}>ðŸ”</div>
                     <h3 className={`text-lg font-bold mb-2 ${dark?'text-white':'text-gray-900'}`}>
                       No recipes found
                     </h3>
@@ -10479,7 +10040,7 @@ Return ONLY the JSON object. No explanation before or after.`
                         )}
                         {recipe.area && (
                           <>
-                            <span className={`${dark?'text-slate-600':'text-gray-400'}`}>•</span>
+                            <span className={`${dark?'text-slate-600':'text-gray-400'}`}>â€¢</span>
                             <span className={`${dark?'text-slate-400':'text-gray-600'}`}>
                               {recipe.area}
                             </span>
@@ -10487,7 +10048,7 @@ Return ONLY the JSON object. No explanation before or after.`
                         )}
                         {recipe.time && (
                           <>
-                            <span className={`${dark?'text-slate-600':'text-gray-400'}`}>•</span>
+                            <span className={`${dark?'text-slate-600':'text-gray-400'}`}>â€¢</span>
                             <span className={`${dark?'text-slate-400':'text-gray-600'}`}>
                               {recipe.time} min
                             </span>
@@ -10554,7 +10115,7 @@ Return ONLY the JSON object. No explanation before or after.`
                                       <ul className="space-y-1">
                                         {userHas.map((ing, i) => (
                                           <li key={i} className={`text-sm flex items-start gap-2 ${dark?'text-emerald-300':'text-emerald-700'}`}>
-                                            <span className="text-emerald-500">✓</span>
+                                            <span className="text-emerald-500">âœ“</span>
                                             <span>{ing}</span>
                                           </li>
                                         ))}
@@ -10572,7 +10133,7 @@ Return ONLY the JSON object. No explanation before or after.`
                                       <ul className="space-y-1">
                                         {userNeeds.map((ing, i) => (
                                           <li key={i} className={`text-sm flex items-start gap-2 ${dark?'text-orange-300':'text-orange-700'}`}>
-                                            <span className="text-orange-500">○</span>
+                                            <span className="text-orange-500">â—‹</span>
                                             <span>{ing}</span>
                                           </li>
                                         ))}
@@ -10727,7 +10288,7 @@ Return ONLY the JSON object. No explanation before or after.`
                       </h3>
                       {recipe.time && (
                         <p className={`text-sm ${dark?'text-slate-400':'text-gray-600'}`}>
-                          {recipe.time} min • {recipe.difficulty}
+                          {recipe.time} min â€¢ {recipe.difficulty}
                         </p>
                       )}
                     </div>
@@ -10789,7 +10350,7 @@ Return ONLY the JSON object. No explanation before or after.`
                         {fav.name}
                       </h3>
                       <p className={`text-sm ${dark?'text-slate-400':'text-gray-600'}`}>
-                        {fav.calories} cal • {fav.protein}g P • {fav.carbs}g C • {fav.fat}g F
+                        {fav.calories} cal â€¢ {fav.protein}g P â€¢ {fav.carbs}g C â€¢ {fav.fat}g F
                       </p>
                     </div>
                     <button
@@ -11083,7 +10644,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 Grocery List
               </h1>
               <p className={`text-xs ${dark?'text-slate-400':'text-gray-600'}`}>
-                {groceryListFinalized ? '🔒 Finalized' : '🔄 Live'}
+                {groceryListFinalized ? 'ðŸ”’ Finalized' : 'ðŸ”„ Live'}
               </p>
             </div>
             <div className="w-10" />
@@ -11450,7 +11011,7 @@ Return ONLY the JSON object. No explanation before or after.`
                           {meal.name}
                         </h3>
                         <p className={`text-sm ${dark?'text-slate-400':'text-gray-600'}`}>
-                          {Math.round(meal.calories)} cal • 
+                          {Math.round(meal.calories)} cal â€¢ 
                           {Math.round(meal.protein)}P / 
                           {Math.round(meal.carbs)}C / 
                           {Math.round(meal.fat)}F
@@ -11789,7 +11350,7 @@ Lunch
                   <h3 className={`text-sm font-semibold ${dark?'text-slate-300':'text-gray-700'}`}>Your Profile</h3>
                 </div>
                 <div className={`text-xs ${dark?'text-slate-400':'text-gray-600'}`}>
-                  {userProfile.weight} lbs • {Math.floor(userProfile.height / 12)}'{userProfile.height % 12}" • {userProfile.birthday ? calculateAge(userProfile.birthday) : userProfile.age} years
+                  {userProfile.weight} lbs â€¢ {Math.floor(userProfile.height / 12)}'{userProfile.height % 12}" â€¢ {userProfile.birthday ? calculateAge(userProfile.birthday) : userProfile.age} years
                 </div>
               </div>
               <button
@@ -11814,7 +11375,7 @@ Lunch
               <div>
                 <h2 className={`text-xl font-bold mb-1 ${dark?'text-white':'text-gray-900'}`}>Training Context</h2>
                 <p className={`text-xs ${dark?'text-slate-500':'text-gray-500'} mb-4`}>
-                  These settings affect how your meals are structured — not your profile.
+                  These settings affect how your meals are structured â€” not your profile.
                 </p>
               </div>
 
@@ -12220,7 +11781,7 @@ Lunch
               <ul className="space-y-2">
                 {(recipeInReview.ingredients || []).map((ing, i) => (
                   <li key={i} className={`text-sm ${dark?'text-slate-300':'text-gray-700'}`}>
-                    • {typeof ing === 'string' ? ing : `${ing.quantity || ''} ${ing.unit || ''} ${ing.name || ing}`}
+                    â€¢ {typeof ing === 'string' ? ing : `${ing.quantity || ''} ${ing.unit || ''} ${ing.name || ing}`}
                   </li>
                 ))}
                 {(!recipeInReview.ingredients || recipeInReview.ingredients.length === 0) && (
@@ -12320,9 +11881,9 @@ Lunch
                 min="1"
               />
               <p className={`text-sm mt-2 ${dark?'text-slate-400':'text-gray-600'}`}>
-                {Math.round(addToPlanRecipe.nutritionPerServing.calories * addToPlanConfig.servings)} cal • 
-                {Math.round(addToPlanRecipe.nutritionPerServing.protein * addToPlanConfig.servings)}g P • 
-                {Math.round(addToPlanRecipe.nutritionPerServing.carbs * addToPlanConfig.servings)}g C • 
+                {Math.round(addToPlanRecipe.nutritionPerServing.calories * addToPlanConfig.servings)} cal â€¢ 
+                {Math.round(addToPlanRecipe.nutritionPerServing.protein * addToPlanConfig.servings)}g P â€¢ 
+                {Math.round(addToPlanRecipe.nutritionPerServing.carbs * addToPlanConfig.servings)}g C â€¢ 
                 {Math.round(addToPlanRecipe.nutritionPerServing.fat * addToPlanConfig.servings)}g F
               </p>
             </div>
@@ -12520,12 +12081,12 @@ Lunch
                       <span className={`text-xs ${dark?'text-slate-500':'text-gray-500'}`}>Protein</span>
                       <span className="text-sm font-medium text-blue-500">{proteinRemaining}g</span>
                     </div>
-                    <span className={`text-xs ${dark?'text-slate-600':'text-gray-400'}`}>•</span>
+                    <span className={`text-xs ${dark?'text-slate-600':'text-gray-400'}`}>â€¢</span>
                     <div className="flex items-baseline gap-1">
                       <span className={`text-xs ${dark?'text-slate-500':'text-gray-500'}`}>Carbs</span>
                       <span className="text-sm font-medium text-orange-500">{carbsRemaining}g</span>
                     </div>
-                    <span className={`text-xs ${dark?'text-slate-600':'text-gray-400'}`}>•</span>
+                    <span className={`text-xs ${dark?'text-slate-600':'text-gray-400'}`}>â€¢</span>
                     <div className="flex items-baseline gap-1">
                       <span className={`text-xs ${dark?'text-slate-500':'text-gray-500'}`}>Fat</span>
                       <span className="text-sm font-medium text-purple-500">{fatRemaining}g</span>
@@ -12585,9 +12146,9 @@ Lunch
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       {[
-                        { val: 'strength', label: 'Strength', icon: '💪' },
-                        { val: 'cardio', label: 'Cardio', icon: '🏃' },
-                        { val: 'mixed', label: 'Mixed', icon: '⚡' }
+                        { val: 'strength', label: 'Strength', icon: 'ðŸ’ª' },
+                        { val: 'cardio', label: 'Cardio', icon: 'ðŸƒ' },
+                        { val: 'mixed', label: 'Mixed', icon: 'âš¡' }
                       ].map(type => (
                         <button
                           key={type.val}
@@ -12646,11 +12207,11 @@ Lunch
                         <p className={`text-xs ${dark?'text-blue-300':'text-blue-700'}`}>
                           {hasAdjustments ? (
                             <>
-                              ✓ Training day noted. Remaining meals slightly adjusted for recovery.
+                              âœ“ Training day noted. Remaining meals slightly adjusted for recovery.
                             </>
                           ) : (
                             <>
-                              📊 This helps optimize your nutrition for{' '}
+                              ðŸ“Š This helps optimize your nutrition for{' '}
                               <span className="font-semibold">
                                 {dailyTrainingContext.intensity || 'moderate'} {dailyTrainingContext.type}
                               </span>
@@ -12839,7 +12400,7 @@ Lunch
                       {meal.name}
                     </h3>
                     <p className="text-white/90 text-sm md:text-base relative z-10" style={{textShadow: '0 1px 2px rgba(0,0,0,0.2)'}}>
-                      {meal.calories || 0} cal • {meal.protein || 0}g protein
+                      {meal.calories || 0} cal â€¢ {meal.protein || 0}g protein
                     </p>
                   </div>
                 )}
@@ -12906,7 +12467,7 @@ Lunch
                       
                       {!plan.isMealsOnly && (
                         <div className={`text-sm mt-1 ${dark?'text-slate-400':'text-slate-600'}`}>
-                          {meal.calories} cal • {meal.protein}g protein • {meal.carbs}g carbs • {meal.fat}g fat
+                          {meal.calories} cal â€¢ {meal.protein}g protein â€¢ {meal.carbs}g carbs â€¢ {meal.fat}g fat
                         </div>
                       )}
                     </div>
@@ -12998,7 +12559,7 @@ Lunch
                           }`}>
                             {getConfidenceTierLabel(meal.macroConfidence)}
                           </span>
-                          {meal.source === 'mealdb' && ' · Macros estimated from ingredients'}
+                          {meal.source === 'mealdb' && ' Â· Macros estimated from ingredients'}
                         </div>
                       )}
                       
@@ -13056,7 +12617,7 @@ Lunch
                                 </>
                               ) : (
                                 <span className={`${dark?'text-slate-400':'text-gray-600'}`}>
-                                  • {ingMeasure ? `${ingMeasure} ${ingName}` : ingName}
+                                  â€¢ {ingMeasure ? `${ingMeasure} ${ingName}` : ingName}
                                 </span>
                               )}
                             </li>
@@ -13066,7 +12627,7 @@ Lunch
                     </div>
                     <div className={`p-4 rounded-xl ${dark?'bg-slate-800':'bg-gray-50'}`}>
                       <div className={`font-semibold mb-2 flex items-center gap-2 ${dark?'text-gray-300':'text-gray-700'}`}>
-                        <span>📋</span>
+                        <span>ðŸ“‹</span>
                         Instructions:
                       </div>
                       <ol className={`list-decimal list-inside space-y-1 ${dark?'text-slate-400':'text-gray-600'}`}>
@@ -13201,9 +12762,9 @@ Lunch
                     Plato is currently using demo data for all features. To enable real API integrations:
                   </p>
                   <ul className={`text-sm ${dark?'text-slate-300':'text-slate-700'} text-left space-y-2 max-w-md mx-auto`}>
-                    <li>• Get a free Unsplash key for real meal photos</li>
-                    <li>• Add Spoonacular API for 5000+ real recipes</li>
-                    <li>• Configure Claude API for YouTube recipe extraction</li>
+                    <li>â€¢ Get a free Unsplash key for real meal photos</li>
+                    <li>â€¢ Add Spoonacular API for 5000+ real recipes</li>
+                    <li>â€¢ Configure Claude API for YouTube recipe extraction</li>
                   </ul>
                   <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
                     <p className={`text-xs ${dark?'text-slate-500':'text-slate-600'}`}>
@@ -13343,7 +12904,7 @@ Lunch
                             </div>
                             {nutrient.mealAddIns && nutrient.mealAddIns.length > 0 && (
                               <div className={`mt-2 text-xs ${dark?'text-slate-400':'text-gray-600'}`}>
-                                <span className="font-medium">Tips:</span> {nutrient.mealAddIns.join(' • ')}
+                                <span className="font-medium">Tips:</span> {nutrient.mealAddIns.join(' â€¢ ')}
                               </div>
                             )}
                           </div>
@@ -13830,7 +13391,7 @@ Lunch
                       return (
                         <div className={`p-4 rounded-xl mb-4 border-2 ${dark?'bg-slate-700/50 border-slate-600':'bg-gray-100 border-gray-300'}`}>
                           <div className="flex items-center gap-3">
-                            <span className="text-3xl">⏳</span>
+                            <span className="text-3xl">â³</span>
                             <div>
                               <p className={`text-sm font-semibold ${dark?'text-slate-300':'text-gray-700'}`}>
                                 Need More Time for Trend
@@ -13846,7 +13407,7 @@ Lunch
                     
                     const trendColor = trend < -0.05 ? 'text-blue-500' : trend > 0.05 ? 'text-orange-500' : 'text-slate-500';
                     const trendBg = trend < -0.05 ? 'bg-blue-500/10 border-blue-500/20' : trend > 0.05 ? 'bg-orange-500/10 border-orange-500/20' : 'bg-slate-500/10 border-slate-500/20';
-                    const trendIcon = trend < -0.05 ? '📉' : trend > 0.05 ? '📈' : '➡️';
+                    const trendIcon = trend < -0.05 ? 'ðŸ“‰' : trend > 0.05 ? 'ðŸ“ˆ' : 'âž¡ï¸';
                     const trendLabel = trend < -0.05 ? 'Losing' : trend > 0.05 ? 'Gaining' : 'Stable';
                     
                     return (
@@ -14342,7 +13903,7 @@ Lunch
                   </div>
                   <div className={`p-3 rounded-xl ${dark?'bg-slate-900':'bg-blue-50'} text-center`}>
                     <div className={`text-2xl font-bold ${dark?'text-blue-400':'text-blue-600'}`}>
-                      {dailyTrainingContext.trained ? '✓' : '—'}
+                      {dailyTrainingContext.trained ? 'âœ“' : 'â€”'}
                     </div>
                     <div className={`text-xs ${dark?'text-slate-400':'text-slate-600'}`}>Today's Training</div>
                   </div>
@@ -14405,7 +13966,7 @@ Lunch
             <div className={`${dark?'glass-dark':'glass'} rounded-3xl shadow-premium-xl p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto`} onClick={e => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>🎯 Daily Tracker</h2>
+                  <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>ðŸŽ¯ Daily Tracker</h2>
                   <p className={`text-sm ${dark?'text-slate-400':'text-slate-600'}`}>{dailyLog.date}</p>
                 </div>
                 <button onClick={() => setShowDailyTracker(false)} className={`p-2 rounded-xl ${dark?'hover:bg-slate-700':'hover:bg-gray-100'}`}>
@@ -14445,7 +14006,7 @@ Lunch
                     onClick={addWater}
                     className="mt-2 w-full bg-cyan-500 text-white text-xs py-1 rounded-lg hover:bg-cyan-600"
                   >
-                    +1 💧
+                    +1 ðŸ’§
                   </button>
                 </div>
               </div>
@@ -14516,12 +14077,12 @@ Lunch
                             )}
                             {meal.source === 'plate-ai' && (
                               <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-semibold rounded">
-                                AI • {Math.round((meal.confidence || 0) * 100)}%
+                                AI â€¢ {Math.round((meal.confidence || 0) * 100)}%
                               </span>
                             )}
                           </div>
                           <div className={`text-xs ${dark?'text-slate-400':'text-slate-600'}`}>
-                            {meal.calories} cal • {meal.protein}g P • {meal.carbs}g C • {meal.fat}g F
+                            {meal.calories} cal â€¢ {meal.protein}g P â€¢ {meal.carbs}g C â€¢ {meal.fat}g F
                           </div>
                           {meal.brand && (
                             <div className={`text-xs ${dark?'text-slate-500':'text-slate-500'} mt-0.5`}>
@@ -14559,7 +14120,7 @@ Lunch
                           <span className={`${dark?'text-slate-400':'text-slate-600'}`}>{log.meals.length} meals</span>
                         </div>
                         <div className={`text-xs mt-1 ${dark?'text-slate-500':'text-slate-500'}`}>
-                          {log.totalCalories} cal • {log.totalProtein}g P • {log.water} glasses 💧
+                          {log.totalCalories} cal â€¢ {log.totalProtein}g P â€¢ {log.water} glasses ðŸ’§
                         </div>
                       </div>
                     ))}
@@ -14574,7 +14135,7 @@ Lunch
           <div className={`fixed inset-0 ${dark?'glass-dark':'glass'} z-50 overflow-y-auto p-6 animate-slideIn backdrop-blur-xl`}>
             <div className="max-w-2xl mx-auto">
               <div className="flex justify-between items-center mb-6">
-                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>🛒 Grocery List</h2>
+                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>ðŸ›’ Grocery List</h2>
                 <button onClick={() => setShowGroceryList(false)} className={`p-2 rounded-xl ${dark?'hover:bg-slate-700':'hover:bg-gray-100'}`}>
                   <X className={`w-6 h-6 ${dark?'text-white':'text-gray-900'}`} />
                 </button>
@@ -14592,7 +14153,7 @@ Lunch
                         item.checked ? 'bg-emerald-500 border-emerald-500' : dark?'border-slate-600':'border-gray-300'
                       }`}
                     >
-                      {item.checked && <span className="text-white text-sm">✓</span>}
+                      {item.checked && <span className="text-white text-sm">âœ“</span>}
                     </div>
                     <div className="flex-1">
                       <span className={`${item.checked?'line-through':''} ${dark?'text-white':'text-gray-900'}`}>
@@ -14600,7 +14161,7 @@ Lunch
                       </span>
                       {item.usedIn > 1 && (
                         <span className={`ml-2 text-xs ${dark?'text-slate-400':'text-slate-600'}`}>
-                          • Used in {item.usedIn} meals
+                          â€¢ Used in {item.usedIn} meals
                         </span>
                       )}
                     </div>
@@ -14627,7 +14188,7 @@ Lunch
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowSavedPlans(false)}>
             <div className={`${dark?'glass-dark':'glass'} rounded-3xl shadow-premium-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto`} onClick={e => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-6">
-                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>📅 Saved Plans</h2>
+                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>ðŸ“… Saved Plans</h2>
                 <button onClick={() => setShowSavedPlans(false)} className={`p-2 rounded-xl ${dark?'hover:bg-slate-700':'hover:bg-gray-100'}`}>
                   <X className={`w-6 h-6 ${dark?'text-white':'text-gray-900'}`} />
                 </button>
@@ -14828,7 +14389,7 @@ Lunch
                                   </p>
                                 </div>
                                 <div className="text-3xl">
-                                  {trendDirection === 'down' ? '📉' : trendDirection === 'up' ? '📈' : '➡️'}
+                                  {trendDirection === 'down' ? 'ðŸ“‰' : trendDirection === 'up' ? 'ðŸ“ˆ' : 'âž¡ï¸'}
                                 </div>
                               </div>
                             </div>
@@ -14987,7 +14548,7 @@ Lunch
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowMealReplace(null)}>
             <div className={`${dark?'glass-dark':'glass'} rounded-3xl shadow-premium-xl p-6 max-w-md w-full`} onClick={e => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-6">
-                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>🔄 Replace Meal</h2>
+                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>ðŸ”„ Replace Meal</h2>
                 <button onClick={() => setShowMealReplace(null)} className={`p-2 rounded-xl ${dark?'hover:bg-slate-700':'hover:bg-gray-100'}`}>
                   <X className={`w-6 h-6 ${dark?'text-white':'text-gray-900'}`} />
                 </button>
@@ -15087,7 +14648,7 @@ Lunch
 
               <div className={`mt-4 p-4 rounded-xl ${dark?'bg-slate-800':'bg-blue-50'}`}>
                 <p className={`text-sm ${dark?'text-slate-300':'text-blue-900'}`}>
-                  💡 <strong>Tip:</strong> Your daily totals will automatically update
+                  ðŸ’¡ <strong>Tip:</strong> Your daily totals will automatically update
                 </p>
               </div>
             </div>
@@ -15099,7 +14660,7 @@ Lunch
           onClick={() => setChatOpen(!chatOpen)}
           className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-premium-xl flex items-center justify-center transition-all ${chatOpen?'bg-gray-400':'bg-gradient-to-r from-sky-500 to-blue-600'} text-white hover:scale-110`}
         >
-          {chatOpen ? <X className="w-6 h-6 sm:w-7 sm:h-7" /> : <span className="text-2xl sm:text-3xl">🤖</span>}
+          {chatOpen ? <X className="w-6 h-6 sm:w-7 sm:h-7" /> : <span className="text-2xl sm:text-3xl">ðŸ¤–</span>}
         </button>
 
         {/* Chat Panel */}
@@ -15107,7 +14668,7 @@ Lunch
           <div className={`fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 w-[calc(100vw-2rem)] sm:w-96 max-w-md h-[70vh] sm:h-[500px] ${dark?'glass-dark':'glass'} rounded-3xl shadow-premium-xl flex flex-col animate-slideUp`}>
             <div className="p-4 border-b ${dark?'border-slate-700':'border-gray-200'} bg-gradient-to-r from-sky-500 to-blue-600 rounded-t-3xl">
               <h3 className="font-bold text-white text-lg flex items-center gap-2">
-                <span className="text-2xl">🤖</span>
+                <span className="text-2xl">ðŸ¤–</span>
                 Chat with Plato
               </h3>
               <p className="text-sm text-emerald-100">Your AI nutrition assistant</p>
@@ -15180,7 +14741,7 @@ Lunch
                     <CheckCircle className="w-6 h-6 opacity-80" />
                   </div>
                   <h3 className="text-2xl font-bold mb-2">Scan Packaged Food</h3>
-                  <p className="text-blue-100">Barcode & QR codes • High accuracy</p>
+                  <p className="text-blue-100">Barcode & QR codes â€¢ High accuracy</p>
                 </button>
 
                 {/* Plate AI Tile */}
@@ -15197,7 +14758,7 @@ Lunch
                     </div>
                   </div>
                   <h3 className="text-2xl font-bold mb-2">Analyze My Plate</h3>
-                  <p className="text-purple-100">Photo-based estimates • Quick logging</p>
+                  <p className="text-purple-100">Photo-based estimates â€¢ Quick logging</p>
                 </button>
               </div>
 
@@ -15373,7 +14934,7 @@ Lunch
                   <ul className="space-y-2">
                     {(recipeInReview.ingredients || []).map((ing, i) => (
                       <li key={i} className={`text-sm ${dark?'text-slate-300':'text-gray-700'}`}>
-                        • {typeof ing === 'string' ? ing : `${ing.quantity || ''} ${ing.unit || ''} ${ing.name || ing}`}
+                        â€¢ {typeof ing === 'string' ? ing : `${ing.quantity || ''} ${ing.unit || ''} ${ing.name || ing}`}
                       </li>
                     ))}
                     {(!recipeInReview.ingredients || recipeInReview.ingredients.length === 0) && (
@@ -15470,9 +15031,9 @@ Lunch
                     min="1"
                   />
                   <p className={`text-sm mt-2 ${dark?'text-slate-400':'text-gray-600'}`}>
-                    {Math.round(addToPlanRecipe.nutritionPerServing.calories * addToPlanConfig.servings)} cal • 
-                    {Math.round(addToPlanRecipe.nutritionPerServing.protein * addToPlanConfig.servings)}g P • 
-                    {Math.round(addToPlanRecipe.nutritionPerServing.carbs * addToPlanConfig.servings)}g C • 
+                    {Math.round(addToPlanRecipe.nutritionPerServing.calories * addToPlanConfig.servings)} cal â€¢ 
+                    {Math.round(addToPlanRecipe.nutritionPerServing.protein * addToPlanConfig.servings)}g P â€¢ 
+                    {Math.round(addToPlanRecipe.nutritionPerServing.carbs * addToPlanConfig.servings)}g C â€¢ 
                     {Math.round(addToPlanRecipe.nutritionPerServing.fat * addToPlanConfig.servings)}g F
                   </p>
                 </div>
@@ -15600,3 +15161,4 @@ Lunch
 
   return null;
 }
+
