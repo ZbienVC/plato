@@ -5310,7 +5310,10 @@ export default function App() {
         }
       }
       
-      // Call Claude Vision API
+      // Claude Vision API — temporarily disabled to control API costs
+      // Re-enable when backend proxy is set up
+      throw new Error('SCAN_DISABLED');
+      // eslint-disable-next-line no-unreachable
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -7099,13 +7102,19 @@ Return ONLY the JSON object. No explanation before or after.`
               <button
                 onClick={async () => {
                   setAnalyzing(true);
-                  const result = await analyzePlate(capturedImage, {
-                    plateSize,
-                    mealSizeEstimate,
-                    plateDimension: plateDimension ? parseFloat(plateDimension) : null
-                  });
+                  try {
+                    const result = await analyzePlate(capturedImage, {
+                      plateSize,
+                      mealSizeEstimate,
+                      plateDimension: plateDimension ? parseFloat(plateDimension) : null
+                    });
+                    setPlateResult(result);
+                  } catch (e) {
+                    if (e.message === 'SCAN_DISABLED') {
+                      alert('Plate scan is temporarily unavailable. This feature will be back soon!');
+                    }
+                  }
                   setAnalyzing(false);
-                  setPlateResult(result);
                 }}
                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold btn-press flex items-center justify-center gap-2"
               >
