@@ -910,6 +910,113 @@ const generateMealPlan = (targetCalories, macros, mealsPerDay, form) => {
 
 // ========== END MEAL DATABASE + PLAN GENERATOR ==========
 
+// Recipe Book Modal Component
+function RecipeBook({ mealPlan, recipes, dark, page, setPage, flipping, setFlipping, onClose }) {
+  const allRecipes = [
+    ...(mealPlan || []).map(meal => ({
+      id: meal.name, title: meal.name, calories: meal.calories,
+      protein: meal.protein, carbs: meal.carbs, fat: meal.fat,
+      ingredients: meal.ingredients || [], instructions: meal.instructions || [],
+      source: 'meal-plan'
+    })),
+    ...(recipes || []).map(r => ({ ...r, source: 'saved' }))
+  ].filter((r, i, arr) => arr.findIndex(x => x.title === r.title) === i);
+
+  const recipe = allRecipes[page] || null;
+  const total = allRecipes.length;
+
+  const flipTo = (dir) => {
+    if (dir === 'forward' && page >= total - 1) return;
+    if (dir === 'back' && page <= 0) return;
+    setFlipping(dir);
+    setTimeout(() => {
+      setPage(p => dir === 'forward' ? p + 1 : p - 1);
+      setFlipping(null);
+    }, 350);
+  };
+
+  return (
+    <div style={{position:'fixed',inset:0,zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',padding:'16px',background:'rgba(0,0,0,0.8)',backdropFilter:'blur(8px)'}}>
+      <style>{`@keyframes flipF{0%{transform:rotateY(0);opacity:1}50%{transform:rotateY(-90deg);opacity:0}100%{transform:rotateY(0);opacity:1}}@keyframes flipB{0%{transform:rotateY(0);opacity:1}50%{transform:rotateY(90deg);opacity:0}100%{transform:rotateY(0);opacity:1}}.flipF{animation:flipF 0.35s ease-in-out}.flipB{animation:flipB 0.35s ease-in-out}`}</style>
+      <div style={{width:'100%',maxWidth:'680px',maxHeight:'90vh',display:'flex',flexDirection:'column',background:dark?'#1e1b14':'#fef9f0',border:'3px solid #d97706',borderRadius:'16px',overflow:'hidden',boxShadow:'0 25px 60px rgba(0,0,0,0.5)'}} className={flipping==='forward'?'flipF':flipping==='back'?'flipB':''}>
+        {/* Header */}
+        <div style={{background:'linear-gradient(135deg,#d97706,#92400e)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <span style={{fontSize:'22px'}}>📖</span>
+            <div>
+              <div style={{color:'#fef3c7',fontWeight:'800',fontSize:'16px'}}>PLATO RECIPE BOOK</div>
+              <div style={{color:'#fde68a',fontSize:'11px'}}>{total === 0 ? 'No recipes yet' : `Recipe ${page+1} of ${total}`}</div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{background:'rgba(0,0,0,0.25)',border:'none',color:'#fef3c7',borderRadius:'8px',width:'32px',height:'32px',fontSize:'20px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>×</button>
+        </div>
+
+        {/* Body */}
+        {total === 0 ? (
+          <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'40px',textAlign:'center'}}>
+            <div style={{fontSize:'60px',marginBottom:'16px'}}>📭</div>
+            <h3 style={{color:dark?'#fef3c7':'#92400e',fontWeight:'700',fontSize:'20px',marginBottom:'8px'}}>No recipes yet</h3>
+            <p style={{color:dark?'#d97706':'#b45309',fontSize:'14px'}}>Generate a meal plan to fill your recipe book!</p>
+          </div>
+        ) : (
+          <div style={{display:'flex',flex:1,minHeight:0,overflow:'hidden'}}>
+            {/* Left page */}
+            <div style={{flex:'0 0 44%',borderRight:`2px solid ${dark?'#78350f':'#fcd34d'}`,display:'flex',flexDirection:'column',overflow:'hidden'}}>
+              <RecipeBookImage recipeName={recipe?.title} dark={dark} />
+              <div style={{padding:'14px',overflowY:'auto'}}>
+                <h2 style={{color:dark?'#fef3c7':'#78350f',fontWeight:'800',fontSize:'15px',lineHeight:'1.3',marginBottom:'12px'}}>{recipe?.title}</h2>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px'}}>
+                  {[{l:'Calories',v:recipe?.calories,u:'kcal',c:'#f97316'},{l:'Protein',v:recipe?.protein,u:'g',c:'#3b82f6'},{l:'Carbs',v:recipe?.carbs,u:'g',c:'#22c55e'},{l:'Fat',v:recipe?.fat,u:'g',c:'#eab308'}].map(m=>(
+                    <div key={m.l} style={{background:dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',borderRadius:'8px',padding:'8px',textAlign:'center',border:`1px solid ${m.c}44`}}>
+                      <div style={{color:m.c,fontWeight:'800',fontSize:'17px'}}>{m.v}</div>
+                      <div style={{color:dark?'#d97706':'#92400e',fontSize:'9px',fontWeight:'700',textTransform:'uppercase',letterSpacing:'0.5px'}}>{m.l}</div>
+                      <div style={{color:dark?'#a16207':'#b45309',fontSize:'9px'}}>{m.u}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {/* Right page */}
+            <div style={{flex:1,overflowY:'auto',padding:'14px',position:'relative'}}>
+              <div style={{position:'absolute',inset:0,backgroundImage:`repeating-linear-gradient(to bottom,transparent,transparent 31px,${dark?'rgba(217,119,6,0.07)':'rgba(217,119,6,0.13)'} 31px,${dark?'rgba(217,119,6,0.07)':'rgba(217,119,6,0.13)'} 32px)`,pointerEvents:'none'}}/>
+              <div style={{position:'relative'}}>
+                <h3 style={{color:'#d97706',fontWeight:'800',fontSize:'12px',textTransform:'uppercase',letterSpacing:'1px',marginBottom:'8px',borderBottom:'1px solid #d97706',paddingBottom:'4px'}}>Ingredients</h3>
+                <ul style={{marginBottom:'16px',listStyle:'none',padding:0}}>
+                  {(recipe?.ingredients||[]).map((ing,i)=>(
+                    <li key={i} style={{display:'flex',gap:'6px',marginBottom:'4px',fontSize:'12px',color:dark?'#fef3c7':'#44200e'}}>
+                      <span style={{color:'#d97706',fontWeight:'700',flexShrink:0}}>·</span>{ing}
+                    </li>
+                  ))}
+                  {(!recipe?.ingredients||recipe.ingredients.length===0)&&<li style={{color:dark?'#a16207':'#b45309',fontSize:'11px',fontStyle:'italic'}}>No ingredients listed</li>}
+                </ul>
+                <h3 style={{color:'#d97706',fontWeight:'800',fontSize:'12px',textTransform:'uppercase',letterSpacing:'1px',marginBottom:'8px',borderBottom:'1px solid #d97706',paddingBottom:'4px'}}>Instructions</h3>
+                <ol style={{listStyle:'none',padding:0}}>
+                  {(recipe?.instructions||[]).map((step,i)=>(
+                    <li key={i} style={{display:'flex',gap:'8px',marginBottom:'8px',fontSize:'12px',color:dark?'#fef3c7':'#44200e'}}>
+                      <span style={{background:'#d97706',color:'white',fontWeight:'800',fontSize:'10px',minWidth:'18px',height:'18px',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:'1px'}}>{i+1}</span>
+                      {step}
+                    </li>
+                  ))}
+                  {(!recipe?.instructions||recipe.instructions.length===0)&&<li style={{color:dark?'#a16207':'#b45309',fontSize:'11px',fontStyle:'italic'}}>No instructions listed</li>}
+                </ol>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Footer nav */}
+        <div style={{background:dark?'#292015':'#fef3c7',borderTop:`2px solid ${dark?'#78350f':'#fcd34d'}`,padding:'10px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
+          <button onClick={()=>flipTo('back')} disabled={page===0||total===0} style={{background:page===0?'rgba(0,0,0,0.1)':'#d97706',color:page===0?(dark?'#78350f':'#a16207'):'white',border:'none',borderRadius:'8px',padding:'7px 14px',fontWeight:'700',fontSize:'12px',cursor:page===0?'not-allowed':'pointer'}}>← Prev</button>
+          <div style={{display:'flex',gap:'5px',alignItems:'center'}}>
+            {total<=12?Array.from({length:total}).map((_,i)=>(<button key={i} onClick={()=>setPage(i)} style={{width:i===page?'18px':'7px',height:'7px',borderRadius:'4px',background:i===page?'#d97706':'#fcd34d',border:'none',cursor:'pointer',transition:'all 0.2s'}}/>)):(<span style={{color:dark?'#d97706':'#92400e',fontSize:'12px',fontWeight:'600'}}>{page+1}/{total}</span>)}
+          </div>
+          <button onClick={()=>flipTo('forward')} disabled={page>=total-1||total===0} style={{background:page>=total-1?'rgba(0,0,0,0.1)':'#d97706',color:page>=total-1?(dark?'#78350f':'#a16207'):'white',border:'none',borderRadius:'8px',padding:'7px 14px',fontWeight:'700',fontSize:'12px',cursor:page>=total-1?'not-allowed':'pointer'}}>Next →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Recipe Book image component - fetches from TheMealDB then Unsplash fallback
 function RecipeBookImage({ recipeName, dark }) {
   const [src, setSrc] = React.useState(null);
@@ -13603,168 +13710,7 @@ Lunch
 
 
         {/* ===== RECIPE BOOK ===== */}
-        {showRecipeBook && (() => {
-          const allRecipes = [
-            ...(mealPlan || []).map(meal => ({
-              id: meal.name,
-              title: meal.name,
-              calories: meal.calories,
-              protein: meal.protein,
-              carbs: meal.carbs,
-              fat: meal.fat,
-              ingredients: meal.ingredients || [],
-              instructions: meal.instructions || [],
-              source: 'meal-plan'
-            })),
-            ...recipes.map(r => ({ ...r, source: 'saved' }))
-          ].filter((r, i, arr) => arr.findIndex(x => x.title === r.title) === i);
-
-          const recipe = allRecipes[recipeBookPage];
-          const total = allRecipes.length;
-
-          const flipTo = (dir) => {
-            if (dir === 'forward' && recipeBookPage >= total - 1) return;
-            if (dir === 'back' && recipeBookPage <= 0) return;
-            setRecipeBookFlipping(dir);
-            setTimeout(() => {
-              setRecipeBookPage(p => dir === 'forward' ? p + 1 : p - 1);
-              setRecipeBookFlipping(null);
-            }, 350);
-          };
-
-          return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,0.75)', backdropFilter:'blur(8px)'}}>
-              <style>{`
-                @keyframes flipForward { 0%{transform:rotateY(0deg);opacity:1} 50%{transform:rotateY(-90deg);opacity:0} 100%{transform:rotateY(0deg);opacity:1} }
-                @keyframes flipBack { 0%{transform:rotateY(0deg);opacity:1} 50%{transform:rotateY(90deg);opacity:0} 100%{transform:rotateY(0deg);opacity:1} }
-                .flip-forward { animation: flipForward 0.35s ease-in-out; }
-                .flip-back { animation: flipBack 0.35s ease-in-out; }
-              `}</style>
-
-              <div className="relative w-full max-w-2xl" style={{maxHeight:'90vh'}}>
-                {/* Book container */}
-                <div
-                  className={`rounded-2xl overflow-hidden shadow-2xl ${recipeBookFlipping === 'forward' ? 'flip-forward' : recipeBookFlipping === 'back' ? 'flip-back' : ''}`}
-                  style={{background: dark ? '#1e1b14' : '#fef9f0', border: '3px solid #d97706', minHeight: '560px', display:'flex', flexDirection:'column'}}
-                >
-                  {/* Book header spine */}
-                  <div style={{background:'linear-gradient(135deg, #d97706, #92400e)', padding:'12px 20px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-                    <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-                      <span style={{fontSize:'22px'}}>📖</span>
-                      <div>
-                        <div style={{color:'#fef3c7', fontWeight:'800', fontSize:'16px', letterSpacing:'0.5px'}}>PLATO RECIPE BOOK</div>
-                        <div style={{color:'#fde68a', fontSize:'11px'}}>Recipe {recipeBookPage + 1} of {total}</div>
-                      </div>
-                    </div>
-                    <button onClick={() => setShowRecipeBook(false)} style={{background:'rgba(0,0,0,0.2)', border:'none', color:'#fef3c7', borderRadius:'8px', padding:'6px 10px', cursor:'pointer', fontSize:'18px', lineHeight:1}}>×</button>
-                  </div>
-
-                  {total === 0 ? (
-                    <div style={{flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'40px', textAlign:'center'}}>
-                      <span style={{fontSize:'64px', marginBottom:'16px'}}>📭</span>
-                      <h3 style={{color: dark?'#fef3c7':'#92400e', fontWeight:'700', fontSize:'20px', marginBottom:'8px'}}>No recipes yet</h3>
-                      <p style={{color: dark?'#d97706':'#b45309', fontSize:'14px'}}>Generate a meal plan or save some recipes to fill your recipe book!</p>
-                    </div>
-                  ) : (
-                    <div style={{display:'flex', flex:1, overflow:'hidden'}}>
-                      {/* LEFT PAGE - Image + Stats */}
-                      <div style={{flex:'0 0 45%', borderRight: `2px solid ${dark?'#78350f':'#fcd34d'}`, display:'flex', flexDirection:'column', overflow:'hidden'}}>
-                        {/* Meal image */}
-                        <RecipeBookImage recipeName={recipe?.title} dark={dark} />
-
-                        {/* Macros */}
-                        <div style={{padding:'16px', flex:1}}>
-                          <h2 style={{color: dark?'#fef3c7':'#78350f', fontWeight:'800', fontSize:'16px', lineHeight:'1.3', marginBottom:'12px'}}>{recipe?.title}</h2>
-                          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px'}}>
-                            {[
-                              {label:'Calories', value: recipe?.calories, unit:'kcal', color:'#f97316'},
-                              {label:'Protein',  value: recipe?.protein,  unit:'g',    color:'#3b82f6'},
-                              {label:'Carbs',    value: recipe?.carbs,    unit:'g',    color:'#22c55e'},
-                              {label:'Fat',      value: recipe?.fat,      unit:'g',    color:'#eab308'},
-                            ].map(m => (
-                              <div key={m.label} style={{background: dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)', borderRadius:'10px', padding:'10px', textAlign:'center', border:`1px solid ${m.color}33`}}>
-                                <div style={{color: m.color, fontWeight:'800', fontSize:'18px'}}>{m.value}</div>
-                                <div style={{color: dark?'#d97706':'#92400e', fontSize:'10px', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.5px'}}>{m.label}</div>
-                                <div style={{color: dark?'#a16207':'#b45309', fontSize:'9px'}}>{m.unit}</div>
-                              </div>
-                            ))}
-                          </div>
-                          {recipe?.source === 'saved' && (
-                            <div style={{marginTop:'10px', padding:'6px 10px', background:'#d97706', borderRadius:'8px', textAlign:'center'}}>
-                              <span style={{color:'white', fontSize:'11px', fontWeight:'700'}}>★ SAVED RECIPE</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* RIGHT PAGE - Ingredients + Instructions */}
-                      <div style={{flex:1, display:'flex', flexDirection:'column', overflow:'auto', padding:'16px'}}>
-                        {/* Page lines decoration */}
-                        <div style={{position:'absolute', right:0, top:0, width:'calc(55% - 3px)', height:'100%', backgroundImage:`repeating-linear-gradient(to bottom, transparent, transparent 31px, ${dark?'rgba(217,119,6,0.08)':'rgba(217,119,6,0.15)'} 31px, ${dark?'rgba(217,119,6,0.08)':'rgba(217,119,6,0.15)'} 32px)`, pointerEvents:'none', zIndex:0}}></div>
-
-                        <div style={{position:'relative', zIndex:1}}>
-                          <h3 style={{color:'#d97706', fontWeight:'800', fontSize:'13px', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'10px', borderBottom:'1px solid #d97706', paddingBottom:'4px'}}>Ingredients</h3>
-                          <ul style={{marginBottom:'18px', listStyle:'none', padding:0}}>
-                            {(recipe?.ingredients || []).map((ing, i) => (
-                              <li key={i} style={{display:'flex', alignItems:'flex-start', gap:'8px', marginBottom:'5px', fontSize:'13px', color: dark?'#fef3c7':'#44200e'}}>
-                                <span style={{color:'#d97706', fontWeight:'700', flexShrink:0}}>·</span>
-                                {ing}
-                              </li>
-                            ))}
-                            {(!recipe?.ingredients || recipe.ingredients.length === 0) && (
-                              <li style={{color: dark?'#a16207':'#b45309', fontSize:'12px', fontStyle:'italic'}}>No ingredients listed</li>
-                            )}
-                          </ul>
-
-                          <h3 style={{color:'#d97706', fontWeight:'800', fontSize:'13px', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'10px', borderBottom:'1px solid #d97706', paddingBottom:'4px'}}>Instructions</h3>
-                          <ol style={{listStyle:'none', padding:0}}>
-                            {(recipe?.instructions || []).map((step, i) => (
-                              <li key={i} style={{display:'flex', gap:'10px', marginBottom:'10px', fontSize:'13px', color: dark?'#fef3c7':'#44200e'}}>
-                                <span style={{background:'#d97706', color:'white', fontWeight:'800', fontSize:'11px', width:'20px', height:'20px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:'1px'}}>{i+1}</span>
-                                {step}
-                              </li>
-                            ))}
-                            {(!recipe?.instructions || recipe.instructions.length === 0) && (
-                              <li style={{color: dark?'#a16207':'#b45309', fontSize:'12px', fontStyle:'italic'}}>No instructions listed</li>
-                            )}
-                          </ol>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Navigation footer */}
-                  <div style={{background: dark?'#292015':'#fef3c7', borderTop:`2px solid ${dark?'#78350f':'#fcd34d'}`, padding:'12px 20px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-                    <button
-                      onClick={() => flipTo('back')}
-                      disabled={recipeBookPage === 0 || total === 0}
-                      style={{display:'flex', alignItems:'center', gap:'6px', background: recipeBookPage === 0 ? 'rgba(0,0,0,0.1)' : '#d97706', color: recipeBookPage === 0 ? (dark?'#78350f':'#d97706') : 'white', border:'none', borderRadius:'10px', padding:'8px 16px', fontWeight:'700', fontSize:'13px', cursor: recipeBookPage === 0 ? 'not-allowed' : 'pointer', transition:'all 0.2s'}}
-                    >
-                      ← Previous
-                    </button>
-
-                    {/* Page dots */}
-                    <div style={{display:'flex', gap:'6px', alignItems:'center'}}>
-                      {total <= 10 ? Array.from({length: total}).map((_, i) => (
-                        <button key={i} onClick={() => setRecipeBookPage(i)} style={{width: i === recipeBookPage ? '20px':'8px', height:'8px', borderRadius:'4px', background: i === recipeBookPage ? '#d97706':'#fcd34d', border:'none', cursor:'pointer', transition:'all 0.2s'}} />
-                      )) : (
-                        <span style={{color: dark?'#d97706':'#92400e', fontSize:'13px', fontWeight:'600'}}>{recipeBookPage + 1} / {total}</span>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={() => flipTo('forward')}
-                      disabled={recipeBookPage >= total - 1 || total === 0}
-                      style={{display:'flex', alignItems:'center', gap:'6px', background: recipeBookPage >= total - 1 ? 'rgba(0,0,0,0.1)' : '#d97706', color: recipeBookPage >= total - 1 ? (dark?'#78350f':'#d97706') : 'white', border:'none', borderRadius:'10px', padding:'8px 16px', fontWeight:'700', fontSize:'13px', cursor: recipeBookPage >= total - 1 ? 'not-allowed' : 'pointer', transition:'all 0.2s'}}
-                    >
-                      Next →
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
+        {showRecipeBook && <RecipeBook mealPlan={mealPlan} recipes={recipes} dark={dark} page={recipeBookPage} setPage={setRecipeBookPage} flipping={recipeBookFlipping} setFlipping={setRecipeBookFlipping} onClose={() => setShowRecipeBook(false)} />}
 
         {/* Menu Sidebar */}
         {menuOpen && (
