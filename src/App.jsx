@@ -1017,6 +1017,56 @@ function RecipeBook({ mealPlan, recipes, dark, page, setPage, flipping, setFlipp
   );
 }
 
+// Meal card image component - fetches real food photo from TheMealDB with gradient fallback
+function MealCardImage({ mealName }) {
+  const [imgSrc, setImgSrc] = React.useState(null);
+  const [imgLoaded, setImgLoaded] = React.useState(false);
+  const [imgError, setImgError] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!mealName) return;
+    const searchName = mealName.split(' ').slice(0, 3).join(' ');
+    fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + encodeURIComponent(searchName))
+      .then(r => r.json())
+      .then(data => {
+        if (data.meals && data.meals[0] && data.meals[0].strMealThumb) {
+          setImgSrc(data.meals[0].strMealThumb);
+        } else {
+          setImgError(true);
+        }
+      })
+      .catch(() => setImgError(true));
+  }, [mealName]);
+
+  const colors = [
+    ['#10d9a0', '#059669'],
+    ['#6366f1', '#4f46e5'],
+    ['#f59e0b', '#d97706'],
+    ['#ef4444', '#dc2626'],
+    ['#3b82f6', '#2563eb'],
+    ['#8b5cf6', '#7c3aed'],
+  ];
+  const colorPair = colors[(mealName ? mealName.charCodeAt(0) : 0) % colors.length];
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '160px', overflow: 'hidden', borderRadius: '12px', flexShrink: 0, marginBottom: '16px' }}>
+      <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${colorPair[0]}, ${colorPair[1]})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ fontSize: '48px', opacity: 0.3 }}>&#127860;</span>
+      </div>
+      {imgSrc && !imgError && (
+        <img
+          src={imgSrc}
+          alt={mealName}
+          onLoad={() => setImgLoaded(true)}
+          onError={() => setImgError(true)}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: imgLoaded ? 1 : 0, transition: 'opacity 0.4s ease' }}
+        />
+      )}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60px', background: 'linear-gradient(to top, rgba(0,0,0,0.5), transparent)' }} />
+    </div>
+  );
+}
+
 // Recipe Book image component - fetches from TheMealDB then Unsplash fallback
 function RecipeBookImage({ recipeName, dark }) {
   const [src, setSrc] = React.useState(null);
@@ -12099,10 +12149,10 @@ Lunch
             >
               <Menu className={`w-6 h-6 ${dark?'text-white':'text-gray-900'}`} />
             </button>
-            <h1 className={`text-3xl md:text-4xl font-extrabold mb-2 gradient-text`}>
+            <h1 className={`text-3xl md:text-4xl font-extrabold mb-2 gradient-text pr-14`}>
               {plan.name}'s Meal Plan
             </h1>
-            <p className={`${dark?'text-slate-400':'text-slate-600'}`}>
+            <p className={`${dark?'text-slate-400':'text-slate-600'} pr-14`}>
               Your personalized nutrition guide
             </p>
           </div>
@@ -12508,7 +12558,7 @@ Lunch
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-2 mb-6 overflow-x-auto">
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 px-1">
             {/* Micronutrient Summary (Advanced Mode Only) */}
             {advancedMode && (
               <button
@@ -12517,17 +12567,17 @@ Lunch
                   setDailyMicroData(summary);
                   setShowDailyMicroSummary(true);
                 }}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${dark?'bg-blue-600 text-white hover:bg-blue-700':'bg-blue-500 text-white hover:bg-blue-600'} shadow-premium-lg text-sm`}
+                className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${dark?'bg-blue-600 text-white hover:bg-blue-700':'bg-blue-500 text-white hover:bg-blue-600'} shadow-premium-lg text-sm`}
               >
                 <Activity className="w-4 h-4" />
                 <span className="hidden sm:inline">Micronutrient Summary</span>
                 <span className="sm:hidden">Micros</span>
               </button>
             )}
-            
+
             <button
               onClick={() => setShowScanning(true)}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-xl shadow-lg btn-press text-sm"
+              className="flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-xl shadow-lg btn-press text-sm"
             >
               <Scan className="w-4 h-4" />
               <span className="hidden sm:inline">Scan Food</span>
@@ -12535,7 +12585,7 @@ Lunch
             </button>
             <button
               onClick={() => setShowWeighInModal(true)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${dark?'bg-purple-600 text-white hover:bg-purple-700':'bg-purple-500 text-white hover:bg-purple-600'} shadow-premium-lg text-sm`}
+              className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${dark?'bg-purple-600 text-white hover:bg-purple-700':'bg-purple-500 text-white hover:bg-purple-600'} shadow-premium-lg text-sm`}
             >
               <TrendingUp className="w-4 h-4" />
               <span className="hidden sm:inline">Log Weight</span>
@@ -12549,7 +12599,7 @@ Lunch
                 }
                 setShowGroceryList(true);
               }}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${dark?'bg-blue-600 text-white hover:bg-blue-700':'bg-blue-500 text-white hover:bg-blue-600'} shadow-premium-lg text-sm`}
+              className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${dark?'bg-blue-600 text-white hover:bg-blue-700':'bg-blue-500 text-white hover:bg-blue-600'} shadow-premium-lg text-sm`}
             >
               <ShoppingCart className="w-4 h-4" />
               <span className="hidden sm:inline">Grocery List</span>
@@ -12557,7 +12607,7 @@ Lunch
             </button>
             <button
               onClick={savePlan}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${dark?'bg-slate-800 text-white hover:bg-slate-700':'bg-white text-slate-900 hover:bg-gray-50'} shadow-premium text-sm`}
+              className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${dark?'bg-slate-800 text-white hover:bg-slate-700':'bg-white text-slate-900 hover:bg-gray-50'} shadow-premium text-sm`}
             >
               <Star className="w-4 h-4" />
               <span className="hidden sm:inline">Save Current Plan</span>
@@ -12573,23 +12623,9 @@ Lunch
               
               return (
               <div key={idx} className={`${dark?'glass-dark':'glass'} p-6 rounded-2xl shadow-premium transition-all`}>
-                {/* Meal Image - Simple CSS Version */}
+                {/* Meal Image - Real food photo from TheMealDB */}
                 {showMealImages && (
-                  <div 
-                    className="mb-4 rounded-xl overflow-hidden shadow-lg flex flex-col items-center justify-center p-8 text-center"
-                    style={{
-                      aspectRatio: '4/3',
-                      background: `linear-gradient(135deg, hsl(${hue}, 70%, 60%), hsl(${(hue + 40) % 360}, 70%, 50%))`,
-                    }}
-                  >
-                    <div className="bg-white/10 rounded-full w-32 h-32 absolute blur-xl"></div>
-                    <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 relative z-10" style={{textShadow: '0 2px 4px rgba(0,0,0,0.2)'}}>
-                      {meal.name}
-                    </h3>
-                    <p className="text-white/90 text-sm md:text-base relative z-10" style={{textShadow: '0 1px 2px rgba(0,0,0,0.2)'}}>
-                      {meal.calories || 0} cal - {meal.protein || 0}g protein
-                    </p>
-                  </div>
+                  <MealCardImage mealName={meal.name} />
                 )}
                 
                 <div className="flex flex-col sm:flex-row justify-between items-start gap-3 mb-3">
