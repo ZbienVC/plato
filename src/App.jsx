@@ -239,17 +239,17 @@ const shouldIgnoreIngredient = (parsed, nutritionData) => {
   
   // Spices: Ignore if no quantity or very small quantity
   if (matchesCategory(name, INGREDIENT_CATEGORIES.spices)) {
-    // "to taste", "pinch", or no quantity â†’ ignore
+    // "to taste", "pinch", or no quantity -> ignore
     if (!qty || qty === 0) {
       return { shouldIgnore: true, reason: 'spice-negligible' };
     }
     
-    // Small amounts â†’ ignore (<1 tsp or <5g)
+    // Small amounts -> ignore (<1 tsp or <5g)
     if ((unit === 'tsp' && qty < 1) || (unit === 'g' && qty < 5)) {
       return { shouldIgnore: true, reason: 'spice-small-amount' };
     }
     
-    // Estimated calorie contribution < 10 â†’ ignore
+    // Estimated calorie contribution < 10 -> ignore
     if (nutritionData) {
       const estimatedCals = estimateCalories(qty, unit, nutritionData);
       if (estimatedCals < 10) {
@@ -258,14 +258,14 @@ const shouldIgnoreIngredient = (parsed, nutritionData) => {
     }
   }
   
-  // Sauces: Only count if â‰¥1 tbsp
+  // Sauces: Only count if >=1 tbsp
   if (matchesCategory(name, INGREDIENT_CATEGORIES.sauces)) {
-    // "to taste" or no quantity â†’ ignore
+    // "to taste" or no quantity -> ignore
     if (!qty || qty === 0) {
       return { shouldIgnore: true, reason: 'sauce-to-taste' };
     }
     
-    // Less than 1 tbsp â†’ ignore
+    // Less than 1 tbsp -> ignore
     if (unit === 'tbsp' && qty < 1) {
       return { shouldIgnore: true, reason: 'sauce-small-amount' };
     }
@@ -336,7 +336,7 @@ const applyDefaultQuantity = (parsed, nutritionData) => {
 const calculateIngredientConfidence = (parsed, nutritionData, perUnit) => {
   let confidence = 0.5; // Base confidence
   
-  // No parsed data â†’ very low confidence
+  // No parsed data -> very low confidence
   if (!parsed) return 0.4;
   
   const { qty, unit, name } = parsed;
@@ -707,7 +707,7 @@ const testMealMacroMath = () => {
     console.log(`  Ingredients: ${meal.ingredients.join(', ')}`);
     console.log(`  Computed: ${computed.protein}p / ${computed.carbs}c / ${computed.fat}f`);
     console.log(`  Calories: ${computed.calories} (4/4/9 check: ${expectedCalories}, diff: ${calorieDiff})`);
-    console.log(`  ${calorieDiff <= 5 ? 'âœ“ PASS' : 'âœ— FAIL'}`);
+    console.log(`  ${calorieDiff <= 5 ? '\u2714 PASS' : '\u2718 FAIL'}`);
   }
 };
 
@@ -732,7 +732,7 @@ const testRestrictionFiltering = () => {
     for (const item of testCase.shouldBlock) {
       const mockMeal = { name: item, ingredients: [item] };
       const allowed = isMealAllowed(mockMeal, forbidden);
-      console.log(`  "${item}": ${allowed ? 'âœ— FAIL (should be blocked)' : 'âœ“ PASS (correctly blocked)'}`);
+      console.log(`  “${item}”: ${allowed ? '\u2718 FAIL (should be blocked)' : '\u2714 PASS (correctly blocked)'}`);
     }
   }
 };
@@ -1202,7 +1202,7 @@ export default function App() {
    */
   
   /**
-   * Migration map: Old goal format â†’ New two-layer format
+   * Migration map: Old goal format -> New two-layer format
    */
   const GOAL_MIGRATION_MAP = {
     'fat-loss': { primaryGoal: 'lose', secondaryGoals: [] },
@@ -2113,7 +2113,7 @@ export default function App() {
       showToast('Removed from favorites', 'info');
     } else {
       setFavs([...favs, {...meal, key: mealKey, savedAt: new Date()}]);
-      showToast('Added to favorites! â¤ï¸', 'success');
+      showToast('Added to favorites! ❤️', 'success');
     }
   };
 
@@ -2733,7 +2733,7 @@ export default function App() {
         prepTime: 25,
         microStrengths: ['vitaminB12', 'iron', 'magnesium'],
         ingredients: ['shrimp', 'brown rice', 'black beans', 'salsa', 'cilantro'],
-        instructions: ['Cook rice and beans', 'Saut shrimp', 'Assemble bowl', 'Top with salsa']
+        instructions: ['Cook rice and beans', 'Sauté shrimp', 'Assemble bowl', 'Top with salsa']
       },
       
       // Lighter Options
@@ -2753,7 +2753,7 @@ export default function App() {
         prepTime: 10,
         microStrengths: ['vitaminA', 'vitaminC', 'potassium'],
         ingredients: ['egg whites', 'spinach', 'mushrooms', 'tomatoes', 'whole grain toast'],
-        instructions: ['Saut vegetables', 'Add egg whites', 'Scramble until cooked', 'Serve with toast']
+        instructions: ['Sauté vegetables', 'Add egg whites', 'Scramble until cooked', 'Serve with toast']
       },
       
       // Faster Prep
@@ -2898,7 +2898,7 @@ export default function App() {
     // Calorie questions
     else if (query.includes('calorie') || query.includes('deficit') || query.includes('surplus')) {
       const deficit = form.goals === 'fat-loss' ? 'deficit' : form.goals === 'lean-bulk' ? 'surplus' : 'maintenance';
-      response = `You're targeting ${plan.calories} calories for ${form.goals}. This puts you in a ${deficit} based on your ${form.activity} activity level and ${form.weight}lbs body.t. ${form.targetRate === 'aggressive' ? 'Your aggressive rate means faster results but requires strict adherence.' : form.targetRate === 'slow' ? 'Your slow & stea- approach is sustainable and easier to stick to long-term.' : 'Your moderate pace balances results with sustainability.'}`;
+      response = `You're targeting ${plan.calories} calories for ${form.goals}. This puts you in a ${deficit} based on your ${form.activity} activity level and ${form.weight}lbs bodyweight. ${form.targetRate === 'aggressive' ? 'Your aggressive rate means faster results but requires strict adherence.' : form.targetRate === 'slow' ? 'Your slow & steady approach is sustainable and easier to stick to long-term.' : 'Your moderate pace balances results with sustainability.'}`;
     }
     // Meal timing
     else if (query.includes('when') && (query.includes('eat') || query.includes('meal'))) {
@@ -2909,7 +2909,7 @@ export default function App() {
       response = form.trainingType === 'strength' 
         ? "Since you're focused on strength training, keep cardio to 2-3 sessions of 20-30min weekly. Too much interferes with recovery and gains."
         : form.trainingType === 'cardio'
-        ? "You're already doing cardio training! Aim for 4-5 sessions weekly. Mix stea-e and HIIT for best results."
+        ? "You're already doing cardio training! Aim for 4-5 sessions weekly. Mix steady-state and HIIT for best results."
         : "As a hybrid athlete, balance 2-3 cardio sessions with your strength work. Don't let cardio interfere with recovery!";
     }
     // Cheat meal questions
@@ -2924,7 +2924,7 @@ export default function App() {
     }
     // Water/hydration
     else if (query.includes('water') || query.includes('hydrat')) {
-      response = `Aim for ${Math.round(form.weight / 2)} oz daily (body.t  2). More if you're training hard or it's hot. Track it in the daily tracker!`;
+      response = `Aim for ${Math.round(form.weight / 2)} oz daily (bodyweight / 2). More if you're training hard or it's hot. Track it in the daily tracker!`;
     }
     // Sleep
     else if (query.includes('sleep')) {
@@ -2938,7 +2938,7 @@ export default function App() {
     }
     // Progress tracking
     else if (query.includes('track') || query.includes('progress') || query.includes('measure')) {
-      response = "Track weekly: body.t (same day/time), progress photos, and how clothes fit. Scale weight fluctuates daily due to water/food. Focus on 2-4 week trends, not daily changes!";
+      response = "Track weekly: bodyweight (same day/time), progress photos, and how clothes fit. Scale weight fluctuates daily due to water/food. Focus on 2-4 week trends, not daily changes!";
     }
     // Meal prep
     else if (query.includes('meal prep') || query.includes('prepare')) {
@@ -3637,7 +3637,7 @@ export default function App() {
           groceryList
             .filter(i => i.category === category && !i.checked)
             .forEach(item => {
-              formatted += `â˜ ${item.name} - ${item.quantity}\n`;
+              formatted += `☐ ${item.name} - ${item.quantity}\n`;
             });
           formatted += '\n';
         });
@@ -3708,7 +3708,7 @@ export default function App() {
       time: 30,
       difficulty: 'Easy',
       ingredients: ['chicken breast', 'broccoli', 'garlic', 'olive oil', 'herbs'],
-      instructions: ['Preheat oven to 400Â°F', 'Season chicken with garlic and herbs', 'Roast chicken and broccoli for 25 minutes', 'Serve hot'],
+      instructions: ['Preheat oven to 400°F', 'Season chicken with garlic and herbs', 'Roast chicken and broccoli for 25 minutes', 'Serve hot'],
       macros: { calories: 380, protein: 42, carbs: 12, fat: 18 }
     },
     {
@@ -3724,7 +3724,7 @@ export default function App() {
       time: 25,
       difficulty: 'Medium',
       ingredients: ['chicken breast', 'pasta', 'cheese', 'garlic', 'cream'],
-      instructions: ['Cook pasta according to package', 'Saut chicken until golden', 'Add cream and cheese', 'Toss with pasta', 'Garnish and serve'],
+      instructions: ['Cook pasta according to package', 'Sauté chicken until golden', 'Add cream and cheese', 'Toss with pasta', 'Garnish and serve'],
       macros: { calories: 520, protein: 38, carbs: 52, fat: 18 }
     },
     // Egg recipes
@@ -3733,7 +3733,7 @@ export default function App() {
       time: 15,
       difficulty: 'Easy',
       ingredients: ['eggs', 'broccoli', 'cheese', 'onions', 'tomatoes'],
-      instructions: ['Whisk eggs with cheese', 'Saut vegetables', 'Pour eggs over vegetables', 'Cook until set', 'Slice and serve'],
+      instructions: ['Whisk eggs with cheese', 'Sauté vegetables', 'Pour eggs over vegetables', 'Cook until set', 'Slice and serve'],
       macros: { calories: 280, protein: 22, carbs: 8, fat: 18 }
     },
     {
@@ -3750,7 +3750,7 @@ export default function App() {
       time: 20,
       difficulty: 'Easy',
       ingredients: ['pasta', 'tomatoes', 'garlic', 'olive oil', 'cheese'],
-      instructions: ['Boil pasta', 'Saut garlic in olive oil', 'Add diced tomatoes', 'Toss with pasta', 'Top with cheese'],
+      instructions: ['Boil pasta', 'Sauté garlic in olive oil', 'Add diced tomatoes', 'Toss with pasta', 'Top with cheese'],
       macros: { calories: 420, protein: 14, carbs: 68, fat: 12 }
     },
     {
@@ -3775,7 +3775,7 @@ export default function App() {
       time: 35,
       difficulty: 'Medium',
       ingredients: ['rice', 'cheese', 'broccoli', 'onions', 'cream'],
-      instructions: ['Cook rice', 'Mix with cheese and cream', 'Add vegetables', 'Bake at 375Â°F for 20 minutes', 'Let cool slightly'],
+      instructions: ['Cook rice', 'Mix with cheese and cream', 'Add vegetables', 'Bake at 375°F for 20 minutes', 'Let cool slightly'],
       macros: { calories: 420, protein: 18, carbs: 48, fat: 18 }
     },
     // Simple quick meals
@@ -3788,11 +3788,11 @@ export default function App() {
       macros: { calories: 220, protein: 12, carbs: 8, fat: 16 }
     },
     {
-      title: 'Garlic Saut Broccoli',
+      title: 'Garlic Sauté Broccoli',
       time: 10,
       difficulty: 'Easy',
       ingredients: ['broccoli', 'garlic', 'olive oil'],
-      instructions: ['Cut broccoli into florets', 'Heat olive oil', 'Add garlic and broccoli', 'Saut until tender', 'Season and serve'],
+      instructions: ['Cut broccoli into florets', 'Heat olive oil', 'Add garlic and broccoli', 'Sauté until tender', 'Season and serve'],
       macros: { calories: 120, protein: 4, carbs: 12, fat: 7 }
     },
     {
@@ -4412,7 +4412,7 @@ export default function App() {
     const targetCalories = plan?.calories || actualTDEE;
     const avgDailyBalance = avgDailyIntake - targetCalories;
     
-    // Weight change forecast using 3500 cal â‰ˆ 1 lb rule
+    // Weight change forecast using 3500 cal ≈ 1 lb rule
     const forecastDays = 14;
     const totalBalanceOver14Days = avgDailyBalance * forecastDays;
     const expectedWeightChange = totalBalanceOver14Days / 3500; // in lbs
@@ -4511,7 +4511,7 @@ export default function App() {
   
   // ========== NUTRIENT SUPPORT SUGGESTIONS (ADDITIVE) ==========
   
-  // Nutrient â†’ Food sources mapping
+  // Nutrient -> Food sources mapping
   const NUTRIENT_FOOD_SOURCES = {
     vitaminC: {
       name: 'Vitamin C',
@@ -4823,7 +4823,7 @@ export default function App() {
       console.log(`\n${meal.name}:`);
       console.log(`  Ingredients: ${meal.ingredients.join(', ')}`);
       console.log(`  Computed: ${computed.protein}p / ${computed.carbs}c / ${computed.fat}f = ${computed.calories} cal`);
-      console.log(`  4/4/9 Check: ${calorieCheck} cal (${calorieMatch ? 'âœ“ PASS' : 'âœ— FAIL'})`);
+      console.log(`  4/4/9 Check: ${calorieCheck} cal (${calorieMatch ? '✔ PASS' : '✘ FAIL'})`);
     });
     
     console.log('\n=== END TEST ===');
@@ -4861,7 +4861,7 @@ export default function App() {
       
       testCase.meals.forEach(meal => {
         const allowed = isMealAllowed(meal, forbidden);
-        console.log(`  ${meal.name}: ${allowed ? 'âœ“ ALLOWED' : 'âœ— BLOCKED'}`);
+        console.log(`  ${meal.name}: ${allowed ? '✔ ALLOWED' : '✘ BLOCKED'}`);
       });
     });
     
@@ -4995,7 +4995,7 @@ export default function App() {
   const analyzePlate = async (imageDataUrl, sizeContext = {}) => {
     setAnalyzing(true);
     
-    // Deterministic pipeline: Vision â†’ Portion â†’ Nutrition â†’ Scoring
+    // Deterministic pipeline: Vision -> Portion -> Nutrition -> Scoring
     const errors = [];
     const debugInfo = {
       sizeContext: sizeContext // Store user-provided size context
@@ -5974,7 +5974,7 @@ Return ONLY the JSON object. No explanation before or after.`
           { name: 'honey', quantity: '1/3', unit: 'cup', optional: false }
         ],
         steps: [
-          'Preheat oven to 350Â°F and grease an 8x8 baking pan',
+          'Preheat oven to 350°F and grease an 8x8 baking pan',
           'Drain and rinse black beans thoroughly',
           'Blend beans, eggs, honey, and vanilla until smooth',
           'Mix in protein powder and cocoa powder',
@@ -6201,7 +6201,7 @@ Return ONLY the JSON object. No explanation before or after.`
         nutritionPerServing: { calories: 420, protein: 38, carbs: 28, fat: 18 },
         servings: 2,
         ingredients: ['12oz salmon', 'Broccoli', 'Sweet potato', 'Olive oil', 'Lemon', 'Garlic'],
-        instructions: ['Preheat oven to 400Â°F', 'Arrange on sheet pan', 'Drizzle with oil', 'Bake 20 minutes']
+        instructions: ['Preheat oven to 400°F', 'Arrange on sheet pan', 'Drizzle with oil', 'Bake 20 minutes']
       },
       {
         id: 'rec-5',
@@ -6245,7 +6245,7 @@ Return ONLY the JSON object. No explanation before or after.`
         nutritionPerServing: { calories: 320, protein: 28, carbs: 2, fat: 22 },
         servings: 4,
         ingredients: ['2lbs chicken wings', 'Olive oil', 'Paprika', 'Garlic powder', 'Salt'],
-        instructions: ['Toss wings with oil and seasonings', 'Air fry at 400Â°F for 20 minutes', 'Flip halfway through']
+        instructions: ['Toss wings with oil and seasonings', 'Air fry at 400°F for 20 minutes', 'Flip halfway through']
       }
     ];
   };
@@ -8319,7 +8319,7 @@ Return ONLY the JSON object. No explanation before or after.`
               {needsReview && !canLog && (
                 <div className={`p-3 rounded-lg ${dark?'bg-yellow-900/20 border border-yellow-700/30':'bg-yellow-50 border border-yellow-200'}`}>
                   <p className={`text-xs ${dark?'text-yellow-300':'text-yellow-700'}`}>
-                    <strong>âš ï¸ Review Required:</strong> {lowConfidenceItems.length > 0 
+                    <strong>⚠️ Review Required:</strong> {lowConfidenceItems.length > 0 
                       ? `${lowConfidenceItems.length} item${lowConfidenceItems.length > 1 ? 's' : ''} need${lowConfidenceItems.length === 1 ? 's' : ''} confirmation. Check the boxes to confirm.`
                       : 'Low confidence detection. Please verify all items and portions before saving.'}
                   </p>
@@ -8330,7 +8330,7 @@ Return ONLY the JSON object. No explanation before or after.`
               {requiresConfirmation && canLog && (
                 <div className={`p-3 rounded-lg ${dark?'bg-green-900/20 border border-green-700/30':'bg-green-50 border border-green-200'}`}>
                   <p className={`text-xs ${dark?'text-green-300':'text-green-700'}`}>
-                    <strong>âœ“ Ready to log:</strong> You've reviewed and confirmed all items.
+                    <strong>✔ Ready to log:</strong> You've reviewed and confirmed all items.
                   </p>
                 </div>
               )}
@@ -8798,7 +8798,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 dark ? 'text-slate-400 hover:text-slate-300' : 'text-slate-600 hover:text-slate-700'
               }`}
             >
-              â† Back
+              ← Back
             </button>
           </div>
         </div>
@@ -9182,7 +9182,7 @@ Return ONLY the JSON object. No explanation before or after.`
                       {/* Helper text for multi-select */}
                       {(form.secondaryGoals || []).length > 0 && (
                         <p className={`text-xs mt-3 ${dark?'text-blue-400':'text-blue-600'}`}>
-                          âœ“ {(form.secondaryGoals || []).length} emphasis area{(form.secondaryGoals || []).length > 1 ? 's' : ''} selected
+                          ✔ {(form.secondaryGoals || []).length} emphasis area{(form.secondaryGoals || []).length > 1 ? 's' : ''} selected
                         </p>
                       )}
                     </div>
@@ -10160,7 +10160,7 @@ Return ONLY the JSON object. No explanation before or after.`
                                       <ul className="space-y-1">
                                         {userHas.map((ing, i) => (
                                           <li key={i} className={`text-sm flex items-start gap-2 ${dark?'text-emerald-300':'text-emerald-700'}`}>
-                                            <span className="text-emerald-500">âœ“</span>
+                                            <span className="text-emerald-500">✔</span>
                                             <span>{ing}</span>
                                           </li>
                                         ))}
@@ -10178,7 +10178,7 @@ Return ONLY the JSON object. No explanation before or after.`
                                       <ul className="space-y-1">
                                         {userNeeds.map((ing, i) => (
                                           <li key={i} className={`text-sm flex items-start gap-2 ${dark?'text-orange-300':'text-orange-700'}`}>
-                                            <span className="text-orange-500">â—‹</span>
+                                            <span className="text-orange-500">○</span>
                                             <span>{ing}</span>
                                           </li>
                                         ))}
@@ -12193,7 +12193,7 @@ Lunch
                       {[
                         { val: 'strength', label: 'Strength', icon: '\uD83D\uDCAA' },
                         { val: 'cardio', label: 'Cardio', icon: '\u2764' },
-                        { val: 'mixed', label: 'Mixed', icon: 'âš¡' }
+                        { val: 'mixed', label: 'Mixed', icon: '⚡' }
                       ].map(type => (
                         <button
                           key={type.val}
@@ -12252,7 +12252,7 @@ Lunch
                         <p className={`text-xs ${dark?'text-blue-300':'text-blue-700'}`}>
                           {hasAdjustments ? (
                             <>
-                              âœ“ Training day noted. Remaining meals slightly adjusted for recovery.
+                              ✔ Training day noted. Remaining meals slightly adjusted for recovery.
                             </>
                           ) : (
                             <>
@@ -13436,7 +13436,7 @@ Lunch
                       return (
                         <div className={`p-4 rounded-xl mb-4 border-2 ${dark?'bg-slate-700/50 border-slate-600':'bg-gray-100 border-gray-300'}`}>
                           <div className="flex items-center gap-3">
-                            <span className="text-3xl">â³</span>
+                            <span className="text-3xl">⏳</span>
                             <div>
                               <p className={`text-sm font-semibold ${dark?'text-slate-300':'text-gray-700'}`}>
                                 Need More Time for Trend
@@ -13452,7 +13452,7 @@ Lunch
                     
                     const trendColor = trend < -0.05 ? 'text-blue-500' : trend > 0.05 ? 'text-orange-500' : 'text-slate-500';
                     const trendBg = trend < -0.05 ? 'bg-blue-500/10 border-blue-500/20' : trend > 0.05 ? 'bg-orange-500/10 border-orange-500/20' : 'bg-slate-500/10 border-slate-500/20';
-                    const trendIcon = trend < -0.05 ? '' : trend > 0.05 ? '' : 'âž¡ï¸';
+                    const trendIcon = trend < -0.05 ? '' : trend > 0.05 ? '' : '➡️';
                     const trendLabel = trend < -0.05 ? 'Losing' : trend > 0.05 ? 'Gaining' : 'Stable';
                     
                     return (
@@ -14126,7 +14126,7 @@ Lunch
                   </div>
                   <div className={`p-3 rounded-xl ${dark?'bg-slate-900':'bg-blue-50'} text-center`}>
                     <div className={`text-2xl font-bold ${dark?'text-blue-400':'text-blue-600'}`}>
-                      {dailyTrainingContext.trained ? 'âœ“' : '"”'}
+                      {dailyTrainingContext.trained ? '✔' : '"”'}
                     </div>
                     <div className={`text-xs ${dark?'text-slate-400':'text-slate-600'}`}>Today's Training</div>
                   </div>
@@ -14376,7 +14376,7 @@ Lunch
                         item.checked ? 'bg-emerald-500 border-emerald-500' : dark?'border-slate-600':'border-gray-300'
                       }`}
                     >
-                      {item.checked && <span className="text-white text-sm">âœ“</span>}
+                      {item.checked && <span className="text-white text-sm">✔</span>}
                     </div>
                     <div className="flex-1">
                       <span className={`${item.checked?'line-through':''} ${dark?'text-white':'text-gray-900'}`}>
@@ -14612,7 +14612,7 @@ Lunch
                                   </p>
                                 </div>
                                 <div className="text-3xl">
-                                  {trendDirection === 'down' ? '' : trendDirection === 'up' ? '' : 'âž¡ï¸'}
+                                  {trendDirection === 'down' ? '' : trendDirection === 'up' ? '' : '➡️'}
                                 </div>
                               </div>
                             </div>
