@@ -1383,9 +1383,9 @@ export default function App() {
 
   // Achievement System
   const [achievements, setAchievements] = useState([
-    {id: 'first-plan', name: 'First Steps', desc: 'Generate your first meal plan', icon: 'ðŸŽ¯', unlocked: false, progress: 0, target: 1},
-    {id: 'week-streak', name: 'Week Warrior', desc: 'Track meals for 7 days', icon: 'ðŸ”¥', unlocked: false, progress: 0, target: 7},
-    {id: 'macro-master', name: 'Macro Master', desc: 'Hit your macros 5 times', icon: 'ðŸŽ¯', unlocked: false, progress: 0, target: 5},
+    {id: 'first-plan', name: 'First Steps', desc: 'Generate your first meal plan', icon: '\uD83C\uDFC6', unlocked: false, progress: 0, target: 1},
+    {id: 'week-streak', name: 'Week Warrior', desc: 'Track meals for 7 days', icon: '\uD83D\uDD25', unlocked: false, progress: 0, target: 7},
+    {id: 'macro-master', name: 'Macro Master', desc: 'Hit your macros 5 times', icon: '\uD83D\uDCAA', unlocked: false, progress: 0, target: 5},
   ]);
   const [showAchievement, setShowAchievement] = useState(null);
   const [toasts, setToasts] = useState([]);
@@ -2002,7 +2002,7 @@ export default function App() {
     if (Math.abs(variance) < 0.15) {
       return {
         status: 'on-track',
-        message: 'ðŸŽ¯ Perfect! Your progress is right on target.',
+        message: ' Perfect! Your progress is right on target.',
         adjustment: 0,
         confidence: 'high'
       };
@@ -2436,7 +2436,7 @@ export default function App() {
   const addWater = () => {
     setDailyLog({...dailyLog, water: dailyLog.water + 1});
     if ((dailyLog.water + 1) >= 8) {
-      showToast('Water goal reached! ðŸ’§', 'success');
+      showToast('Water goal reached! ', 'success');
     }
   };
 
@@ -2456,7 +2456,7 @@ export default function App() {
       totalCarbs: 0,
       totalFat: 0
     });
-    showToast('Day logged! Great job! ðŸŽ‰', 'success');
+    showToast('Day logged! Great job! ', 'success');
   };
 
   // ========== MICRONUTRIENT ANALYSIS ENGINE (ADDITIVE, ISOLATED) ==========
@@ -2733,7 +2733,7 @@ export default function App() {
         prepTime: 25,
         microStrengths: ['vitaminB12', 'iron', 'magnesium'],
         ingredients: ['shrimp', 'brown rice', 'black beans', 'salsa', 'cilantro'],
-        instructions: ['Cook rice and beans', 'SautÃ© shrimp', 'Assemble bowl', 'Top with salsa']
+        instructions: ['Cook rice and beans', 'Saut shrimp', 'Assemble bowl', 'Top with salsa']
       },
       
       // Lighter Options
@@ -2753,7 +2753,7 @@ export default function App() {
         prepTime: 10,
         microStrengths: ['vitaminA', 'vitaminC', 'potassium'],
         ingredients: ['egg whites', 'spinach', 'mushrooms', 'tomatoes', 'whole grain toast'],
-        instructions: ['SautÃ© vegetables', 'Add egg whites', 'Scramble until cooked', 'Serve with toast']
+        instructions: ['Saut vegetables', 'Add egg whites', 'Scramble until cooked', 'Serve with toast']
       },
       
       // Faster Prep
@@ -2924,7 +2924,7 @@ export default function App() {
     }
     // Water/hydration
     else if (query.includes('water') || query.includes('hydrat')) {
-      response = `Aim for ${Math.round(form.weight / 2)} oz daily (body.t Ã· 2). More if you're training hard or it's hot. Track it in the daily tracker!`;
+      response = `Aim for ${Math.round(form.weight / 2)} oz daily (body.t  2). More if you're training hard or it's hot. Track it in the daily tracker!`;
     }
     // Sleep
     else if (query.includes('sleep')) {
@@ -2962,7 +2962,7 @@ export default function App() {
       response = `Welcome! You're set up for ${form.goals} with ${plan.calories} calories and ${plan.protein}g protein daily. Start by following your meal plan, use the grocery list feature, and track daily in the tracker. Questions? Just ask!`;
     }
     else if (query.includes('thanks') || query.includes('thank')) {
-      response = "You're welcome! Remember, consistency beats perfection. You've got this! ðŸ’ª";
+      response = "You're welcome! Remember, consistency beats perfection. You've got this! ";
     }
     // Default intelligent response
     else {
@@ -3629,7 +3629,7 @@ export default function App() {
       case 'copy':
       default:
         // Checklist format
-        formatted = 'ðŸ›’ GROCERY LIST\n\n';
+        formatted = ' GROCERY LIST\n\n';
         
         const categories = [...new Set(groceryList.map(i => i.category))];
         categories.forEach(category => {
@@ -3724,7 +3724,7 @@ export default function App() {
       time: 25,
       difficulty: 'Medium',
       ingredients: ['chicken breast', 'pasta', 'cheese', 'garlic', 'cream'],
-      instructions: ['Cook pasta according to package', 'SautÃ© chicken until golden', 'Add cream and cheese', 'Toss with pasta', 'Garnish and serve'],
+      instructions: ['Cook pasta according to package', 'Saut chicken until golden', 'Add cream and cheese', 'Toss with pasta', 'Garnish and serve'],
       macros: { calories: 520, protein: 38, carbs: 52, fat: 18 }
     },
     // Egg recipes
@@ -3733,7 +3733,7 @@ export default function App() {
       time: 15,
       difficulty: 'Easy',
       ingredients: ['eggs', 'broccoli', 'cheese', 'onions', 'tomatoes'],
-      instructions: ['Whisk eggs with cheese', 'SautÃ© vegetables', 'Pour eggs over vegetables', 'Cook until set', 'Slice and serve'],
+      instructions: ['Whisk eggs with cheese', 'Saut vegetables', 'Pour eggs over vegetables', 'Cook until set', 'Slice and serve'],
       macros: { calories: 280, protein: 22, carbs: 8, fat: 18 }
     },
     {
@@ -3750,7 +3750,7 @@ export default function App() {
       time: 20,
       difficulty: 'Easy',
       ingredients: ['pasta', 'tomatoes', 'garlic', 'olive oil', 'cheese'],
-      instructions: ['Boil pasta', 'SautÃ© garlic in olive oil', 'Add diced tomatoes', 'Toss with pasta', 'Top with cheese'],
+      instructions: ['Boil pasta', 'Saut garlic in olive oil', 'Add diced tomatoes', 'Toss with pasta', 'Top with cheese'],
       macros: { calories: 420, protein: 14, carbs: 68, fat: 12 }
     },
     {
@@ -3788,11 +3788,11 @@ export default function App() {
       macros: { calories: 220, protein: 12, carbs: 8, fat: 16 }
     },
     {
-      title: 'Garlic SautÃ©ed Broccoli',
+      title: 'Garlic Saut Broccoli',
       time: 10,
       difficulty: 'Easy',
       ingredients: ['broccoli', 'garlic', 'olive oil'],
-      instructions: ['Cut broccoli into florets', 'Heat olive oil', 'Add garlic and broccoli', 'SautÃ© until tender', 'Season and serve'],
+      instructions: ['Cut broccoli into florets', 'Heat olive oil', 'Add garlic and broccoli', 'Saut until tender', 'Season and serve'],
       macros: { calories: 120, protein: 4, carbs: 12, fat: 7 }
     },
     {
@@ -6637,7 +6637,7 @@ Return ONLY the JSON object. No explanation before or after.`
     setBaselineTDEE(newTDEE);
     setActualTDEE(newTDEE);
     
-    console.log('ðŸ”„ Nutrition targets recalculated due to weight change:', {
+    console.log(' Nutrition targets recalculated due to weight change:', {
       oldWeight: plan.calculationData.weight,
       newWeight: userProfile.weight,
       oldCalories: plan.calories,
@@ -7114,10 +7114,10 @@ Return ONLY the JSON object. No explanation before or after.`
                       </label>
                       <div className="grid grid-cols-4 gap-2">
                         {[
-                          { value: 'small', label: 'Small', icon: 'ðŸ½ï¸' },
-                          { value: 'medium', label: 'Medium', icon: 'ðŸ½ï¸' },
-                          { value: 'large', label: 'Large', icon: 'ðŸ½ï¸' },
-                          { value: 'unknown', label: "Don't know", icon: 'ðŸ¤·' }
+                          { value: 'small', label: 'Small', icon: '' },
+                          { value: 'medium', label: 'Medium', icon: '' },
+                          { value: 'large', label: 'Large', icon: '' },
+                          { value: 'unknown', label: "Don't know", icon: '' }
                         ].map(option => (
                           <button
                             key={option.value}
@@ -8213,7 +8213,7 @@ Return ONLY the JSON object. No explanation before or after.`
             {plateResult.debug && Object.keys(plateResult.debug).length > 0 && (
               <details className={`p-4 rounded-xl ${dark?'bg-slate-700':'bg-slate-100'}`}>
                 <summary className={`cursor-pointer font-semibold text-sm ${dark?'text-slate-300':'text-slate-700'} flex items-center gap-2`}>
-                  <code className="text-xs">ðŸ” Debug Info</code>
+                  <code className="text-xs"> Debug Info</code>
                   <span className="text-xs opacity-60">(Click to expand)</span>
                 </summary>
                 <div className="mt-3 space-y-3">
@@ -9217,12 +9217,12 @@ Return ONLY the JSON object. No explanation before or after.`
                         {/* Show context-aware helper text */}
                         {(form.secondaryGoals || []).includes('build-muscle') && form.primaryGoal === 'lose' && (
                           <p className={`text-xs mb-3 ${dark?'text-blue-400':'text-blue-600'}`}>
-                            ðŸ’¡ Slower pace recommended for muscle retention during fat loss
+                             Slower pace recommended for muscle retention during fat loss
                           </p>
                         )}
                         {(form.secondaryGoals || []).includes('improve-performance') && form.primaryGoal === 'gain' && (
                           <p className={`text-xs mb-3 ${dark?'text-blue-400':'text-blue-600'}`}>
-                            ðŸ’¡ Leaner gains recommended for performance optimization
+                             Leaner gains recommended for performance optimization
                           </p>
                         )}
                         
@@ -9658,7 +9658,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 ) : (
                   /* Empty State */
                   <div className="text-center py-12">
-                    <div className={`text-6xl mb-4`}>ðŸ”</div>
+                    <div className={`text-6xl mb-4`}></div>
                     <h3 className={`text-lg font-bold mb-2 ${dark?'text-white':'text-gray-900'}`}>
                       No recipes found
                     </h3>
@@ -10689,7 +10689,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 Grocery List
               </h1>
               <p className={`text-xs ${dark?'text-slate-400':'text-gray-600'}`}>
-                {groceryListFinalized ? 'ðŸ”’ Finalized' : 'ðŸ”„ Live'}
+                {groceryListFinalized ? ' Finalized' : ' Live'}
               </p>
             </div>
             <div className="w-10" />
@@ -12191,8 +12191,8 @@ Lunch
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       {[
-                        { val: 'strength', label: 'Strength', icon: 'ðŸ’ª' },
-                        { val: 'cardio', label: 'Cardio', icon: 'ðŸƒ' },
+                        { val: 'strength', label: 'Strength', icon: '\uD83D\uDCAA' },
+                        { val: 'cardio', label: 'Cardio', icon: '\u2764' },
                         { val: 'mixed', label: 'Mixed', icon: 'âš¡' }
                       ].map(type => (
                         <button
@@ -12256,7 +12256,7 @@ Lunch
                             </>
                           ) : (
                             <>
-                              ðŸ“Š This helps optimize your nutrition for{' '}
+                               This helps optimize your nutrition for{' '}
                               <span className="font-semibold">
                                 {dailyTrainingContext.intensity || 'moderate'} {dailyTrainingContext.type}
                               </span>
@@ -12672,7 +12672,7 @@ Lunch
                     </div>
                     <div className={`p-4 rounded-xl ${dark?'bg-slate-800':'bg-gray-50'}`}>
                       <div className={`font-semibold mb-2 flex items-center gap-2 ${dark?'text-gray-300':'text-gray-700'}`}>
-                        <span>ðŸ“‹</span>
+                        <span></span>
                         Instructions:
                       </div>
                       <ol className={`list-decimal list-inside space-y-1 ${dark?'text-slate-400':'text-gray-600'}`}>
@@ -13452,7 +13452,7 @@ Lunch
                     
                     const trendColor = trend < -0.05 ? 'text-blue-500' : trend > 0.05 ? 'text-orange-500' : 'text-slate-500';
                     const trendBg = trend < -0.05 ? 'bg-blue-500/10 border-blue-500/20' : trend > 0.05 ? 'bg-orange-500/10 border-orange-500/20' : 'bg-slate-500/10 border-slate-500/20';
-                    const trendIcon = trend < -0.05 ? 'ðŸ“‰' : trend > 0.05 ? 'ðŸ“ˆ' : 'âž¡ï¸';
+                    const trendIcon = trend < -0.05 ? '' : trend > 0.05 ? '' : 'âž¡ï¸';
                     const trendLabel = trend < -0.05 ? 'Losing' : trend > 0.05 ? 'Gaining' : 'Stable';
                     
                     return (
@@ -14189,7 +14189,7 @@ Lunch
             <div className={`${dark?'glass-dark':'glass'} rounded-3xl shadow-premium-xl p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto`} onClick={e => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>ðŸŽ¯ Daily Tracker</h2>
+                  <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}> Daily Tracker</h2>
                   <p className={`text-sm ${dark?'text-slate-400':'text-slate-600'}`}>{dailyLog.date}</p>
                 </div>
                 <button onClick={() => setShowDailyTracker(false)} className={`p-2 rounded-xl ${dark?'hover:bg-slate-700':'hover:bg-gray-100'}`}>
@@ -14229,7 +14229,7 @@ Lunch
                     onClick={addWater}
                     className="mt-2 w-full bg-cyan-500 text-white text-xs py-1 rounded-lg hover:bg-cyan-600"
                   >
-                    +1 ðŸ’§
+                    +1 
                   </button>
                 </div>
               </div>
@@ -14343,7 +14343,7 @@ Lunch
                           <span className={`${dark?'text-slate-400':'text-slate-600'}`}>{log.meals.length} meals</span>
                         </div>
                         <div className={`text-xs mt-1 ${dark?'text-slate-500':'text-slate-500'}`}>
-                          {log.totalCalories} cal - {log.totalProtein}g P - {log.water} glasses ðŸ’§
+                          {log.totalCalories} cal - {log.totalProtein}g P - {log.water} glasses 
                         </div>
                       </div>
                     ))}
@@ -14358,7 +14358,7 @@ Lunch
           <div className={`fixed inset-0 ${dark?'glass-dark':'glass'} z-50 overflow-y-auto p-6 animate-slideIn backdrop-blur-xl`}>
             <div className="max-w-2xl mx-auto">
               <div className="flex justify-between items-center mb-6">
-                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>ðŸ›’ Grocery List</h2>
+                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}> Grocery List</h2>
                 <button onClick={() => setShowGroceryList(false)} className={`p-2 rounded-xl ${dark?'hover:bg-slate-700':'hover:bg-gray-100'}`}>
                   <X className={`w-6 h-6 ${dark?'text-white':'text-gray-900'}`} />
                 </button>
@@ -14411,7 +14411,7 @@ Lunch
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowSavedPlans(false)}>
             <div className={`${dark?'glass-dark':'glass'} rounded-3xl shadow-premium-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto`} onClick={e => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-6">
-                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>ðŸ“… Saved Plans</h2>
+                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}> Saved Plans</h2>
                 <button onClick={() => setShowSavedPlans(false)} className={`p-2 rounded-xl ${dark?'hover:bg-slate-700':'hover:bg-gray-100'}`}>
                   <X className={`w-6 h-6 ${dark?'text-white':'text-gray-900'}`} />
                 </button>
@@ -14612,7 +14612,7 @@ Lunch
                                   </p>
                                 </div>
                                 <div className="text-3xl">
-                                  {trendDirection === 'down' ? 'ðŸ“‰' : trendDirection === 'up' ? 'ðŸ“ˆ' : 'âž¡ï¸'}
+                                  {trendDirection === 'down' ? '' : trendDirection === 'up' ? '' : 'âž¡ï¸'}
                                 </div>
                               </div>
                             </div>
@@ -14771,7 +14771,7 @@ Lunch
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowMealReplace(null)}>
             <div className={`${dark?'glass-dark':'glass'} rounded-3xl shadow-premium-xl p-6 max-w-md w-full`} onClick={e => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-6">
-                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}>ðŸ”„ Replace Meal</h2>
+                <h2 className={`text-2xl font-bold ${dark?'text-white':'text-gray-900'}`}> Replace Meal</h2>
                 <button onClick={() => setShowMealReplace(null)} className={`p-2 rounded-xl ${dark?'hover:bg-slate-700':'hover:bg-gray-100'}`}>
                   <X className={`w-6 h-6 ${dark?'text-white':'text-gray-900'}`} />
                 </button>
@@ -14871,7 +14871,7 @@ Lunch
 
               <div className={`mt-4 p-4 rounded-xl ${dark?'bg-slate-800':'bg-blue-50'}`}>
                 <p className={`text-sm ${dark?'text-slate-300':'text-blue-900'}`}>
-                  ðŸ’¡ <strong>Tip:</strong> Your daily totals will automatically update
+                   <strong>Tip:</strong> Your daily totals will automatically update
                 </p>
               </div>
             </div>
@@ -14883,7 +14883,7 @@ Lunch
           onClick={() => setChatOpen(!chatOpen)}
           className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-premium-xl flex items-center justify-center transition-all ${chatOpen?'bg-gray-400':'bg-gradient-to-r from-sky-500 to-blue-600'} text-white hover:scale-110`}
         >
-          {chatOpen ? <X className="w-6 h-6 sm:w-7 sm:h-7" /> : <span className="text-2xl sm:text-3xl">ðŸ¤–</span>}
+          {chatOpen ? <X className="w-6 h-6 sm:w-7 sm:h-7" /> : <span className="text-2xl sm:text-3xl"></span>}
         </button>
 
         {/* Chat Panel */}
@@ -14891,7 +14891,7 @@ Lunch
           <div className={`fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 w-[calc(100vw-2rem)] sm:w-96 max-w-md h-[70vh] sm:h-[500px] ${dark?'glass-dark':'glass'} rounded-3xl shadow-premium-xl flex flex-col animate-slideUp`}>
             <div className="p-4 border-b ${dark?'border-slate-700':'border-gray-200'} bg-gradient-to-r from-sky-500 to-blue-600 rounded-t-3xl">
               <h3 className="font-bold text-white text-lg flex items-center gap-2">
-                <span className="text-2xl">ðŸ¤–</span>
+                <span className="text-2xl"></span>
                 Chat with Plato
               </h3>
               <p className="text-sm text-emerald-100">Your AI nutrition assistant</p>
