@@ -1018,6 +1018,14 @@ function RecipeBook({ mealPlan, recipes, dark, page, setPage, flipping, setFlipp
 }
 
 // Meal card image component - fetches real food photo from TheMealDB with gradient fallback
+// Extract the best food keywords from a meal name for image search
+function getMealImageKeywords(mealName) {
+  if (!mealName) return 'healthy food meal';
+  const stop = new Set(['with','and','the','in','on','a','an','of','for','to','or','bowl','plate','style','grilled','baked','roasted','steamed','fried','fresh','mixed','loaded','classic','spicy','creamy','crispy']);
+  const words = mealName.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w => w.length > 2 && !stop.has(w));
+  return (words.slice(0,3).join(' ') || mealName.split(' ').slice(0,2).join(' ')) + ' food';
+}
+
 function MealCardImage({ mealName }) {
   const [imgSrc, setImgSrc] = React.useState(null);
   const [imgLoaded, setImgLoaded] = React.useState(false);
@@ -1025,44 +1033,51 @@ function MealCardImage({ mealName }) {
 
   React.useEffect(() => {
     if (!mealName) return;
-    const searchName = mealName.split(' ').slice(0, 3).join(' ');
-    fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + encodeURIComponent(searchName))
+    setImgSrc(null); setImgLoaded(false); setImgError(false);
+
+    // Step 1: Try TheMealDB with first 2 words (works for common meals)
+    const shortName = mealName.split(' ').slice(0,2).join(' ');
+    fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + encodeURIComponent(shortName))
       .then(r => r.json())
       .then(data => {
-        if (data.meals && data.meals[0] && data.meals[0].strMealThumb) {
+        if (data.meals && data.meals[0]?.strMealThumb) {
           setImgSrc(data.meals[0].strMealThumb);
         } else {
-          setImgError(true);
+          // Step 2: Unsplash keyword search using extracted food words
+          const kw = encodeURIComponent(getMealImageKeywords(mealName));
+          setImgSrc(`https://source.unsplash.com/480x320/?${kw}`);
         }
       })
-      .catch(() => setImgError(true));
+      .catch(() => {
+        const kw = encodeURIComponent(getMealImageKeywords(mealName));
+        setImgSrc(`https://source.unsplash.com/480x320/?${kw}`);
+      });
   }, [mealName]);
 
   const colors = [
-    ['#10d9a0', '#059669'],
-    ['#6366f1', '#4f46e5'],
-    ['#f59e0b', '#d97706'],
-    ['#ef4444', '#dc2626'],
-    ['#3b82f6', '#2563eb'],
-    ['#8b5cf6', '#7c3aed'],
+    ['#10d9a0','#059669'],['#6366f1','#4f46e5'],['#f59e0b','#d97706'],
+    ['#ef4444','#dc2626'],['#3b82f6','#2563eb'],['#8b5cf6','#7c3aed'],
   ];
   const colorPair = colors[(mealName ? mealName.charCodeAt(0) : 0) % colors.length];
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '160px', overflow: 'hidden', borderRadius: '12px', flexShrink: 0, marginBottom: '16px' }}>
-      <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${colorPair[0]}, ${colorPair[1]})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: '48px', opacity: 0.3 }}>&#127860;</span>
+    <div style={{ position:'relative', width:'100%', height:'180px', overflow:'hidden', borderRadius:'12px 12px 0 0', flexShrink:0 }}>
+      {/* Gradient always behind as fallback */}
+      <div style={{ position:'absolute', inset:0, background:`linear-gradient(135deg, ${colorPair[0]}, ${colorPair[1]})`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <span style={{ fontSize:'52px', opacity:0.25 }}>&#127860;</span>
       </div>
-      {imgSrc && !imgError && (
+      {/* Real photo fades in on load */}
+      {imgSrc && (
         <img
           src={imgSrc}
           alt={mealName}
           onLoad={() => setImgLoaded(true)}
-          onError={() => setImgError(true)}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: imgLoaded ? 1 : 0, transition: 'opacity 0.4s ease' }}
+          onError={() => { setImgError(true); setImgLoaded(false); }}
+          style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', opacity: imgLoaded && !imgError ? 1 : 0, transition:'opacity 0.5s ease' }}
         />
       )}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60px', background: 'linear-gradient(to top, rgba(0,0,0,0.5), transparent)' }} />
+      {/* Bottom gradient for text readability */}
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'70px', background:'linear-gradient(to top, rgba(0,0,0,0.65), transparent)' }} />
     </div>
   );
 }
