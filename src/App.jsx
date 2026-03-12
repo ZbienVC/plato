@@ -9125,10 +9125,10 @@ Return ONLY the JSON object. No explanation before or after.`
     const IconComponent = current.icon;
 
     return (
-      <div className={`min-h-screen relative overflow-hidden ${dark?'bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800':'bg-gradient-to-br from-slate-50 via-white to-blue-50/30'}`}>
+      <div className={`min-h-screen relative overflow-hidden ${dark?'bg-gradient-to-br from-slate-900 to-slate-800':'bg-gradient-to-br from-emerald-50 via-white to-teal-50/40'}`}>
         {/* Subtle background accent - single element */}
         <div className={`absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-3xl opacity-10 pointer-events-none ${
-          dark ? 'bg-blue-500' : 'bg-blue-400'
+          dark ? 'bg-emerald-500' : 'bg-emerald-400'
         }`} style={{transform: 'translate(30%, -30%)'}} />
 
         {/* Progress indicators */}
@@ -9138,9 +9138,9 @@ Return ONLY the JSON object. No explanation before or after.`
               key={idx}
               className={`h-1.5 rounded-full transition-all duration-500 ${
                 idx === onboardingStep
-                  ? 'w-8 bg-blue-600'
+                  ? 'w-8 bg-gradient-to-r from-emerald-400 to-teal-500'
                   : idx < onboardingStep
-                  ? 'w-1.5 bg-blue-600'
+                  ? 'w-1.5 bg-emerald-400'
                   : `w-1.5 ${dark ? 'bg-slate-700' : 'bg-slate-300'}`
               }`}
             />
@@ -9153,20 +9153,20 @@ Return ONLY the JSON object. No explanation before or after.`
             {/* Icon with refined spacing */}
             <div className="mb-10">
               <div className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl ${
-                dark 
-                  ? 'bg-blue-600/10 border border-blue-500/20' 
-                  : 'bg-blue-50 border border-blue-100'
+                dark
+                  ? 'bg-gradient-to-br from-emerald-900/30 to-teal-900/30 border border-emerald-700/30'
+                  : 'bg-gradient-to-br from-emerald-100 to-teal-100 border border-emerald-200'
               } shadow-lg`}>
-                <IconComponent className={`w-10 h-10 ${dark ? 'text-blue-400' : 'text-blue-600'}`} strokeWidth={1.5} />
+                <IconComponent className={`w-10 h-10 ${dark ? 'text-emerald-400' : 'text-emerald-600'}`} strokeWidth={1.5} />
               </div>
             </div>
 
             {/* Text content with refined spacing */}
             <div className="space-y-5 mb-12">
-              <h1 className={`text-4xl md:text-5xl font-bold leading-tight ${dark?'text-white':'text-slate-900'}`}>
+              <h1 className={`text-4xl md:text-5xl font-extrabold leading-tight ${dark?'text-white':'text-slate-900'}`}>
                 {current.title}
               </h1>
-              <p className={`text-xl font-semibold ${dark?'text-blue-400':'text-blue-600'}`}>
+              <p className={`text-xl font-semibold ${dark?'text-emerald-400':'text-emerald-600'}`}>
                 {current.subtitle}
               </p>
               <p className={`text-base leading-relaxed ${dark?'text-slate-400':'text-slate-600'} max-w-md mx-auto`}>
@@ -9179,10 +9179,10 @@ Return ONLY the JSON object. No explanation before or after.`
               {onboardingStep > 0 && (
                 <button
                   onClick={() => setOnboardingStep(onboardingStep - 1)}
-                  className={`flex-1 px-5 py-3 rounded-xl text-sm font-semibold transition-all ${
-                    dark 
-                      ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' 
-                      : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm'
+                  className={`flex-1 px-5 py-3 rounded-xl text-sm font-semibold transition-all border ${
+                    dark
+                      ? 'bg-transparent text-slate-300 hover:bg-slate-800 border-slate-600'
+                      : 'bg-transparent text-slate-600 hover:bg-slate-50 border-slate-300'
                   }`}
                 >
                   Back
@@ -9196,11 +9196,7 @@ Return ONLY the JSON object. No explanation before or after.`
                     setOnboardingStep(onboardingStep + 1);
                   }
                 }}
-                className={`flex-1 px-5 py-3 rounded-xl text-sm font-semibold shadow-lg transition-all ${
-                  dark
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-900/30'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-600/30'
-                }`}
+                className="flex-1 px-5 py-3 rounded-xl text-sm font-bold shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02] transition-all bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
               >
                 {onboardingStep === screens.length - 1 ? 'Get Started' : 'Continue'}
               </button>
@@ -9234,7 +9230,7 @@ Return ONLY the JSON object. No explanation before or after.`
           <div className={`${dark?'glass-dark':'glass'} rounded-3xl p-8 md:p-12 shadow-2xl`}>
             <div className="text-center space-y-6">
               {/* Logo/Brand */}
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg mb-2">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg mb-2">
                 <ChefHat className="w-10 h-10 text-white" strokeWidth={2} />
               </div>
               
@@ -9242,7 +9238,7 @@ Return ONLY the JSON object. No explanation before or after.`
                 <h1 className={`text-5xl font-extrabold mb-3 gradient-text`}>
                   Plato
                 </h1>
-                <p className={`text-lg ${dark?'text-slate-300':'text-slate-600'}`}>
+                <p className={`text-lg ${dark?'text-slate-400':'text-slate-500'}`}>
                   AI-Powered Nutrition Coaching
                 </p>
               </div>
@@ -9253,17 +9249,16 @@ Return ONLY the JSON object. No explanation before or after.`
                   placeholder="Enter your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && name && setStep('intent')}
-                  className={`w-full px-5 py-4 rounded-xl text-center font-medium ${dark?'bg-slate-800 text-white border-slate-700 placeholder-slate-500':'bg-white border-slate-200 placeholder-slate-400'} border-2 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all`}
+                  onKeyPress={(e) => e.key === 'Enter' && name && (setUserIntent('both'), setStep('input'))}
+                  className={`w-full px-5 py-4 rounded-xl text-center font-medium ${dark?'bg-slate-800 text-white border-slate-700 placeholder-slate-500':'bg-white border-slate-200 placeholder-slate-400'} border-2 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/15 transition-all`}
                 />
                 
                 <button
-                  onClick={() => name && setStep('intent')}
+                  onClick={() => name && (setUserIntent('both'), setStep('input'))}
                   disabled={!name}
-                  className="group w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed btn-press transition-all relative overflow-hidden"
+                  className="group w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed btn-press transition-all"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <span className="relative flex items-center justify-center gap-2">
+                  <span className="flex items-center justify-center gap-2">
                     Get Started
                     <ChevronRight className="w-5 h-5" />
                   </span>
@@ -9293,134 +9288,42 @@ Return ONLY the JSON object. No explanation before or after.`
     );
   }
 
-  // Intent Selection Screen (NEW)
-  if (step === 'intent') {
-    return (
-      <div className={`min-h-screen ${dark?'app-bg-dark':'app-bg-light'} flex items-center justify-center p-6`}>
-        <div className="relative z-10 max-w-4xl w-full animate-fadeIn">
-          <div className={`${dark?'glass-dark':'glass'} rounded-3xl p-8 md:p-12 shadow-2xl`}>
-            <div className="text-center mb-8">
-              <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${dark?'text-white':'text-slate-900'}`}>
-                What would you like help with, {name}?
-              </h2>
-              <p className={`text-lg ${dark?'text-slate-400':'text-slate-600'}`}>
-                Choose your focus (you can always adjust later)
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 max-w-3xl mx-auto">
-              {/* Meal Planning Only */}
-              <button
-                onClick={() => {
-                  setUserIntent('meals');
-                  setShowNutritionDetails(false);
-                  setStep('input');
-                  setOnboardingPhase(2); // Skip to meal preferences
-                }}
-                className={`p-8 rounded-2xl text-left transition-all btn-press ${
-                  dark 
-                    ? 'bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-green-500' 
-                    : 'bg-white hover:bg-green-50 border-2 border-slate-200 hover:border-green-400'
-                } shadow-lg hover:shadow-xl`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-                    <Utensils className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                <h3 className={`text-2xl font-bold mb-2 ${dark?'text-white':'text-slate-900'}`}>
-                  Create a Meal Plan
-                </h3>
-                <p className={`text-base mb-3 ${dark?'text-slate-300':'text-slate-600'}`}>
-                  Get delicious, easy meals to cook today
-                </p>
-                <p className={`text-sm font-medium flex items-center gap-2 ${dark?'text-slate-400':'text-slate-500'}`}>
-                  <Zap className="w-4 h-4" />
-                  <span>Fastest setup - Focus on food</span>
-                </p>
-              </button>
-
-              {/* Do Both (RECOMMENDED) */}
-              <button
-                onClick={() => {
-                  setUserIntent('both');
-                  setShowNutritionDetails(true);
-                  setStep('input');
-                  setOnboardingPhase(1); // Full flow
-                }}
-                className="p-8 rounded-2xl text-left transition-all btn-press bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-xl hover:shadow-2xl relative overflow-hidden"
-              >
-                <div className="absolute top-6 right-6 px-3 py-1.5 bg-white/20 backdrop-blur text-xs font-bold rounded-full">
-                  RECOMMENDED
-                </div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center">
-                    <Sparkles className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                <h3 className="text-2xl font-bold mb-2">Meals + Nutrition</h3>
-                <p className="text-blue-100 text-base mb-3">
-                  Complete meal plan with personalized targets
-                </p>
-                <p className="text-sm text-blue-200 font-medium flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  <span>Complete experience - Adaptive learning</span>
-                </p>
-              </button>
-            </div>
-
-            <button
-              onClick={() => setStep('welcome')}
-              className={`w-full mt-6 py-3 rounded-xl font-semibold transition-all ${
-                dark ? 'text-slate-400 hover:text-slate-300' : 'text-slate-600 hover:text-slate-700'
-              }`}
-            >
-              ← Back
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (step === 'input') {
     const phaseConfig = {
       1: {
-        title: "Let's Calculate Your Plan",
-        subtitle: "Basic information for accurate calculations",
-        progress: "1 of 2"
+        title: `Hey ${name}! Let's get to know you.`,
+        subtitle: "Basic info for accurate calculations",
+        progress: "1 of 3"
       },
       2: {
-        title: "Meal Preferences",
+        title: "Your Goals",
+        subtitle: "Tell us what you're working toward",
+        progress: "2 of 3"
+      },
+      3: {
+        title: "Your Meals",
         subtitle: "Help us plan meals you'll love",
-        progress: "2 of 2"
+        progress: "3 of 3"
       }
     };
 
     const currentPhase = phaseConfig[onboardingPhase];
 
     return (
-      <div className={`min-h-screen ${dark?'bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800':'bg-gradient-to-br from-slate-50 via-white to-blue-50/30'} p-6 py-10`}>
+      <div className={`min-h-screen ${dark?'bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800':'bg-gradient-to-br from-emerald-50 via-white to-teal-50/30'} p-6 py-10`}>
         <div className="max-w-2xl mx-auto">
           <div className={`${
             dark
               ? 'bg-slate-800/90 border border-slate-700/50 backdrop-blur-sm'
-              : 'bg-white border border-slate-200/50 backdrop-blur-sm'
+              : 'bg-white border border-slate-100'
           } rounded-2xl shadow-2xl p-8 md:p-10 animate-fadeIn`}>
-            {/* Phase Progress - refined spacing */}
-            <div className="flex justify-center mb-8">
-              <div className="flex gap-2">
-                {[1, 2].map(phase => (
-                  <div
-                    key={phase}
-                    className={`h-1.5 rounded-full transition-all ${
-                      phase === onboardingPhase ? 'w-12 bg-blue-600' :
-                      phase < onboardingPhase ? 'w-1.5 bg-blue-600' :
-                      `w-1.5 ${dark ? 'bg-slate-700' : 'bg-slate-300'}`
-                    }`}
-                  />
-                ))}
-              </div>
+            {/* Segmented Phase Progress */}
+            <div className="flex gap-2 mb-8">
+              {[1,2,3].map(s => (
+                <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-500 ${
+                  s <= onboardingPhase ? 'bg-gradient-to-r from-emerald-400 to-teal-500' : dark ? 'bg-slate-700' : 'bg-slate-200'
+                }`} />
+              ))}
             </div>
 
             <div className="flex items-center justify-between mb-8">
@@ -9446,8 +9349,8 @@ Return ONLY the JSON object. No explanation before or after.`
             {loading ? (
               <div className="text-center py-16">
                 <div className="relative inline-flex items-center justify-center mb-6">
-                  <div className="absolute w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 opacity-20 animate-ping" />
-                  <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+                  <div className="absolute w-20 h-20 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 opacity-20 animate-ping" />
+                  <Loader2 className="w-12 h-12 animate-spin text-emerald-600" />
                 </div>
                 <p className={`text-lg font-medium ${dark?'text-slate-300':'text-slate-600'} mb-2`}>
                   {['Understanding your goals', 'Balancing your meals', 'Keeping prep time realistic', 'Final check for sustainability'][loadingStep] || 'Building your plan...'}
@@ -9459,8 +9362,8 @@ Return ONLY the JSON object. No explanation before or after.`
             ) : (
               <>
                 <div className="space-y-6 mb-8">
-                  {/* PHASE 1: Core Profile (SKIP for meals-only users) */}
-                  {onboardingPhase === 1 && userIntent !== 'meals' && (
+                  {/* PHASE 1: Core Profile */}
+                  {onboardingPhase === 1 && (
                     <>
                       {/* Basic Info Row */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -9474,7 +9377,7 @@ Return ONLY the JSON object. No explanation before or after.`
                           setForm({...form, birthday: e.target.value, age: age || 30});
                         }}
                         max={new Date().toISOString().split('T')[0]}
-                        className={`w-full px-4 py-2.5 rounded-xl ${dark?'bg-slate-800/50 text-white border-slate-700':'bg-white text-slate-900 border-slate-200'} border focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all`}
+                        className={`w-full px-4 py-2.5 rounded-xl ${dark?'bg-slate-800/50 text-white border-slate-700':'bg-white text-slate-900 border-slate-200'} border focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all`}
                       />
                     </div>
 
@@ -9484,7 +9387,7 @@ Return ONLY the JSON object. No explanation before or after.`
                         type="number"
                         value={form.weight}
                         onChange={(e) => setForm({...form, weight: parseInt(e.target.value)})}
-                        className={`w-full px-4 py-2.5 rounded-xl ${dark?'bg-slate-800/50 text-white border-slate-700':'bg-white text-slate-900 border-slate-200'} border focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all`}
+                        className={`w-full px-4 py-2.5 rounded-xl ${dark?'bg-slate-800/50 text-white border-slate-700':'bg-white text-slate-900 border-slate-200'} border focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all`}
                       />
                     </div>
 
@@ -9499,7 +9402,7 @@ Return ONLY the JSON object. No explanation before or after.`
                             setHeightFeet(parseInt(e.target.value) || 0);
                             setForm({...form, height: (parseInt(e.target.value) || 0) * 12 + heightInches});
                           }}
-                          className={`w-full px-4 py-3 rounded-xl ${dark?'bg-slate-800 text-white border-slate-700':'bg-white text-slate-900 border-slate-200'} border-2 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all`}
+                          className={`w-full px-4 py-3 rounded-xl ${dark?'bg-slate-800 text-white border-slate-700':'bg-white text-slate-900 border-slate-200'} border-2 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/15 transition-all`}
                         />
                         <input
                           type="number"
@@ -9509,7 +9412,7 @@ Return ONLY the JSON object. No explanation before or after.`
                             setHeightInches(parseInt(e.target.value) || 0);
                             setForm({...form, height: heightFeet * 12 + (parseInt(e.target.value) || 0)});
                           }}
-                          className={`w-full px-4 py-3 rounded-xl ${dark?'bg-slate-800 text-white border-slate-700':'bg-white text-slate-900 border-slate-200'} border-2 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all`}
+                          className={`w-full px-4 py-3 rounded-xl ${dark?'bg-slate-800 text-white border-slate-700':'bg-white text-slate-900 border-slate-200'} border-2 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/15 transition-all`}
                         />
                       </div>
                     </div>
@@ -9517,18 +9420,18 @@ Return ONLY the JSON object. No explanation before or after.`
 
                   {/* Live TDEE Preview */}
                   {form.age && form.weight && form.height && (
-                    <div className={`p-4 rounded-xl ${dark?'bg-blue-900/20 border-blue-800':'bg-blue-50 border-blue-200'} border-2 animate-slideDown`}>
+                    <div className={`p-4 rounded-xl ${dark?'bg-emerald-900/20 border-emerald-800':'bg-emerald-50 border-emerald-200'} border-2 animate-slideDown`}>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className={`text-sm font-semibold ${dark?'text-blue-300':'text-blue-700'}`}>
+                          <p className={`text-sm font-semibold ${dark?'text-emerald-300':'text-emerald-700'}`}>
                             Estimated Daily Burn (TDEE)
                           </p>
-                          <p className={`text-xs ${dark?'text-blue-400':'text-blue-600'} mt-1`}>
+                          <p className={`text-xs ${dark?'text-emerald-400':'text-emerald-600'} mt-1`}>
                             Based on your profile & activity level
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-3xl font-bold text-blue-600">
+                          <p className="text-3xl font-bold text-emerald-600">
                             {calculateTDEE(calculateBMR(form.gender, form.weight, form.height, form.age), form.activity)}
                           </p>
                           <p className={`text-xs ${dark?'text-slate-400':'text-slate-600'}`}>calories/day</p>
@@ -9550,7 +9453,7 @@ Return ONLY the JSON object. No explanation before or after.`
                           onClick={() => setForm({...form, gender: g.val})}
                           className={`flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-semibold btn-press transition-all ${
                             form.gender === g.val
-                              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                              ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg'
                               : dark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border-2 border-slate-700' : 'bg-white text-slate-700 hover:bg-slate-50 border-2 border-slate-200'
                           }`}
                         >
@@ -9576,17 +9479,23 @@ Return ONLY the JSON object. No explanation before or after.`
                           onClick={() => setForm({...form, activity: a.val})}
                           className={`py-3 px-3 rounded-xl text-sm font-semibold btn-press transition-all ${
                             form.activity === a.val
-                              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                              ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md'
                               : dark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
                           }`}
                         >
                           <div className="font-semibold">{a.label}</div>
-                          <div className={`text-xs mt-1 ${form.activity === a.val ? 'text-blue-100' : dark ? 'text-slate-500' : 'text-slate-500'}`}>{a.desc}</div>
+                          <div className={`text-xs mt-1 ${form.activity === a.val ? 'text-emerald-100' : dark ? 'text-slate-500' : 'text-slate-500'}`}>{a.desc}</div>
                         </button>
                       ))}
                     </div>
                   </div>
 
+                    </>
+                  )}
+
+                  {/* PHASE 2: Goals */}
+                  {onboardingPhase === 2 && (
+                    <>
                   {/* Training Type */}
                   <div>
                     <label className={`block mb-3 text-sm font-semibold ${dark?'text-slate-300':'text-slate-700'}`}>Training Type</label>
@@ -9602,7 +9511,7 @@ Return ONLY the JSON object. No explanation before or after.`
                           onClick={() => setForm({...form, trainingType: t.val})}
                           className={`py-3 px-3 rounded-xl text-sm font-semibold btn-press transition-all ${
                             form.trainingType === t.val
-                              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                              ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md'
                               : dark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
                           }`}
                         >
@@ -9653,10 +9562,10 @@ Return ONLY the JSON object. No explanation before or after.`
                             className={`py-4 px-3 rounded-xl text-sm font-semibold transition-all ${
                               form.primaryGoal === g.val
                                 ? dark
-                                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30 border border-blue-500'
-                                  : 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 border border-blue-500'
-                                : dark 
-                                  ? 'bg-slate-800/50 text-slate-300 hover:bg-slate-700 border border-slate-700 hover:border-slate-600' 
+                                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30 border border-emerald-500'
+                                  : 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 border border-emerald-500'
+                                : dark
+                                  ? 'bg-slate-800/50 text-slate-300 hover:bg-slate-700 border border-slate-700 hover:border-slate-600'
                                   : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 hover:border-slate-300 shadow-sm'
                             }`}
                           >
@@ -9671,8 +9580,8 @@ Return ONLY the JSON object. No explanation before or after.`
                             </div>
                             <div className="font-semibold text-sm mb-1">{g.label}</div>
                             <div className={`text-xs ${
-                              form.primaryGoal === g.val 
-                                ? 'text-blue-100' 
+                              form.primaryGoal === g.val
+                                ? 'text-emerald-100'
                                 : dark ? 'text-slate-500' : 'text-slate-500'
                             }`}>{g.desc}</div>
                           </button>
@@ -9733,10 +9642,10 @@ Return ONLY the JSON object. No explanation before or after.`
                               className={`py-4 px-3 rounded-xl text-sm font-semibold transition-all ${
                                 isSelected
                                   ? dark
-                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/30 border border-indigo-500'
-                                    : 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 border border-indigo-500'
-                                  : dark 
-                                    ? 'bg-slate-800/50 text-slate-300 hover:bg-slate-700 border border-slate-700 hover:border-slate-600' 
+                                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30 border border-emerald-500'
+                                    : 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 border border-emerald-500'
+                                  : dark
+                                    ? 'bg-slate-800/50 text-slate-300 hover:bg-slate-700 border border-slate-700 hover:border-slate-600'
                                     : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 hover:border-slate-300 shadow-sm'
                               }`}
                             >
@@ -9750,7 +9659,7 @@ Return ONLY the JSON object. No explanation before or after.`
                                 </div>
                               </div>
                               <div className="font-semibold text-xs">{g.label}</div>
-                              <div className={`text-xs mt-1 ${isSelected ? 'text-purple-100' : dark ? 'text-slate-500' : 'text-slate-500'}`}>{g.desc}</div>
+                              <div className={`text-xs mt-1 ${isSelected ? 'text-emerald-100' : dark ? 'text-slate-500' : 'text-slate-500'}`}>{g.desc}</div>
                             </button>
                           );
                         })}
@@ -9758,7 +9667,7 @@ Return ONLY the JSON object. No explanation before or after.`
                       
                       {/* Helper text for multi-select */}
                       {(form.secondaryGoals || []).length > 0 && (
-                        <p className={`text-xs mt-3 ${dark?'text-blue-400':'text-blue-600'}`}>
+                        <p className={`text-xs mt-3 ${dark?'text-emerald-400':'text-emerald-600'}`}>
                           ✔ {(form.secondaryGoals || []).length} emphasis area{(form.secondaryGoals || []).length > 1 ? 's' : ''} selected
                         </p>
                       )}
@@ -9773,8 +9682,8 @@ Return ONLY the JSON object. No explanation before or after.`
                     if (!validRates) {
                       return (
                         <div className="animate-slideDown">
-                          <div className={`py-4 px-4 rounded-xl text-center ${dark?'bg-slate-800 border-2 border-blue-500':'bg-blue-50 border-2 border-blue-400'}`}>
-                            <div className="font-bold text-lg text-blue-600">Maintain Current Weight</div>
+                          <div className={`py-4 px-4 rounded-xl text-center ${dark?'bg-slate-800 border-2 border-emerald-500':'bg-emerald-50 border-2 border-emerald-400'}`}>
+                            <div className="font-bold text-lg text-emerald-600">Maintain Current Weight</div>
                             <div className={`text-xs mt-1 ${dark?'text-slate-400':'text-slate-600'}`}>
                               Calories balanced with expenditure
                             </div>
@@ -9793,12 +9702,12 @@ Return ONLY the JSON object. No explanation before or after.`
                         
                         {/* Show context-aware helper text */}
                         {(form.secondaryGoals || []).includes('build-muscle') && form.primaryGoal === 'lose' && (
-                          <p className={`text-xs mb-3 ${dark?'text-blue-400':'text-blue-600'}`}>
+                          <p className={`text-xs mb-3 ${dark?'text-emerald-400':'text-emerald-600'}`}>
                              Slower pace recommended for muscle retention during fat loss
                           </p>
                         )}
                         {(form.secondaryGoals || []).includes('improve-performance') && form.primaryGoal === 'gain' && (
-                          <p className={`text-xs mb-3 ${dark?'text-blue-400':'text-blue-600'}`}>
+                          <p className={`text-xs mb-3 ${dark?'text-emerald-400':'text-emerald-600'}`}>
                              Leaner gains recommended for performance optimization
                           </p>
                         )}
@@ -9810,14 +9719,14 @@ Return ONLY the JSON object. No explanation before or after.`
                               onClick={() => setForm({...form, targetRate: r.value})}
                               className={`py-4 px-3 rounded-xl text-sm font-semibold btn-press transition-all ${
                                 form.targetRate === r.value
-                                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg'
                                   : r.recommended
                                   ? dark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border-2 border-green-500' : 'bg-white text-slate-700 hover:bg-slate-50 border-2 border-green-400'
                                   : dark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border-2 border-slate-700' : 'bg-white text-slate-700 hover:bg-slate-50 border-2 border-slate-200'
                               }`}
                             >
                               <div className="font-bold">{r.label}</div>
-                              <div className={`text-xs mt-1 ${form.targetRate === r.value ? 'text-blue-200' : dark ? 'text-slate-500' : 'text-slate-500'}`}>
+                              <div className={`text-xs mt-1 ${form.targetRate === r.value ? 'text-emerald-200' : dark ? 'text-slate-500' : 'text-slate-500'}`}>
                                 {r.desc}
                               </div>
                               {r.recommended && form.targetRate !== r.value && (
@@ -9837,7 +9746,7 @@ Return ONLY the JSON object. No explanation before or after.`
                     <label className={`block mb-3 text-sm font-semibold ${dark?'text-slate-300':'text-slate-700'}`}>
                       Training Days Per Week
                     </label>
-                    <div className="flex items-center gap-4 p-6 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-700">
+                    <div className="flex items-center gap-4 p-6 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-700">
                       <button
                         onClick={() => setForm({...form, trainingDays: Math.max(0, form.trainingDays - 1)})}
                         className="w-14 h-14 rounded-xl bg-white dark:bg-slate-600 flex items-center justify-center font-bold text-xl hover:bg-slate-50 dark:hover:bg-slate-500 transition-all shadow-md btn-press"
@@ -9845,7 +9754,7 @@ Return ONLY the JSON object. No explanation before or after.`
                         <Minus className="w-6 h-6" />
                       </button>
                       <div className="flex-1 text-center">
-                        <div className="text-5xl font-bold text-blue-600">{form.trainingDays}</div>
+                        <div className="text-5xl font-bold text-emerald-600">{form.trainingDays}</div>
                         <div className={`text-sm mt-2 ${dark?'text-slate-300':'text-slate-700'} font-semibold`}>
                           days per week
                         </div>
@@ -9864,8 +9773,8 @@ Return ONLY the JSON object. No explanation before or after.`
                     </>
                   )}
 
-                  {/* PHASE 2: Meal Preferences */}
-                  {onboardingPhase === 2 && (
+                  {/* PHASE 3: Meal Preferences */}
+                  {onboardingPhase === 3 && (
                     <>
                       {/* Meals Per Day */}
                       <div>
@@ -9879,7 +9788,7 @@ Return ONLY the JSON object. No explanation before or after.`
                               onClick={() => setForm({...form, meals: n})}
                               className={`py-4 rounded-xl text-lg font-bold transition-all btn-press ${
                                 form.meals === n
-                                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg'
                                   : dark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border-2 border-slate-700' : 'bg-white text-slate-700 hover:bg-slate-50 border-2 border-slate-200'
                               }`}
                             >
@@ -9902,7 +9811,7 @@ Return ONLY the JSON object. No explanation before or after.`
                           placeholder="e.g., nuts, dairy, gluten..."
                           value={form.restrictions}
                           onChange={(e) => setForm({...form, restrictions: e.target.value})}
-                          className={`w-full px-4 py-3 rounded-xl ${dark?'bg-slate-800 text-white':'bg-white'} border-2 ${dark?'border-slate-700':'border-gray-200'} focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all`}
+                          className={`w-full px-4 py-3 rounded-xl ${dark?'bg-slate-800 text-white':'bg-white'} border-2 ${dark?'border-slate-700':'border-gray-200'} focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/15 transition-all`}
                         />
                         <p className={`text-xs mt-2 ${dark?'text-slate-400':'text-slate-600'}`}>
                           Let us know about any dietary restrictions
@@ -9928,10 +9837,10 @@ Return ONLY the JSON object. No explanation before or after.`
                                 className={`py-4 px-3 rounded-xl text-sm font-semibold transition-all ${
                                   form.cookTime === t.val
                                     ? dark
-                                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30 border border-blue-500'
-                                      : 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 border border-blue-500'
-                                    : dark 
-                                      ? 'bg-slate-800/50 text-slate-300 hover:bg-slate-700 border border-slate-700 hover:border-slate-600' 
+                                      ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30 border border-emerald-500'
+                                      : 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 border border-emerald-500'
+                                    : dark
+                                      ? 'bg-slate-800/50 text-slate-300 hover:bg-slate-700 border border-slate-700 hover:border-slate-600'
                                       : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 hover:border-slate-300 shadow-sm'
                                 }`}
                               >
@@ -9945,7 +9854,7 @@ Return ONLY the JSON object. No explanation before or after.`
                                   </div>
                                 </div>
                                 <div className="font-bold">{t.label}</div>
-                                <div className={`text-xs mt-1 ${form.cookTime === t.val ? 'text-blue-100' : dark ? 'text-slate-500' : 'text-slate-500'}`}>
+                                <div className={`text-xs mt-1 ${form.cookTime === t.val ? 'text-emerald-100' : dark ? 'text-slate-500' : 'text-slate-500'}`}>
                                   {t.desc}
                                 </div>
                               </button>
@@ -9972,12 +9881,12 @@ Return ONLY the JSON object. No explanation before or after.`
                               onClick={() => setForm({...form, dietStyle: d.val})}
                               className={`py-4 px-3 rounded-xl text-sm font-semibold btn-press transition-all ${
                                 form.dietStyle === d.val
-                                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg'
                                   : dark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border-2 border-slate-700' : 'bg-white text-slate-700 hover:bg-slate-50 border-2 border-slate-200'
                               }`}
                             >
                               <div className="font-bold">{d.label}</div>
-                              <div className={`text-xs mt-1 ${form.dietStyle === d.val ? 'text-blue-100' : dark ? 'text-slate-500' : 'text-slate-500'}`}>
+                              <div className={`text-xs mt-1 ${form.dietStyle === d.val ? 'text-emerald-100' : dark ? 'text-slate-500' : 'text-slate-500'}`}>
                                 {d.desc}
                               </div>
                             </button>
@@ -10013,7 +9922,7 @@ Return ONLY the JSON object. No explanation before or after.`
                               }}
                               className={`py-3 px-3 rounded-xl text-sm font-semibold btn-press transition-all ${
                                 form.cuisines.includes(c.val)
-                                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md'
                                   : dark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
                               }`}
                             >
@@ -10031,49 +9940,38 @@ Return ONLY the JSON object. No explanation before or after.`
                     </>
                   )}
 
-                  {/* PHASE 3: Training & Advanced (Optional) - SKIP for meals-only users */}
-                  {onboardingPhase === 3 && userIntent !== 'meals' && (
-                    <>
-                      {/* Phase 3 is now lighter - Training Days and Macro Philosophy moved to earlier phases */}
-                      {/* This phase can be used for future advanced options */}
-                    </>
-                  )}
                 </div>
 
                 {/* Phase Navigation Buttons */}
                 <div className="flex gap-3">
-                  {onboardingPhase > 1 && userIntent !== 'meals' && (
+                  {onboardingPhase > 1 && (
                     <button
                       onClick={() => setOnboardingPhase(onboardingPhase - 1)}
-                      className={`flex-1 py-4 rounded-xl font-semibold text-base ${dark?'bg-slate-700 text-white hover:bg-slate-600':'bg-slate-100 text-slate-900 hover:bg-slate-200'} transition-all btn-press`}
+                      className={`flex-1 py-4 rounded-xl font-semibold text-base border transition-all btn-press ${dark?'bg-transparent text-slate-300 hover:bg-slate-800 border-slate-600':'bg-transparent text-slate-600 hover:bg-slate-50 border-slate-300'}`}
                     >
                       Back
                     </button>
                   )}
-                  
-                  {/* For meals-only: Phase 2 generates directly */}
-                  {/* For nutrition users: Phase 2 also generates now (Phase 3 moved to Phase 1 & 2) */}
-                  {onboardingPhase === 2 ? (
+
+                  {onboardingPhase === 3 ? (
                     <button
                       onClick={gen}
-                      className="flex-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-2xl btn-press transition-all relative overflow-hidden group animate-gradientShift"
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02] btn-press transition-all"
                     >
-                      <span className="relative flex items-center justify-center gap-2">
+                      <span className="flex items-center justify-center gap-2">
                         <Sparkles className="w-6 h-6" />
-                        {userIntent === 'meals' ? 'Create My Meals' : 'Build My Day'}
+                        Build My Plan
                       </span>
                     </button>
-                  ) : onboardingPhase < 2 ? (
+                  ) : (
                     <button
                       onClick={() => setOnboardingPhase(onboardingPhase + 1)}
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-2xl btn-press transition-all"
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02] btn-press transition-all"
                     >
                       Continue
                     </button>
-                  ) : null}
+                  )}
                 </div>
-
-                {/* Remove skip option - Phase 3 no longer needed */}
               </>
             )}
           </div>
