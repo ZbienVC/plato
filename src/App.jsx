@@ -14511,6 +14511,19 @@ Lunch
                   </button>
                   <button
                     onClick={() => {
+                      setShowRestaurantMode(true);
+                      setMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${dark?'bg-gradient-to-r from-orange-900/60 to-red-900/60 hover:from-orange-800/60 hover:to-red-800/60':'bg-gradient-to-r from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 border border-orange-200'}`}
+                  >
+                    <span className="text-xl">🍽️</span>
+                    <div className="text-left">
+                      <span className={`font-bold ${dark?'text-orange-200':'text-orange-800'}`}>Restaurant Mode</span>
+                      <p className={`text-xs ${dark?'text-orange-400':'text-orange-600'}`}>Browse menus, log macros</p>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
                       setShowSavedRecipes(true);
                       setMenuOpen(false);
                     }}
