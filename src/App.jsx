@@ -1018,62 +1018,26 @@ function RecipeBook({ mealPlan, recipes, dark, page, setPage, flipping, setFlipp
 }
 
 // Meal card image component - fetches real food photo from TheMealDB with gradient fallback
-// Curated food photo lookup — direct Unsplash photo IDs, no API key needed
-const FOOD_PHOTOS = {
-  chicken:   'photo-1532550907401-a500c9a57435',
-  salmon:    'photo-1467003909585-2f8a72700288',
-  fish:      'photo-1467003909585-2f8a72700288',
-  tuna:      'photo-1599084993091-1cb5c0721cc6',
-  shrimp:    'photo-1565680018434-b513d5e5fd47',
-  beef:      'photo-1546833999-b9f581a1996d',
-  steak:     'photo-1546833999-b9f581a1996d',
-  turkey:    'photo-1574672280600-4accfa5b6f98',
-  pork:      'photo-1529692236671-f1f6cf9683ba',
-  egg:       'photo-1482049016688-2d3e1b311543',
-  eggs:      'photo-1482049016688-2d3e1b311543',
-  oatmeal:   'photo-1517673132405-a56a62b18caf',
-  oats:      'photo-1517673132405-a56a62b18caf',
-  pasta:     'photo-1551892374-ecf8754cf8b0',
-  rice:      'photo-1536304993881-ff86d42818e0',
-  quinoa:    'photo-1512621776951-a57141f2eefd',
-  salad:     'photo-1512621776951-a57141f2eefd',
-  soup:      'photo-1547592180-85f173990554',
-  stir:      'photo-1512058454905-6b841e7ad132',
-  bowl:      'photo-1546069901-ba9599a7e63c',
-  smoothie:  'photo-1505252585461-04db1eb84625',
-  shake:     'photo-1563729784474-d77dbb933a9e',
-  pancake:   'photo-1567620905732-2d1ec7ab7445',
-  waffle:    'photo-1484723091739-30a097e8f929',
-  toast:     'photo-1528736235302-52922df5c122',
-  sandwich:  'photo-1528736235302-52922df5c122',
-  wrap:      'photo-1565299507177-b0ac66763828',
-  burger:    'photo-1568901346375-23c9450c58cd',
-  pizza:     'photo-1513104890138-7c749659a591',
-  tacos:     'photo-1565299585323-38d6b0865b47',
-  sushi:     'photo-1579871494447-9811cf80d66c',
-  veggie:    'photo-1540420773420-3366772f4999',
-  vegetable: 'photo-1540420773420-3366772f4999',
-  fruit:     'photo-1490474418585-ba9bad8fd0ea',
-  yogurt:    'photo-1488477181946-6428a0291777',
-  cottage:   'photo-1563636619-e9143da7973b',
-  bread:     'photo-1509440159596-0249088772ff',
-  lentil:    'photo-1547592180-85f173990554',
-  bean:      'photo-1512621776951-a57141f2eefd',
-  tofu:      'photo-1546069901-ba9599a7e63c',
-  avocado:   'photo-1512621776951-a57141f2eefd',
-  sweet:     'photo-1518977676601-b53f82aba655',
-  potato:    'photo-1518977676601-b53f82aba655',
-  broccoli:  'photo-1459411621453-7b03977f4bfc',
-  default:   'photo-1546069901-ba9599a7e63c',
-};
-
-function getMealPhoto(mealName) {
-  if (!mealName) return FOOD_PHOTOS.default;
+// Extract best TheMealDB ingredient keyword from meal name
+function getMealIngredientKey(mealName) {
+  if (!mealName) return null;
   const lower = mealName.toLowerCase();
-  for (const [key, id] of Object.entries(FOOD_PHOTOS)) {
-    if (key !== 'default' && lower.includes(key)) return id;
+  const keywords = [
+    'chicken','salmon','beef','tuna','shrimp','pork','turkey','lamb',
+    'egg','oat','pasta','rice','quinoa','tofu','lentil','bean',
+    'potato','broccoli','spinach','avocado','banana','strawberry',
+  ];
+  for (const kw of keywords) {
+    if (lower.includes(kw)) return kw;
   }
-  return FOOD_PHOTOS.default;
+  return null;
+}
+
+// Simple string hash for consistent but varied index selection
+function strHash(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
 }
 
 function MealCardImage({ mealName }) {
@@ -1085,23 +1049,37 @@ function MealCardImage({ mealName }) {
     if (!mealName) return;
     setImgSrc(null); setImgLoaded(false); setImgError(false);
 
-    // Step 1: Try TheMealDB (works for common/traditional meals)
-    const shortName = mealName.split(' ').slice(0,2).join(' ');
-    fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + encodeURIComponent(shortName))
-      .then(r => r.json())
-      .then(data => {
-        if (data.meals && data.meals[0]?.strMealThumb) {
-          setImgSrc(data.meals[0].strMealThumb);
-        } else {
-          // Step 2: Curated Unsplash photo by food keyword
-          const photoId = getMealPhoto(mealName);
-          setImgSrc(`https://images.unsplash.com/${photoId}?w=480&q=80&fit=crop`);
-        }
-      })
-      .catch(() => {
-        const photoId = getMealPhoto(mealName);
-        setImgSrc(`https://images.unsplash.com/${photoId}?w=480&q=80&fit=crop`);
-      });
+    const hash = strHash(mealName);
+    const ingredient = getMealIngredientKey(mealName);
+
+    if (ingredient) {
+      // Use TheMealDB ingredient filter — returns full list with thumbnails
+      // Pick by name hash so similar meals get different photos
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(ingredient)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.meals && data.meals.length > 0) {
+            const pick = data.meals[hash % data.meals.length];
+            setImgSrc(pick.strMealThumb);
+          } else {
+            // Fall back to name search
+            return fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(mealName.split(' ')[0])}`)
+              .then(r => r.json())
+              .then(d => d.meals?.[0]?.strMealThumb && setImgSrc(d.meals[0].strMealThumb));
+          }
+        })
+        .catch(() => {});
+    } else {
+      // No known ingredient — try name search with first word
+      fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(mealName.split(' ')[0])}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.meals && data.meals.length > 0) {
+            setImgSrc(data.meals[hash % data.meals.length].strMealThumb);
+          }
+        })
+        .catch(() => {});
+    }
   }, [mealName]);
 
   const colors = [
