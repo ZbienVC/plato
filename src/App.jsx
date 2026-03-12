@@ -1152,6 +1152,320 @@ function RecipeBookImage({ recipeName, dark }) {
   );
 }
 
+const RESTAURANT_DB = [
+  {
+    name: 'Chipotle',
+    emoji: '🌯',
+    color: '#a51c30',
+    category: 'Mexican',
+    items: [
+      { name: 'Chicken Burrito Bowl', cal: 625, protein: 51, carbs: 64, fat: 16, cat: 'Bowls' },
+      { name: 'Steak Burrito Bowl', cal: 595, protein: 47, carbs: 64, fat: 15, cat: 'Bowls' },
+      { name: 'Barbacoa Burrito Bowl', cal: 570, protein: 43, carbs: 64, fat: 14, cat: 'Bowls' },
+      { name: 'Carnitas Burrito Bowl', cal: 580, protein: 40, carbs: 64, fat: 18, cat: 'Bowls' },
+      { name: 'Sofritas Burrito Bowl', cal: 550, protein: 18, carbs: 70, fat: 17, cat: 'Bowls' },
+      { name: 'Chicken Salad Bowl', cal: 430, protein: 47, carbs: 25, fat: 14, cat: 'Salads' },
+      { name: 'Steak Salad Bowl', cal: 400, protein: 43, carbs: 25, fat: 13, cat: 'Salads' },
+      { name: 'Chicken Tacos (3)', cal: 525, protein: 42, carbs: 54, fat: 14, cat: 'Tacos' },
+      { name: 'Steak Tacos (3)', cal: 495, protein: 38, carbs: 54, fat: 13, cat: 'Tacos' },
+      { name: 'Chicken Burrito', cal: 795, protein: 51, carbs: 86, fat: 25, cat: 'Burritos' },
+    ]
+  },
+  {
+    name: "McDonald's",
+    emoji: '🍔',
+    color: '#DA291C',
+    category: 'Fast Food',
+    items: [
+      { name: 'McDouble', cal: 390, protein: 22, carbs: 34, fat: 19, cat: 'Burgers' },
+      { name: 'Quarter Pounder w/ Cheese', cal: 530, protein: 30, carbs: 41, fat: 26, cat: 'Burgers' },
+      { name: 'Big Mac', cal: 550, protein: 25, carbs: 46, fat: 29, cat: 'Burgers' },
+      { name: 'Grilled Chicken Sandwich', cal: 380, protein: 37, carbs: 41, fat: 7, cat: 'Sandwiches' },
+      { name: 'Egg McMuffin', cal: 310, protein: 17, carbs: 30, fat: 12, cat: 'Breakfast' },
+      { name: 'Sausage McMuffin w/ Egg', cal: 480, protein: 21, carbs: 30, fat: 30, cat: 'Breakfast' },
+      { name: 'Southwest Grilled Chicken Salad', cal: 350, protein: 37, carbs: 27, fat: 11, cat: 'Salads' },
+      { name: 'Fruit & Maple Oatmeal', cal: 290, protein: 5, carbs: 57, fat: 4, cat: 'Breakfast' },
+      { name: 'Chicken McNuggets 10pc', cal: 420, protein: 24, carbs: 26, fat: 24, cat: 'Chicken' },
+      { name: 'McChicken', cal: 400, protein: 14, carbs: 39, fat: 21, cat: 'Sandwiches' },
+    ]
+  },
+  {
+    name: 'Subway',
+    emoji: '🥖',
+    color: '#009B48',
+    category: 'Sandwiches',
+    items: [
+      { name: 'Rotisserie Chicken 6"', cal: 350, protein: 28, carbs: 46, fat: 7, cat: '6-inch' },
+      { name: 'Turkey Breast 6"', cal: 280, protein: 18, carbs: 46, fat: 4, cat: '6-inch' },
+      { name: 'Chicken Breast 6"', cal: 310, protein: 23, carbs: 47, fat: 5, cat: '6-inch' },
+      { name: 'Tuna 6"', cal: 450, protein: 19, carbs: 45, fat: 22, cat: '6-inch' },
+      { name: 'Italian BMT 6"', cal: 410, protein: 19, carbs: 46, fat: 18, cat: '6-inch' },
+      { name: 'Veggie Delite 6"', cal: 230, protein: 9, carbs: 44, fat: 3, cat: '6-inch' },
+      { name: 'Rotisserie Chicken Footlong', cal: 700, protein: 56, carbs: 92, fat: 14, cat: 'Footlong' },
+      { name: 'Turkey Breast Footlong', cal: 560, protein: 36, carbs: 92, fat: 8, cat: 'Footlong' },
+      { name: 'Chicken Caesar Salad', cal: 220, protein: 26, carbs: 10, fat: 9, cat: 'Salads' },
+      { name: 'Steak & Cheese 6"', cal: 380, protein: 24, carbs: 46, fat: 11, cat: '6-inch' },
+    ]
+  },
+  {
+    name: 'Chick-fil-A',
+    emoji: '🍗',
+    color: '#E51636',
+    category: 'Chicken',
+    items: [
+      { name: 'Grilled Chicken Sandwich', cal: 320, protein: 28, carbs: 40, fat: 5, cat: 'Sandwiches' },
+      { name: 'Original Chicken Sandwich', cal: 440, protein: 28, carbs: 41, fat: 19, cat: 'Sandwiches' },
+      { name: 'Grilled Chicken Club', cal: 430, protein: 38, carbs: 40, fat: 11, cat: 'Sandwiches' },
+      { name: 'Grilled Nuggets 8pc', cal: 130, protein: 25, carbs: 1, fat: 3, cat: 'Nuggets' },
+      { name: 'Grilled Nuggets 12pc', cal: 200, protein: 38, carbs: 2, fat: 4, cat: 'Nuggets' },
+      { name: 'Cobb Salad (Grilled)', cal: 430, protein: 38, carbs: 17, fat: 23, cat: 'Salads' },
+      { name: 'Market Salad (Grilled)', cal: 340, protein: 28, carbs: 25, fat: 14, cat: 'Salads' },
+      { name: 'Chicken Soup (Medium)', cal: 220, protein: 18, carbs: 22, fat: 5, cat: 'Soups' },
+      { name: 'Greek Yogurt Parfait', cal: 230, protein: 13, carbs: 31, fat: 5, cat: 'Breakfast' },
+      { name: 'Egg White Grill', cal: 290, protein: 26, carbs: 30, fat: 7, cat: 'Breakfast' },
+    ]
+  },
+  {
+    name: 'Sweetgreen',
+    emoji: '🥗',
+    color: '#9BC44C',
+    category: 'Salads & Bowls',
+    items: [
+      { name: 'Harvest Bowl', cal: 655, protein: 32, carbs: 68, fat: 29, cat: 'Bowls' },
+      { name: 'Shroomami Bowl', cal: 615, protein: 18, carbs: 68, fat: 28, cat: 'Bowls' },
+      { name: 'Fish Taco Bowl', cal: 625, protein: 43, carbs: 49, fat: 28, cat: 'Bowls' },
+      { name: 'Chicken + Brussels Caesar', cal: 500, protein: 42, carbs: 25, fat: 27, cat: 'Salads' },
+      { name: 'Guacamole Greens', cal: 485, protein: 14, carbs: 42, fat: 29, cat: 'Salads' },
+      { name: 'Garden Cobb', cal: 385, protein: 15, carbs: 30, fat: 24, cat: 'Salads' },
+      { name: 'Kale Caesar (Chicken)', cal: 415, protein: 35, carbs: 20, fat: 22, cat: 'Salads' },
+      { name: 'Hot Honey Chicken Bowl', cal: 670, protein: 48, carbs: 71, fat: 22, cat: 'Bowls' },
+    ]
+  },
+  {
+    name: 'Panera Bread',
+    emoji: '🥐',
+    color: '#6B3A2A',
+    category: 'Cafe',
+    items: [
+      { name: 'Fuji Apple Chicken Salad', cal: 540, protein: 31, carbs: 52, fat: 22, cat: 'Salads' },
+      { name: 'Green Goddess Cobb Salad', cal: 570, protein: 44, carbs: 23, fat: 34, cat: 'Salads' },
+      { name: 'Turkey BLT Sandwich', cal: 420, protein: 27, carbs: 39, fat: 16, cat: 'Sandwiches' },
+      { name: 'Chicken Noodle Soup (Bowl)', cal: 140, protein: 8, carbs: 19, fat: 3, cat: 'Soups' },
+      { name: 'Broccoli Cheddar Soup (Bowl)', cal: 290, protein: 11, carbs: 24, fat: 17, cat: 'Soups' },
+      { name: 'Bacon Turkey Bravo', cal: 680, protein: 42, carbs: 67, fat: 25, cat: 'Sandwiches' },
+      { name: 'Mediterranean Veggie Sandwich', cal: 570, protein: 21, carbs: 85, fat: 16, cat: 'Sandwiches' },
+      { name: 'Steel Cut Oatmeal', cal: 200, protein: 6, carbs: 39, fat: 3, cat: 'Breakfast' },
+    ]
+  },
+  {
+    name: 'Shake Shack',
+    emoji: '🍔',
+    color: '#68A63E',
+    category: 'Burgers',
+    items: [
+      { name: 'ShackBurger', cal: 490, protein: 27, carbs: 39, fat: 27, cat: 'Burgers' },
+      { name: 'SmokeShack', cal: 590, protein: 36, carbs: 39, fat: 34, cat: 'Burgers' },
+      { name: 'Grilled Chicken Sandwich', cal: 490, protein: 43, carbs: 46, fat: 14, cat: 'Chicken' },
+      { name: "Chick'n Shack", cal: 590, protein: 27, carbs: 55, fat: 29, cat: 'Chicken' },
+      { name: 'Shroom Burger', cal: 490, protein: 19, carbs: 40, fat: 29, cat: 'Veggie' },
+      { name: 'Flat-Top Dog', cal: 370, protein: 13, carbs: 32, fat: 22, cat: 'Hot Dogs' },
+    ]
+  },
+  {
+    name: 'Starbucks',
+    emoji: '☕',
+    color: '#00704A',
+    category: 'Cafe',
+    items: [
+      { name: 'Spinach Feta Wrap', cal: 290, protein: 19, carbs: 33, fat: 9, cat: 'Wraps' },
+      { name: 'Turkey Provolone Sandwich', cal: 420, protein: 25, carbs: 55, fat: 9, cat: 'Sandwiches' },
+      { name: 'Protein Box (Eggs)', cal: 270, protein: 13, carbs: 26, fat: 12, cat: 'Snacks' },
+      { name: 'Chicken Quinoa Bowl', cal: 420, protein: 27, carbs: 51, fat: 11, cat: 'Bowls' },
+      { name: 'Oatmeal (Classic)', cal: 160, protein: 5, carbs: 28, fat: 2, cat: 'Breakfast' },
+      { name: 'Sous Vide Egg Bites (2pc)', cal: 310, protein: 19, carbs: 9, fat: 22, cat: 'Breakfast' },
+    ]
+  },
+  {
+    name: 'Cheesecake Factory',
+    emoji: '🍰',
+    color: '#C8A96E',
+    category: 'Casual Dining',
+    items: [
+      { name: 'Grilled Salmon', cal: 590, protein: 57, carbs: 17, fat: 33, cat: 'Seafood' },
+      { name: 'Chicken Madeira', cal: 850, protein: 72, carbs: 41, fat: 44, cat: 'Chicken' },
+      { name: 'Skinnylicious Chicken', cal: 590, protein: 60, carbs: 28, fat: 25, cat: 'Skinnylicious' },
+      { name: 'Skinnylicious Salmon', cal: 550, protein: 51, carbs: 32, fat: 24, cat: 'Skinnylicious' },
+      { name: 'Caesar Salad (Small)', cal: 380, protein: 10, carbs: 28, fat: 26, cat: 'Salads' },
+      { name: 'Grilled Steak Medallions', cal: 780, protein: 64, carbs: 47, fat: 34, cat: 'Steaks' },
+    ]
+  },
+  {
+    name: 'Texas Roadhouse',
+    emoji: '🥩',
+    color: '#8B1A1A',
+    category: 'Steakhouse',
+    items: [
+      { name: '6oz Sirloin', cal: 250, protein: 43, carbs: 0, fat: 8, cat: 'Steaks' },
+      { name: '10oz Sirloin', cal: 420, protein: 72, carbs: 0, fat: 13, cat: 'Steaks' },
+      { name: 'Herb Crusted Chicken', cal: 400, protein: 58, carbs: 8, fat: 15, cat: 'Chicken' },
+      { name: 'Grilled Chicken Salad', cal: 430, protein: 43, carbs: 24, fat: 18, cat: 'Salads' },
+      { name: 'Grilled Shrimp', cal: 220, protein: 32, carbs: 9, fat: 6, cat: 'Seafood' },
+      { name: 'Grilled Salmon', cal: 460, protein: 52, carbs: 4, fat: 25, cat: 'Seafood' },
+    ]
+  }
+];
+
+function RestaurantMode({ dark, onClose, onLogItem }) {
+  const [search, setSearch] = React.useState('');
+  const [filter, setFilter] = React.useState('protein');
+  const [selectedRestaurant, setSelectedRestaurant] = React.useState(null);
+  const [confirmItem, setConfirmItem] = React.useState(null);
+
+  const filteredRestaurants = RESTAURANT_DB.filter(r =>
+    r.name.toLowerCase().includes(search.toLowerCase()) ||
+    r.category.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const scoreItem = (item) => {
+    if (filter === 'protein') return item.protein;
+    if (filter === 'calories') return -item.cal;
+    if (filter === 'macros') return Math.round((item.protein / item.cal) * 100);
+    if (filter === 'balanced') {
+      const pct = item.protein * 4 / item.cal;
+      const cct = item.carbs * 4 / item.cal;
+      const fct = item.fat * 9 / item.cal;
+      return -(Math.abs(pct - 0.30) + Math.abs(cct - 0.40) + Math.abs(fct - 0.30)) * 100;
+    }
+    return 0;
+  };
+
+  const restaurant = selectedRestaurant ? RESTAURANT_DB.find(r => r.name === selectedRestaurant) : null;
+  const sortedItems = restaurant
+    ? [...restaurant.items].sort((a, b) => scoreItem(b) - scoreItem(a))
+    : [];
+
+  const filterOptions = [
+    { key: 'protein', label: 'Most Protein' },
+    { key: 'macros', label: 'Best Macros' },
+    { key: 'calories', label: 'Lowest Cal' },
+    { key: 'balanced', label: 'Most Balanced' },
+  ];
+
+  return (
+    <div style={{ position:'fixed', inset:0, zIndex:9999, background: dark ? '#080d1a' : '#f5f3ee', display:'flex', flexDirection:'column', overflow:'hidden' }}>
+      {/* Header */}
+      <div style={{ background: dark ? '#0f1629' : '#fff', borderBottom: `1px solid ${dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.08)'}`, padding:'16px 20px', display:'flex', alignItems:'center', gap:'12px', flexShrink:0 }}>
+        <button onClick={onClose} style={{ background:'none', border:'none', color: dark?'#8b9cc8':'#475569', cursor:'pointer', fontSize:'20px', padding:'4px', lineHeight:1 }}>←</button>
+        <div>
+          <h2 style={{ color: dark?'#f0f4ff':'#0f172a', fontWeight:800, fontSize:'20px', margin:0 }}>Restaurant Mode</h2>
+          <p style={{ color: dark?'#4a5580':'#94a3b8', fontSize:'12px', margin:0 }}>Find the best macros at your favorite spots</p>
+        </div>
+      </div>
+
+      {/* Search */}
+      <div style={{ padding:'12px 16px', background: dark?'#0f1629':'#fff', borderBottom:`1px solid ${dark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.06)'}`, flexShrink:0 }}>
+        <input
+          value={search}
+          onChange={e => { setSearch(e.target.value); setSelectedRestaurant(null); }}
+          placeholder="Search restaurant..."
+          style={{ width:'100%', background: dark?'rgba(255,255,255,0.06)':'#f8fafc', border:`1px solid ${dark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.1)'}`, borderRadius:'12px', padding:'10px 14px', color: dark?'#f0f4ff':'#0f172a', fontSize:'15px', outline:'none', boxSizing:'border-box' }}
+        />
+      </div>
+
+      {/* Filter toggles */}
+      <div style={{ padding:'10px 16px', display:'flex', gap:'8px', overflowX:'auto', background: dark?'#0f1629':'#fff', borderBottom:`1px solid ${dark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.06)'}`, flexShrink:0 }}>
+        {filterOptions.map(f => (
+          <button key={f.key} onClick={() => setFilter(f.key)}
+            style={{ flexShrink:0, padding:'6px 14px', borderRadius:'20px', border:'none', cursor:'pointer', fontWeight:700, fontSize:'12px', background: filter===f.key ? 'linear-gradient(135deg,#10d9a0,#059669)' : dark?'rgba(255,255,255,0.06)':'#f1f5f9', color: filter===f.key ? '#fff' : dark?'#8b9cc8':'#64748b', transition:'all 0.2s' }}>
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div style={{ flex:1, overflowY:'auto', padding:'16px' }}>
+        {!selectedRestaurant ? (
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(2, 1fr)', gap:'12px' }}>
+            {filteredRestaurants.map(r => (
+              <button key={r.name} onClick={() => setSelectedRestaurant(r.name)}
+                style={{ background: dark?'#0f1629':'#fff', border:`1px solid ${dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)'}`, borderRadius:'16px', padding:'16px', cursor:'pointer', textAlign:'left', transition:'all 0.2s', boxShadow: dark?'0 4px 12px rgba(0,0,0,0.3)':'0 2px 8px rgba(0,0,0,0.06)' }}>
+                <div style={{ fontSize:'32px', marginBottom:'8px' }}>{r.emoji}</div>
+                <div style={{ color: dark?'#f0f4ff':'#0f172a', fontWeight:800, fontSize:'14px', marginBottom:'2px' }}>{r.name}</div>
+                <div style={{ color: dark?'#4a5580':'#94a3b8', fontSize:'11px' }}>{r.category}</div>
+                <div style={{ color: dark?'#4a5580':'#94a3b8', fontSize:'11px', marginTop:'4px' }}>{r.items.length} items</div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div>
+            <button onClick={() => setSelectedRestaurant(null)}
+              style={{ background:'none', border:'none', color:'#10d9a0', cursor:'pointer', fontWeight:700, fontSize:'13px', padding:0, marginBottom:'16px', display:'flex', alignItems:'center', gap:'4px' }}>
+              ← All Restaurants
+            </button>
+            <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'16px' }}>
+              <span style={{ fontSize:'28px' }}>{restaurant.emoji}</span>
+              <div>
+                <h3 style={{ color: dark?'#f0f4ff':'#0f172a', fontWeight:800, fontSize:'18px', margin:0 }}>{restaurant.name}</h3>
+                <p style={{ color:'#10d9a0', fontSize:'12px', fontWeight:600, margin:0, textTransform:'uppercase', letterSpacing:'0.5px' }}>
+                  {filter === 'protein' ? 'Sorted by: Most Protein' : filter === 'macros' ? 'Sorted by: Best Macro Ratio' : filter === 'calories' ? 'Sorted by: Lowest Calories' : 'Sorted by: Most Balanced'}
+                </p>
+              </div>
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+              {sortedItems.map((item, i) => (
+                <button key={i} onClick={() => setConfirmItem(item)}
+                  style={{ background: dark?'#0f1629':'#fff', border:`1px solid ${dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)'}`, borderRadius:'14px', padding:'14px 16px', cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'12px', transition:'all 0.2s' }}>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ color: dark?'#f0f4ff':'#0f172a', fontWeight:700, fontSize:'14px', marginBottom:'4px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{item.name}</div>
+                    <div style={{ display:'flex', gap:'10px', alignItems:'center' }}>
+                      <span style={{ color: dark?'#8b9cc8':'#64748b', fontSize:'12px' }}>{item.cal} cal</span>
+                      <span style={{ color:'#3b82f6', fontSize:'12px', fontWeight:700 }}>{item.protein}g protein</span>
+                      <span style={{ color: dark?'#4a5580':'#94a3b8', fontSize:'11px' }}>{item.carbs}g carbs · {item.fat}g fat</span>
+                    </div>
+                  </div>
+                  {i < 3 && (
+                    <div style={{ flexShrink:0, background:'linear-gradient(135deg,#10d9a0,#059669)', color:'white', fontSize:'9px', fontWeight:800, padding:'3px 8px', borderRadius:'10px', textTransform:'uppercase', letterSpacing:'0.5px' }}>
+                      {filter === 'protein' ? 'Top Pick' : filter === 'macros' ? 'Best Ratio' : filter === 'calories' ? 'Low Cal' : 'Balanced'}
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Log confirmation modal */}
+      {confirmItem && (
+        <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'flex-end', zIndex:10 }}>
+          <div style={{ width:'100%', background: dark?'#0f1629':'#fff', borderRadius:'24px 24px 0 0', padding:'24px 20px 32px' }}>
+            <h3 style={{ color: dark?'#f0f4ff':'#0f172a', fontWeight:800, fontSize:'18px', marginBottom:'4px' }}>{confirmItem.name}</h3>
+            <p style={{ color: dark?'#4a5580':'#94a3b8', fontSize:'13px', marginBottom:'20px' }}>{selectedRestaurant}</p>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'10px', marginBottom:'24px' }}>
+              {[{l:'Calories',v:confirmItem.cal,c:'#f97316'},{l:'Protein',v:confirmItem.protein+'g',c:'#3b82f6'},{l:'Carbs',v:confirmItem.carbs+'g',c:'#22c55e'},{l:'Fat',v:confirmItem.fat+'g',c:'#eab308'}].map(m => (
+                <div key={m.l} style={{ background: dark?'rgba(255,255,255,0.05)':'#f8fafc', borderRadius:'12px', padding:'12px 8px', textAlign:'center' }}>
+                  <div style={{ color:m.c, fontWeight:900, fontSize:'20px' }}>{m.v}</div>
+                  <div style={{ color: dark?'#4a5580':'#94a3b8', fontSize:'10px', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px' }}>{m.l}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display:'flex', gap:'10px' }}>
+              <button onClick={() => setConfirmItem(null)}
+                style={{ flex:1, padding:'14px', borderRadius:'12px', border:`1px solid ${dark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.1)'}`, background:'none', color: dark?'#8b9cc8':'#64748b', fontWeight:700, cursor:'pointer', fontSize:'15px' }}>
+                Cancel
+              </button>
+              <button onClick={() => { onLogItem(confirmItem, selectedRestaurant); setConfirmItem(null); }}
+                style={{ flex:2, padding:'14px', borderRadius:'12px', border:'none', background:'linear-gradient(135deg,#10d9a0,#059669)', color:'white', fontWeight:800, cursor:'pointer', fontSize:'15px' }}>
+                Log to Diary
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   // ========== API CONFIGURATION ==========
   const [apiConfig, setApiConfig] = useState(() => {
@@ -1877,6 +2191,10 @@ export default function App() {
   const [recipeBookPage, setRecipeBookPage] = useState(0);
   const [recipeBookFlipping, setRecipeBookFlipping] = useState(null); // 'forward' | 'back' | null
   const [showFavoriteMeals, setShowFavoriteMeals] = useState(false);
+
+  // ========== RESTAURANT MODE (ADDITIVE) ==========
+  const [showRestaurantMode, setShowRestaurantMode] = useState(false);
+  // ========== END RESTAURANT MODE ==========
   
   // ========== INSIGHT & INTENT FEATURES (ADDITIVE) ==========
   const [showMealAnalysis, setShowMealAnalysis] = useState(false); // User preference
@@ -1989,6 +2307,30 @@ export default function App() {
     const id = Date.now();
     setToasts(prev => [...prev, {id, message, type}]);
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
+  };
+
+  const handleRestaurantLog = (item, restaurantName) => {
+    const logEntry = {
+      id: Date.now().toString(),
+      name: `${item.name} (${restaurantName})`,
+      calories: item.cal,
+      protein: item.protein,
+      carbs: item.carbs,
+      fat: item.fat,
+      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      date: new Date().toISOString().split('T')[0],
+      source: 'restaurant',
+    };
+    setDailyLog(prev => ({
+      ...prev,
+      meals: [...prev.meals, logEntry],
+      totalCalories: prev.totalCalories + item.cal,
+      totalProtein: prev.totalProtein + item.protein,
+      totalCarbs: prev.totalCarbs + item.carbs,
+      totalFat: prev.totalFat + item.fat,
+    }));
+    showToast(`${item.name} logged!`, 'success');
+    setShowRestaurantMode(false);
   };
   
   // Calculate age from birthday
@@ -12627,6 +12969,14 @@ Lunch
               <span className="sm:hidden">Scan</span>
             </button>
             <button
+              onClick={() => setShowRestaurantMode(true)}
+              className="flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-xl shadow-lg btn-press text-sm"
+            >
+              <Utensils className="w-4 h-4" />
+              <span className="hidden sm:inline">Restaurant</span>
+              <span className="sm:hidden">Restaurant</span>
+            </button>
+            <button
               onClick={() => setShowWeighInModal(true)}
               className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${dark?'bg-purple-600 text-white hover:bg-purple-700':'bg-purple-500 text-white hover:bg-purple-600'} shadow-premium-lg text-sm`}
             >
@@ -13825,6 +14175,16 @@ Lunch
 
         {/* ===== RECIPE BOOK ===== */}
         {showRecipeBook && <RecipeBook mealPlan={mealPlan} recipes={recipes} dark={dark} page={recipeBookPage} setPage={setRecipeBookPage} flipping={recipeBookFlipping} setFlipping={setRecipeBookFlipping} onClose={() => setShowRecipeBook(false)} />}
+
+        {/* ===== RESTAURANT MODE ===== */}
+        {showRestaurantMode && (
+          <RestaurantMode
+            dark={dark}
+            onClose={() => setShowRestaurantMode(false)}
+            onLogItem={handleRestaurantLog}
+            userPlan={plan}
+          />
+        )}
 
         {/* Menu Sidebar */}
         {menuOpen && (
