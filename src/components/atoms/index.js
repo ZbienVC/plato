@@ -2,3 +2,4 @@
 export { Button, IconButton } from './Button';
 export { Card, MealCard } from './Card';
 export { Input, Textarea, Select } from './Input';
+export { Badge, StatusBadge } from './Badge';
