@@ -1,0 +1,176 @@
+/* FLOATING ACTION BUTTON */
+
+.fab {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6B8F71 0%, #7BA985 100%);
+  border: none;
+  box-shadow: 0 4px 20px rgba(107, 143, 113, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 200;
+  color: #FFFFFF;
+  font-size: 28px;
+  font-weight: 700;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  gap: 8px;
+  padding: 0;
+  flex-direction: column;
+}
+
+/* ICON */
+
+.fab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fab-label {
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: none;
+}
+
+/* HOVER STATE */
+
+.fab:hover:not(:disabled) {
+  transform: scale(1.1) translateY(-4px);
+  box-shadow: 0 8px 28px rgba(107, 143, 113, 0.5);
+}
+
+.fab:hover:not(:disabled) .fab-icon {
+  transform: scale(1.15);
+}
+
+/* ACTIVE STATE */
+
+.fab:active:not(:disabled) {
+  transform: scale(0.95);
+  box-shadow: 0 4px 16px rgba(107, 143, 113, 0.35);
+}
+
+/* DISABLED STATE */
+
+.fab:disabled {
+  background: #4A4A4A;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+/* LOADING STATE */
+
+.fab-loading {
+  pointer-events: none;
+}
+
+.fab-icon-spin {
+  animation: spin 2s linear infinite;
+}
+
+/* DESKTOP - Expand to show label */
+
+@media (min-width: 768px) {
+  .fab {
+    width: auto;
+    height: 56px;
+    padding: 0 24px;
+    flex-direction: row;
+    bottom: 24px;
+    right: 24px;
+  }
+
+  .fab-label {
+    display: inline;
+    margin-left: 4px;
+  }
+
+  .fab-icon {
+    font-size: 24px;
+  }
+}
+
+/* SAFE AREA PADDING - Account for notch/home indicator */
+
+@supports (padding: max(0px)) {
+  .fab {
+    bottom: calc(80px + max(0px, env(safe-area-inset-bottom)));
+    right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* ANIMATIONS */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Entrance animation */
+
+@keyframes slideUpFAB {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.fab {
+  animation: slideUpFAB 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+  .fab,
+  .fab-icon {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* TOUCH DEVICE OPTIMIZATION */
+
+@media (hover: none) and (pointer: coarse) {
+  .fab {
+    width: 64px;
+    height: 64px;
+    font-size: 32px;
+  }
+
+  .fab-icon {
+    font-size: 32px;
+  }
+}
