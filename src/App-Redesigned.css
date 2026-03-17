@@ -1,0 +1,115 @@
+/* APP REDESIGNED - CONTAINER STYLES */
+
+.app-redesigned {
+  width: 100%;
+  min-height: 100vh;
+  background: #0F0F0F;
+  color: #FFFFFF;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-redesigned.light {
+  background: #FFFFFF;
+  color: #0F0F0F;
+}
+
+/* Reset default styles */
+.app-redesigned * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Scrollbar styling */
+.app-redesigned ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.app-redesigned ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-redesigned ::-webkit-scrollbar-thumb {
+  background: #6B8F71;
+  border-radius: 4px;
+}
+
+.app-redesigned ::-webkit-scrollbar-thumb:hover {
+  background: #7BA985;
+}
+
+/* Page wrapper ensure full viewport height */
+.app-redesigned > div {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Safe area padding for mobile notches */
+@supports (padding: max(0px)) {
+  .app-redesigned {
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive typography */
+@media (max-width: 640px) {
+  .app-redesigned {
+    font-size: 14px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .app-redesigned {
+    background: #FFFFFF;
+    color: #000000;
+  }
+}
