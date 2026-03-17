@@ -1,0 +1,3 @@
+// ORGANISM COMPONENTS - BARREL EXPORT
+export { Modal, BottomSheet } from './Modal';
+// More organisms to come...
