@@ -7,8 +7,7 @@ import './MealDetail.css';
 /**
  * MEAL DETAIL PAGE - Full meal breakdown with edit/delete
  */
-export const MealDetail = ({ mealId = '1' }) => {
-  const [activeTab, setActiveTab] = useState('meals');
+export const MealDetail = ({ mealId = '1', activeTab = 'detail', onTabChange = () => {} }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [editedMeal, setEditedMeal] = useState(null);
@@ -55,11 +54,7 @@ export const MealDetail = ({ mealId = '1' }) => {
   };
 
   return (
-    <MainLayout
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-      showFAB={false}
-    >
+    <>
       {/* HEADER */}
       <div className="meal-detail-header">
         <div>
@@ -205,7 +200,7 @@ export const MealDetail = ({ mealId = '1' }) => {
           Are you sure you want to delete "{meal.name}"? This action cannot be undone.
         </p>
       </Modal>
-    </MainLayout>
+    </>
   );
 };
 

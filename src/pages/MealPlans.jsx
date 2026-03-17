@@ -6,8 +6,7 @@ import './MealPlans.css';
 /**
  * MEAL PLANS PAGE - AI meal planning with multiple view modes
  */
-export const MealPlans = () => {
-  const [activeTab, setActiveTab] = useState('meals');
+export const MealPlans = ({ activeTab = 'meals', onTabChange = () => {} }) => {
   const [viewMode, setViewMode] = useState('calendar'); // calendar | stack | list
   const [selectedDate, setSelectedDate] = useState('2026-03-16');
   const [currentStackIndex, setCurrentStackIndex] = useState(0);
@@ -54,11 +53,7 @@ export const MealPlans = () => {
   const stackMeal = mealsForSelectedDate[currentStackIndex];
 
   return (
-    <MainLayout
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-      showFAB={false}
-    >
+    <>
       {/* HEADER */}
       <div className="meal-plans-header">
         <h1 className="page-title">Your AI Meal Plan</h1>
@@ -236,7 +231,7 @@ export const MealPlans = () => {
           </Card>
         </div>
       )}
-    </MainLayout>
+    </>
   );
 };
 

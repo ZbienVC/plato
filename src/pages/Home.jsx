@@ -7,8 +7,7 @@ import './Home.css';
 /**
  * HOME PAGE - Dashboard with macros overview and meal summary
  */
-export const Home = () => {
-  const [activeTab, setActiveTab] = useState('home');
+export const Home = ({ activeTab = 'home', onTabChange = () => {} }) => {
   const [showQuickLog, setShowQuickLog] = useState(false);
   const [voice, setVoice] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -64,11 +63,7 @@ export const Home = () => {
   };
 
   return (
-    <MainLayout
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-      onQuickLog={() => setShowQuickLog(true)}
-    >
+    <>
       {/* GREETING HEADER */}
       <div className="home-header">
         <h1 className="home-greeting">Good morning, Zach 👋</h1>
@@ -228,7 +223,7 @@ export const Home = () => {
           </div>
         </div>
       </BottomSheet>
-    </MainLayout>
+    </>
   );
 };
 

@@ -23,22 +23,27 @@ export default function AppRedesigned() {
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <Home />;
+        return <Home activeTab={currentPage} onTabChange={handleTabChange} />;
       case 'meals':
-        return <MealPlans />;
+        return <MealPlans activeTab={currentPage} onTabChange={handleTabChange} />;
       case 'detail':
-        return <MealDetail />;
+        return <MealDetail activeTab={currentPage} onTabChange={handleTabChange} />;
       case 'profile':
-        return <Profile />;
+        return <Profile activeTab={currentPage} onTabChange={handleTabChange} />;
       default:
-        return <Home />;
+        return <Home activeTab={currentPage} onTabChange={handleTabChange} />;
     }
   };
 
   return (
     <div className={`app-redesigned ${theme === 'dark' ? 'dark' : 'light'}`}>
-      {/* Render current page with layout wrapper */}
-      {renderPage()}
+      <MainLayout
+        activeTab={currentPage}
+        onTabChange={handleTabChange}
+        onQuickLog={() => {/* Will add voice logging */}}
+      >
+        {renderPage()}
+      </MainLayout>
     </div>
   );
 }

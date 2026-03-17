@@ -27,6 +27,7 @@ export const MainLayout = ({
           onClick={onQuickLog}
           icon="🎤"
           label="Quick Log"
+          tooltipText="Quick meal log"
         />
       )}
 
@@ -34,6 +35,12 @@ export const MainLayout = ({
       <BottomNav
         activeTab={activeTab}
         onTabChange={onTabChange}
+        tabs={[
+          { id: 'home', label: 'Home', icon: '🏠' },
+          { id: 'meals', label: 'Meals', icon: '🍽️' },
+          { id: 'detail', label: 'Detail', icon: '📊' },
+          { id: 'profile', label: 'Profile', icon: '👤' }
+        ]}
       />
     </div>
   );

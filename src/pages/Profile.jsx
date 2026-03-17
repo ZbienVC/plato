@@ -6,8 +6,7 @@ import './Profile.css';
 /**
  * PROFILE PAGE - User stats, settings, subscription
  */
-export const Profile = () => {
-  const [activeTab, setActiveTab] = useState('profile');
+export const Profile = ({ activeTab = 'profile', onTabChange = () => {} }) => {
 
   // Mock user data
   const user = {
@@ -37,11 +36,7 @@ export const Profile = () => {
   };
 
   return (
-    <MainLayout
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-      showFAB={false}
-    >
+    <>
       {/* PROFILE HEADER */}
       <div className="profile-header">
         <div className="profile-avatar">
@@ -200,7 +195,7 @@ export const Profile = () => {
         <Button variant="secondary" fullWidth>Edit Profile</Button>
         <Button variant="tertiary" fullWidth>Sign Out</Button>
       </div>
-    </MainLayout>
+    </>
   );
 };
 
