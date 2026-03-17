@@ -1,3 +1,4 @@
 // ATOMIC COMPONENTS - BARREL EXPORT
 export { Button, IconButton } from './Button';
-// Future: Card, Badge, Input, etc.
+export { Card, MealCard } from './Card';
+export { Input, Textarea, Select } from './Input';

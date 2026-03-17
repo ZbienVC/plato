@@ -1,0 +1,209 @@
+/* INPUT COMPONENT STYLES */
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.input-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #FFFFFF;
+  display: block;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #1A1A1A;
+  border: 1.5px solid #2A2A2A;
+  border-radius: 8px;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-container.input-with-icon {
+  padding-left: 0;
+}
+
+.input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: #A0A0A0;
+  font-size: 16px;
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 12px 16px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.input::placeholder {
+  color: #707070;
+}
+
+/* FOCUS STATE */
+
+.input-container.input-focused {
+  border-color: #6B8F71;
+  box-shadow: 0 0 0 3px rgba(107, 143, 113, 0.1);
+  background-color: #1F1F1F;
+}
+
+.input-container.input-focused .input-icon {
+  color: #6B8F71;
+}
+
+/* ERROR STATE */
+
+.input-container.input-error {
+  border-color: #FF6B6B;
+  background-color: rgba(255, 107, 107, 0.05);
+}
+
+.input-error-message {
+  font-size: 12px;
+  color: #FF6B6B;
+  margin: 0;
+  animation: slideUp 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* DISABLED STATE */
+
+.input:disabled {
+  background-color: #0F0F0F;
+  color: #707070;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.input-container:has(input:disabled) {
+  border-color: #1F1F1F;
+  background-color: #0F0F0F;
+}
+
+/* TEXTAREA SPECIFIC */
+
+.textarea-container {
+  padding: 8px;
+}
+
+.textarea {
+  padding: 12px !important;
+  resize: vertical;
+  min-height: 80px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* SELECT SPECIFIC */
+
+.select-container {
+  position: relative;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #A0A0A0;
+  font-size: 12px;
+}
+
+.select-container.input-focused .select-arrow {
+  color: #6B8F71;
+}
+
+/* SCROLLBAR STYLING FOR TEXTAREA */
+
+.textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.textarea::-webkit-scrollbar-thumb {
+  background-color: #2A2A2A;
+  border-radius: 3px;
+}
+
+.textarea::-webkit-scrollbar-thumb:hover {
+  background-color: #3A3A3A;
+}
+
+/* ANIMATIONS */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 640px) {
+  .input {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 14px 16px;
+    min-height: 44px; /* Touch target size */
+  }
+
+  .input-container {
+    min-height: 44px;
+  }
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+  .input-container,
+  .input-error-message {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* AUTOFILL STYLING */
+
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #1A1A1A inset !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+.input:-webkit-autofill::first-line {
+  font-family: inherit;
+}
