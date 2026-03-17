@@ -64,6 +64,11 @@ export const Home = ({ activeTab = 'home', onTabChange = () => {} }) => {
 
   return (
     <>
+      {/* REDESIGN BANNER */}
+      <div style={{background: '#6B8F71', color: '#fff', padding: '12px 16px', textAlign: 'center', marginBottom: '16px', borderRadius: '8px'}}>
+        <h2 style={{margin: 0, fontSize: '18px', fontWeight: '700'}}>✨ PLATO PHASE 1 REDESIGN LIVE ✨</h2>
+      </div>
+
       {/* GREETING HEADER */}
       <div className="home-header">
         <h1 className="home-greeting">Good morning, Zach 👋</h1>
