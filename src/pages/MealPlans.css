@@ -1,0 +1,356 @@
+/* MEAL PLANS PAGE */
+
+.meal-plans-header {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 8px 0;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #A0A0A0;
+  margin: 0;
+}
+
+/* VIEW MODE SELECTOR */
+
+.view-mode-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.view-mode-btn {
+  padding: 10px 16px;
+  background: transparent;
+  border: 1.5px solid #2A2A2A;
+  border-radius: 8px;
+  color: #A0A0A0;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.view-mode-btn:hover {
+  border-color: #6B8F71;
+  color: #6B8F71;
+  background: rgba(107, 143, 113, 0.05);
+}
+
+.view-mode-btn.view-mode-active {
+  background: linear-gradient(135deg, #6B8F71 0%, #7BA985 100%);
+  border-color: #6B8F71;
+  color: #FFFFFF;
+}
+
+/* CALENDAR VIEW */
+
+.meal-plans-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.calendar-card {
+  padding: 20px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  border: 1px solid #2A2A2A;
+  background: rgba(107, 143, 113, 0.05);
+  border-radius: 8px;
+  color: #A0A0A0;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendar-day:hover {
+  border-color: #6B8F71;
+  color: #6B8F71;
+}
+
+.calendar-day-has-meals {
+  background: rgba(107, 143, 113, 0.15);
+  border-color: rgba(107, 143, 113, 0.3);
+}
+
+.calendar-day-selected {
+  background: linear-gradient(135deg, #6B8F71 0%, #7BA985 100%);
+  border-color: #6B8F71;
+  color: #FFFFFF;
+}
+
+/* DAILY MEALS CARD */
+
+.daily-meals-card {
+  padding: 20px;
+}
+
+.daily-meals-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.meals-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #2A2A2A;
+}
+
+.meal-preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.meal-preview-info {
+  flex: 1;
+}
+
+.meal-preview-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.meal-preview-time {
+  font-size: 12px;
+  color: #A0A0A0;
+  margin: 2px 0 0 0;
+}
+
+.meal-preview-macros {
+  display: flex;
+  gap: 8px;
+}
+
+.macro-small {
+  font-size: 11px;
+  color: #6B8F71;
+  font-weight: 600;
+}
+
+.daily-totals {
+  margin-bottom: 16px;
+}
+
+.totals-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.totals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.total-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px;
+  background: rgba(107, 143, 113, 0.1);
+  border-radius: 8px;
+}
+
+.total-label {
+  font-size: 11px;
+  color: #A0A0A0;
+  font-weight: 500;
+}
+
+.total-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #6B8F71;
+}
+
+/* CARD STACK VIEW */
+
+.stack-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.stack-counter {
+  font-size: 12px;
+  color: #A0A0A0;
+  margin: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.meal-stack-card {
+  padding: 32px 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.meal-stack-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.meal-stack-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.meal-stack-time {
+  font-size: 14px;
+  color: #A0A0A0;
+  margin: 0;
+}
+
+.stack-macros {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stack-macro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: rgba(107, 143, 113, 0.1);
+  border-radius: 8px;
+}
+
+.stack-macro-label {
+  font-size: 11px;
+  color: #A0A0A0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.stack-macro-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #6B8F71;
+}
+
+.stack-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.stack-nav button {
+  flex: 1;
+}
+
+/* LIST VIEW */
+
+.list-meal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #2A2A2A;
+}
+
+.list-meal-item:last-child {
+  border-bottom: none;
+}
+
+.list-meal-info {
+  flex: 1;
+}
+
+.list-meal-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.list-meal-time {
+  font-size: 12px;
+  color: #A0A0A0;
+  margin: 2px 0 0 0;
+}
+
+.list-meal-calories {
+  display: flex;
+  gap: 8px;
+}
+
+.cal-badge {
+  background: rgba(107, 143, 113, 0.15);
+  color: #6B8F71;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(107, 143, 113, 0.2);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 640px) {
+  .page-title {
+    font-size: 24px;
+  }
+
+  .meal-stack-name {
+    font-size: 20px;
+  }
+
+  .stack-macros {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .totals-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stack-nav {
+    flex-direction: column;
+  }
+
+  .stack-nav button {
+    width: 100%;
+  }
+}

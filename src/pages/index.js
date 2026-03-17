@@ -1,3 +1,5 @@
 // PAGES - BARREL EXPORT
 export { Home } from './Home';
-// More pages to come...
+export { MealDetail } from './MealDetail';
+export { MealPlans } from './MealPlans';
+export { Profile } from './Profile';

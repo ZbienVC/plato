@@ -1,0 +1,216 @@
+/* MEAL DETAIL PAGE */
+
+.meal-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.meal-detail-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 4px 0;
+}
+
+.meal-detail-meta {
+  font-size: 13px;
+  color: #A0A0A0;
+  margin: 0;
+}
+
+.meal-detail-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.meal-detail-status {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0 0 16px 0;
+}
+
+/* MACROS BREAKDOWN */
+
+.meal-detail-macros {
+  margin-bottom: 24px;
+}
+
+.macro-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.macro-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(107, 143, 113, 0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(107, 143, 113, 0.15);
+}
+
+.macro-detail-item.macro-detail-total {
+  grid-column: 1 / -1;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(107, 143, 113, 0.15) 0%, rgba(123, 169, 133, 0.1) 100%);
+  border-color: rgba(107, 143, 113, 0.3);
+}
+
+.macro-detail-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.macro-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.macro-detail-label {
+  font-size: 12px;
+  color: #A0A0A0;
+  font-weight: 500;
+}
+
+.macro-detail-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #6B8F71;
+}
+
+.macro-detail-total .macro-detail-value {
+  color: #7BA985;
+}
+
+/* FOODS BREAKDOWN */
+
+.meal-detail-foods {
+  margin-bottom: 24px;
+}
+
+.foods-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.food-item {
+  padding: 12px;
+  background: rgba(107, 143, 113, 0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(107, 143, 113, 0.15);
+}
+
+.food-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.food-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.food-portion {
+  font-size: 12px;
+  color: #A0A0A0;
+  margin: 2px 0 0 0;
+}
+
+.food-macros {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.food-macro {
+  font-size: 12px;
+  color: #6B8F71;
+  font-weight: 500;
+}
+
+/* NOTES */
+
+.meal-detail-notes {
+  margin-bottom: 40px;
+}
+
+.notes-text {
+  font-size: 14px;
+  color: #A0A0A0;
+  margin: 0;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* MODAL */
+
+.modal-footer-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-footer-buttons button {
+  flex: 1;
+}
+
+/* EDIT FORM */
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.delete-confirm-text {
+  font-size: 14px;
+  color: #A0A0A0;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 640px) {
+  .meal-detail-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .meal-detail-actions {
+    width: 100%;
+  }
+
+  .meal-detail-actions button {
+    flex: 1;
+  }
+
+  .macro-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .meal-detail-title {
+    font-size: 20px;
+  }
+}
