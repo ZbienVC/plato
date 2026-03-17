@@ -1,0 +1,3 @@
+// PAGES - BARREL EXPORT
+export { Home } from './Home';
+// More pages to come...
