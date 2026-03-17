@@ -3,7 +3,7 @@ import './BottomNav.css';
 
 /**
  * BOTTOM NAVIGATION - Mobile-first nav bar
- * 5 tabs: Home | Meals | Profile | Social | More
+ * 4 tabs: Home | Meals | Detail | Profile
  */
 export const BottomNav = ({
   activeTab = 'home',
@@ -12,9 +12,8 @@ export const BottomNav = ({
   const tabs = [
     { id: 'home', label: 'Home', icon: '🏠' },
     { id: 'meals', label: 'Meals', icon: '🍽️' },
+    { id: 'detail', label: 'Detail', icon: '📊' },
     { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'social', label: 'Social', icon: '👥' },
-    { id: 'more', label: 'More', icon: '⋯' },
   ];
 
   return (
