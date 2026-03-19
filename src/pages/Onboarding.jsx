@@ -60,15 +60,15 @@ export function Onboarding({ onComplete }) {
   const Card = ({ children, className = '' }) => <div className={`glass rounded-2xl p-5 ${className}`}>{children}</div>;
 
   const PrimaryBtn = ({ children, onClick, className = '' }) => (
-    <motion.button whileTap={{ scale: 0.97 }} onClick={onClick}
-      className={`relative z-50 cursor-pointer py-3.5 rounded-xl bg-gradient-to-r from-teal-400 to-indigo-500 text-white font-bold text-[15px] glow-teal ${className}`}
-    >{children}</motion.button>
+    <button onClick={onClick}
+      className={`relative z-50 cursor-pointer py-3.5 rounded-xl bg-gradient-to-r from-teal-400 to-indigo-500 text-white font-bold text-[15px] glow-teal active:scale-95 transition-transform touch-manipulation ${className}`}
+    >{children}</button>
   );
 
   const GhostBtn = ({ children, onClick, className = '' }) => (
-    <motion.button whileTap={{ scale: 0.97 }} onClick={onClick}
-      className={`relative z-50 cursor-pointer py-3.5 rounded-xl glass text-slate-400 font-semibold text-[15px] ${className}`}
-    >{children}</motion.button>
+    <button onClick={onClick}
+      className={`relative z-50 cursor-pointer py-3.5 rounded-xl glass text-slate-400 font-semibold text-[15px] active:scale-95 transition-transform touch-manipulation ${className}`}
+    >{children}</button>
   );
 
   return (
@@ -129,7 +129,7 @@ export function Onboarding({ onComplete }) {
 
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}
                 className="mt-12 w-full max-w-[280px]">
-                <PrimaryBtn onClick={() => setStep(1)} className="w-full">Get Started</PrimaryBtn>
+                <PrimaryBtn onClick={() => setStep(1)} className="w-full">Let's Go!</PrimaryBtn>
                 <p className="text-[12px] text-slate-600 mt-3">Free · No account needed</p>
               </motion.div>
             </motion.div>
