@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { MEAL_DATABASE } from '../services/mealGenerator';
 
 const AppContext = createContext(null);
 
@@ -172,6 +173,34 @@ export function AppProvider({ children }) {
     });
   }, []);
 
+  const swapMeal = useCallback((mealSlotIndex, currentMeal) => {
+    setPlan(prevPlan => {
+      if (!prevPlan || !prevPlan.meals) return prevPlan;
+      
+      const dayIndex = Math.floor((Date.now() - new Date(prevPlan.createdAt || Date.now()).getTime()) / 86400000) % 7;
+      const absoluteIndex = dayIndex * (prevPlan.mealsPerDay || 3) + mealSlotIndex;
+      
+      const sameTypeMeals = MEAL_DATABASE.filter(m => m.type === currentMeal.type && m.name !== currentMeal.name);
+      if (sameTypeMeals.length === 0) return prevPlan;
+      
+      const randomMeal = sameTypeMeals[Math.floor(Math.random() * sameTypeMeals.length)];
+      
+      const scale = currentMeal.calories / randomMeal.calories;
+      const scaledMeal = {
+        ...randomMeal,
+        calories: currentMeal.calories,
+        protein: Math.round(randomMeal.protein * scale),
+        carbs: Math.round(randomMeal.carbs * scale),
+        fat: Math.round(randomMeal.fat * scale),
+      };
+      
+      const newMeals = [...prevPlan.meals];
+      newMeals[absoluteIndex] = scaledMeal;
+      
+      return { ...prevPlan, meals: newMeals };
+    });
+  }, []);
+
   // Reset all data
   const resetAll = useCallback(() => {
     const keys = ['dark', 'userProfile', 'planConfig', 'plan', 'dailyLog', 'logHistory',
@@ -184,6 +213,7 @@ export function AppProvider({ children }) {
   const value = {
     // Theme
     dark, setDark,
+    swapMeal,
     // User
     userProfile, setUserProfile,
     planConfig, setPlanConfig,
