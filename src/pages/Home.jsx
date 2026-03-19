@@ -118,7 +118,7 @@ export function Home() {
               {todaysPlanned.map((meal, i) => (
                 <MealCard key={i} meal={meal} mealSlot={slots[i] || `Meal ${i+1}`}
                   logged={todayMeals.some(m => m.name?.toLowerCase() === meal.name?.toLowerCase())}
-                  showImage={showMealImages}
+                  showImage={false}
                   onLog={m => logMeal({ name: m.name, calories: m.calories, protein: m.protein, carbs: m.carbs, fat: m.fat })}
                   onSwap={() => {}}
                 />

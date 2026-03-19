@@ -79,10 +79,10 @@ export function AppProvider({ children }) {
   const [activeTab, setActiveTab] = useState('home');
   const [showVoiceLog, setShowVoiceLog] = useState(false);
   const [advancedMode, setAdvancedMode] = useState(() => loadState('advancedMode', false));
-  // v2.1: force meal images off (clear old cached true value)
+  // v3: force meal images off
   const [showMealImages, setShowMealImages] = useState(() => {
     const v = loadState('_mealImgV', 0);
-    if (v < 1) { saveState('showMealImages', false); saveState('_mealImgV', 1); return false; }
+    if (v < 3) { saveState('showMealImages', false); saveState('_mealImgV', 3); return false; }
     return loadState('showMealImages', false);
   });
 

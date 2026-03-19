@@ -7,9 +7,9 @@ export function MealCard({ meal, mealSlot, time, showImage = false, onLog, onSwa
 
   return (
     <motion.div whileTap={{ scale: 0.99 }} onClick={() => setExpanded(!expanded)}
-      className={`glass rounded-2xl overflow-hidden cursor-pointer transition-colors hover:border-white/[0.12] ${logged ? 'opacity-50' : ''} ${className}`}>
+      className={`glass rounded-2xl cursor-pointer transition-colors hover:border-white/[0.12] ${logged ? 'opacity-50' : ''} ${className}`}>
 
-      {showImage && meal?.name && <FoodImage name={meal.name} height="100px" rounded="rounded-none" />}
+      {showImage && meal?.name && <div className="overflow-hidden rounded-t-2xl"><FoodImage name={meal.name} height="100px" rounded="rounded-none" /></div>}
 
       <div className="px-5 py-4">
         <div className="flex items-start justify-between gap-3">
