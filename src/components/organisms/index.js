@@ -7,4 +7,5 @@ export { RecipeBook } from './RecipeBook';
 export { GroceryList } from './GroceryList';
 export { WeightTracker } from './WeightTracker';
 export { SettingsPanel } from './SettingsPanel';
+export { YouTubeImporter } from './YouTubeImporter';
 export { Toast, useToast } from './Toast';

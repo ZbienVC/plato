@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { MealPlanViewer } from '../components/organisms/MealPlanViewer';
 import { RecipeBook } from '../components/organisms/RecipeBook';
 import { GroceryList } from '../components/organisms/GroceryList';
+import { YouTubeImporter } from '../components/organisms/YouTubeImporter';
 import { Card } from '../components/atoms/Card';
 import { Button } from '../components/atoms/Button';
 
@@ -18,6 +19,7 @@ export function MealPlans() {
   const [mealStates, setMealStates] = useState({});
   const [showRecipeBook, setShowRecipeBook] = useState(false);
   const [showGroceryList, setShowGroceryList] = useState(false);
+  const [showYouTube, setShowYouTube] = useState(false);
 
   const handleLogMeal = (meal, index) => {
     logMeal(meal);
@@ -55,7 +57,7 @@ export function MealPlans() {
           {[
             { emoji: '📖', label: 'Recipe Book', action: () => setShowRecipeBook(true) },
             { emoji: '🔍', label: 'Find Recipes', action: () => {} },
-            { emoji: '▶️', label: 'YouTube', action: () => {} },
+            { emoji: '▶️', label: 'YouTube', action: () => setShowYouTube(true) },
           ].map((item, i) => (
             <Card
               key={i}
@@ -134,6 +136,15 @@ export function MealPlans() {
           meals={plan?.meals || []}
           dark={dark}
           onClose={() => setShowGroceryList(false)}
+        />
+      )}
+
+      {/* YouTube Importer Modal */}
+      {showYouTube && (
+        <YouTubeImporter
+          dark={dark}
+          onImport={(recipe) => saveRecipe(recipe)}
+          onClose={() => setShowYouTube(false)}
         />
       )}
     </div>
