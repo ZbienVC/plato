@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AppProvider, useApp } from './context/AppContext';
 import { MainLayout } from './components/layout/MainLayout';
 import { VoiceLogModal } from './components/organisms/VoiceLogModal';
@@ -64,17 +65,29 @@ function AppContent() {
         shouldPulseFAB={shouldPulseFAB}
         dark={dark}
       >
-        {renderTab()}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            {renderTab()}
+          </motion.div>
+        </AnimatePresence>
       </MainLayout>
 
       {/* Voice Log Modal (Global Overlay) */}
-      {showVoiceLog && (
-        <VoiceLogModal
-          dark={dark}
-          onLog={logMeal}
-          onClose={() => setShowVoiceLog(false)}
-        />
-      )}
+      <AnimatePresence>
+        {showVoiceLog && (
+          <VoiceLogModal
+            dark={dark}
+            onLog={logMeal}
+            onClose={() => setShowVoiceLog(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

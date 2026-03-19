@@ -137,7 +137,7 @@ export function Onboarding({ onComplete }) {
 
           {/* ===== STEP 1 ===== */}
           {step === 1 && (
-            <motion.div key="step1" {...page} transition={trans} className="flex-1 pt-20 pb-8 space-y-4">
+            <motion.div key="step1" {...page} transition={trans} className="flex-1 flex flex-col justify-center py-10 space-y-6">
               <div className="mb-2">
                 <h2 className="text-[26px] font-extrabold tracking-tight text-white">About you</h2>
                 <p className="text-[14px] text-slate-400 mt-1">Used to calculate your daily targets.</p>
@@ -191,7 +191,7 @@ export function Onboarding({ onComplete }) {
 
           {/* ===== STEP 2 ===== */}
           {step === 2 && (
-            <motion.div key="step2" {...page} transition={trans} className="flex-1 pt-20 pb-8 space-y-4">
+            <motion.div key="step2" {...page} transition={trans} className="flex-1 flex flex-col justify-center py-10 space-y-6">
               <div className="mb-2">
                 <h2 className="text-[26px] font-extrabold tracking-tight text-white">Your goal</h2>
                 <p className="text-[14px] text-slate-400 mt-1">We'll optimize everything for this.</p>
@@ -238,7 +238,7 @@ export function Onboarding({ onComplete }) {
 
           {/* ===== STEP 3 ===== */}
           {step === 3 && (
-            <motion.div key="step3" {...page} transition={trans} className="flex-1 pt-20 pb-8 space-y-4">
+            <motion.div key="step3" {...page} transition={trans} className="flex-1 flex flex-col justify-center py-10 space-y-6">
               <div className="mb-2">
                 <h2 className="text-[26px] font-extrabold tracking-tight text-white">Preferences</h2>
                 <p className="text-[14px] text-slate-400 mt-1">Last step — how do you eat?</p>

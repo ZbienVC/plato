@@ -1,55 +1,38 @@
 import React from 'react';
-
-const variants = {
-  default: {
-    dark: 'bg-slate-800/50 border-white/[0.06]',
-    light: 'bg-white border-slate-200/60',
-  },
-  glass: {
-    dark: 'bg-[#0f1629]/80 backdrop-blur-xl border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]',
-    light: 'bg-white/85 backdrop-blur-xl border-black/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.08)]',
-  },
-  elevated: {
-    dark: 'bg-[#161e35] border-white/[0.08] shadow-xl',
-    light: 'bg-white border-slate-200 shadow-lg',
-  },
-};
+import { motion } from 'framer-motion';
 
 const paddings = {
   none: '',
-  sm: 'p-3',
-  md: 'p-4',
-  lg: 'p-6',
-  xl: 'p-8',
+  sm: 'p-4',
+  md: 'p-6',
+  lg: 'p-8',
 };
 
 export function Card({
   children,
-  variant = 'default',
-  padding = 'lg',
-  dark = true,
+  padding = 'md',
   hover = false,
   onClick,
   className = '',
+  delay = 0,
   ...props
 }) {
-  const mode = dark ? 'dark' : 'light';
-
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay, ease: [0.25, 0.1, 0.25, 1] }}
+      whileHover={hover ? { y: -2, scale: 1.01 } : {}}
       onClick={onClick}
       className={`
-        ${variants[variant][mode]}
+        bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl
         ${paddings[padding]}
-        border rounded-2xl
-        ${hover ? 'card-hover cursor-pointer' : ''}
-        ${onClick ? 'cursor-pointer' : ''}
-        transition-all duration-200
+        ${onClick || hover ? 'cursor-pointer' : ''}
         ${className}
       `}
       {...props}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
