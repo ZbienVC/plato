@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import { generateMealPlan } from '../services/mealGenerator';
+import { Input } from '../components/atoms/Input';
 
 const page = { initial: { opacity: 0, x: 40 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -40 } };
 const trans = { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] };
@@ -15,10 +16,6 @@ const Chip = ({ label, active, onClick }) => (
 );
 
 const Label = ({ children }) => <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-slate-500 mb-2">{children}</p>;
-
-const Input = ({ ...props }) => (
-  <input {...props} className="w-full px-4 py-3 rounded-xl text-[15px] outline-none bg-white/[0.04] border border-white/[0.08] text-white placeholder-slate-600 focus:border-teal-500/50 transition-colors" />
-);
 
 const Card = ({ children, className = '' }) => <div className={`glass rounded-2xl p-5 ${className}`}>{children}</div>;
 
@@ -145,14 +142,14 @@ export function Onboarding({ onComplete }) {
 
               <Card>
                 <div className="space-y-6">
-                  <div><Label>Name</Label><Input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Your name" /></div>
+                  <div><Input label="Name" value={form.name} onChange={e => set('name', e.target.value)} placeholder="Your name" /></div>
                   <div className="grid grid-cols-3 gap-3">
-                    <div><Label>Age</Label><Input type="number" value={form.age} onChange={e => set('age', +e.target.value || 0)} /></div>
-                    <div><Label>Ft</Label><Input type="number" value={form.heightFeet} onChange={e => set('heightFeet', +e.target.value || 0)} /></div>
-                    <div><Label>In</Label><Input type="number" value={form.heightInches} onChange={e => set('heightInches', +e.target.value || 0)} /></div>
+                    <div><Input label="Age" type="number" value={form.age} onChange={e => set('age', +e.target.value || 0)} /></div>
+                    <div><Input label="Ft" type="number" value={form.heightFeet} onChange={e => set('heightFeet', +e.target.value || 0)} /></div>
+                    <div><Input label="In" type="number" value={form.heightInches} onChange={e => set('heightInches', +e.target.value || 0)} /></div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <div><Label>Weight (lbs)</Label><Input type="number" value={form.weight} onChange={e => set('weight', +e.target.value || 0)} /></div>
+                    <div><Input label="Weight (lbs)" type="number" value={form.weight} onChange={e => set('weight', +e.target.value || 0)} /></div>
                     <div><Label>Gender</Label><div className="flex gap-2 pt-0.5">{['Male', 'Female'].map(g => <Chip key={g} label={g} active={form.gender === g.toLowerCase()} onClick={() => set('gender', g.toLowerCase())} />)}</div></div>
                   </div>
                 </div>
@@ -249,7 +246,7 @@ export function Onboarding({ onComplete }) {
                   <div><Label>Meals / Day</Label><div className="flex gap-2">{[2,3,4,5,6].map(n => <Chip key={n} label={`${n}`} active={form.mealsPerDay === n} onClick={() => set('mealsPerDay', n)} />)}</div></div>
                   <div><Label>Cook Time</Label><div className="flex flex-wrap gap-2">{[{l:'Quick',v:'quick'},{l:'Moderate',v:'moderate'},{l:'Any',v:'any'}].map(t => <Chip key={t.v} label={t.l} active={form.cookTime === t.v} onClick={() => set('cookTime', t.v)} />)}</div></div>
                   <div><Label>Cuisines</Label><div className="flex flex-wrap gap-2">{['Italian','Asian','Mexican','Mediterranean','American','Indian'].map(c => <Chip key={c} label={c} active={form.cuisines.includes(c.toLowerCase())} onClick={() => togCuisine(c.toLowerCase())} />)}</div></div>
-                  <div><Label>Restrictions</Label><Input value={form.restrictions} onChange={e => set('restrictions', e.target.value)} placeholder="e.g., nuts, dairy" /></div>
+                  <div><Input label="Restrictions" value={form.restrictions} onChange={e => set('restrictions', e.target.value)} placeholder="e.g., nuts, dairy" /></div>
                 </div>
               </Card>
 

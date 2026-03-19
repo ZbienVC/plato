@@ -9,7 +9,7 @@ const stagger = { animate: { transition: { staggerChildren: 0.07 } } };
 const item = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0, transition: { duration: 0.35 } } };
 
 export function Home() {
-  const { plan, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak } = useApp();
+  const { plan, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak, swapMeal, showMealImages } = useApp();
   const { targets, current, remaining } = useMacros();
   const hasPlan = plan?.meals?.length > 0;
   const todayMeals = dailyLog?.meals || [];
@@ -144,8 +144,9 @@ export function Home() {
               {todaysPlanned.map((meal, i) => (
                 <MealCard key={i} meal={meal} mealSlot={slots[i] || `Meal ${i+1}`}
                   logged={todayMeals.some(m => m.name?.toLowerCase() === meal.name?.toLowerCase())}
+                  showImage={showMealImages}
                   onLog={m => logMeal({ name: m.name, calories: m.calories, protein: m.protein, carbs: m.carbs, fat: m.fat })}
-                  onSwap={() => {}}
+                  onSwap={() => swapMeal(i, meal)}
                 />
               ))}
             </div>

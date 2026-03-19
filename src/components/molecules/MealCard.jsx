@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FoodImage } from './FoodImage';
 
-export function MealCard({ meal, mealSlot, time, onLog, onSwap, logged = false, className = '' }) {
+export function MealCard({ meal, mealSlot, time, showImage = false, onLog, onSwap, logged = false, className = '' }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -15,6 +16,11 @@ export function MealCard({ meal, mealSlot, time, onLog, onSwap, logged = false, 
         boxShadow: '0 2px 12px rgba(0,0,0,0.2)',
       }}
     >
+      {showImage && meal?.name && (
+        <div className="overflow-hidden rounded-t-2xl">
+          <FoodImage name={meal.name} height="120px" rounded="rounded-none" />
+        </div>
+      )}
       <div className="p-4">
         {/* Header row */}
         <div className="flex items-start justify-between gap-3 mb-2">
