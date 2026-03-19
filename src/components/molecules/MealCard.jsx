@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '../atoms/Card';
+import { FoodImage } from './FoodImage';
 
 /**
  * Meal card displaying meal name, macros, and actions
@@ -39,11 +40,18 @@ export function MealCard({
       onClick={handleTap}
       className={`${logged ? 'opacity-60' : ''} ${className}`}
     >
-      <div className="flex items-start gap-3">
+      {/* Food image (optional) */}
+      {showImage && meal?.name && (
+        <FoodImage name={meal.name} height="120px" rounded="rounded-t-xl" />
+      )}
+
+      <div className="flex items-start gap-3 p-0">
         {/* Meal slot emoji */}
-        <div className="text-2xl mt-0.5">
-          {mealEmoji[meal?.type] || '🍽️'}
-        </div>
+        {!showImage && (
+          <div className="text-2xl mt-0.5">
+            {mealEmoji[meal?.type] || '🍽️'}
+          </div>
+        )}
 
         <div className="flex-1 min-w-0">
           {/* Header */}

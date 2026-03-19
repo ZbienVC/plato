@@ -14,7 +14,7 @@ import { Button } from '../components/atoms/Button';
 export function MealPlans() {
   const {
     dark, plan, logMeal, savedPlans, recipes, favorites,
-    setActiveTab
+    setActiveTab, saveRecipe,
   } = useApp();
   const [mealStates, setMealStates] = useState({});
   const [showRecipeBook, setShowRecipeBook] = useState(false);
