@@ -61,13 +61,13 @@ export function Onboarding({ onComplete }) {
 
   const PrimaryBtn = ({ children, onClick, className = '' }) => (
     <motion.button whileTap={{ scale: 0.97 }} onClick={onClick}
-      className={`py-3.5 rounded-xl bg-gradient-to-r from-teal-400 to-indigo-500 text-white font-bold text-[15px] glow-teal ${className}`}
+      className={`relative z-50 cursor-pointer py-3.5 rounded-xl bg-gradient-to-r from-teal-400 to-indigo-500 text-white font-bold text-[15px] glow-teal ${className}`}
     >{children}</motion.button>
   );
 
   const GhostBtn = ({ children, onClick, className = '' }) => (
     <motion.button whileTap={{ scale: 0.97 }} onClick={onClick}
-      className={`py-3.5 rounded-xl glass text-slate-400 font-semibold text-[15px] ${className}`}
+      className={`relative z-50 cursor-pointer py-3.5 rounded-xl glass text-slate-400 font-semibold text-[15px] ${className}`}
     >{children}</motion.button>
   );
 
