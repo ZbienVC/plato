@@ -128,9 +128,9 @@ export function Onboarding({ onComplete }) {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}
-                className="mt-12 w-full max-w-[280px]">
+                className="mt-12 w-full max-w-[280px] relative z-50 pointer-events-auto">
                 <PrimaryBtn onClick={() => setStep(1)} className="w-full">Let's Go!</PrimaryBtn>
-                <p className="text-[12px] text-slate-600 mt-3">Free · No account needed</p>
+                <p className="text-[12px] text-slate-600 mt-3 relative z-50">Free · No account needed</p>
               </motion.div>
             </motion.div>
           )}
