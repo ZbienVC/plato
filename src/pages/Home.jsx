@@ -10,7 +10,7 @@ const stagger = { animate: { transition: { staggerChildren: 0.1 } } };
 const item = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 } };
 
 export function Home() {
-  const { plan, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak } = useApp();
+  const { plan, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak, swapMeal } = useApp();
   const { targets, current, remaining } = useMacros();
   
   const hasPlan = plan?.meals?.length > 0;
@@ -96,9 +96,9 @@ export function Home() {
                   meal={meal} 
                   mealSlot={slots[i] || `Meal ${i+1}`}
                   logged={todayMeals.some(m => m.name?.toLowerCase() === meal.name?.toLowerCase())}
-                  showImage={false}
+                  showImage={true}
                   onLog={m => logMeal({ name: m.name, calories: m.calories, protein: m.protein, carbs: m.carbs, fat: m.fat })}
-                  onSwap={() => {}}
+                  onSwap={(m) => swapMeal(i, m)}
                 />
               ))}
             </div>

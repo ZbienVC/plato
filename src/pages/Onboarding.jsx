@@ -6,6 +6,34 @@ import { generateMealPlan } from '../services/mealGenerator';
 const page = { initial: { opacity: 0, x: 40 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -40 } };
 const trans = { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] };
 
+// ---- Shared UI pieces ----
+const Chip = ({ label, active, onClick }) => (
+  <motion.button whileTap={{ scale: 0.95 }} onClick={onClick}
+    className={`px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-colors ${
+      active ? 'bg-gradient-to-r from-teal-500 to-indigo-500 text-white glow-teal' : 'glass text-slate-400'
+    }`}>{label}</motion.button>
+);
+
+const Label = ({ children }) => <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-slate-500 mb-2">{children}</p>;
+
+const Input = ({ ...props }) => (
+  <input {...props} className="w-full px-4 py-3 rounded-xl text-[15px] outline-none bg-white/[0.04] border border-white/[0.08] text-white placeholder-slate-600 focus:border-teal-500/50 transition-colors" />
+);
+
+const Card = ({ children, className = '' }) => <div className={`glass rounded-2xl p-5 ${className}`}>{children}</div>;
+
+const PrimaryBtn = ({ children, onClick, className = '' }) => (
+  <button onClick={onClick}
+    className={`relative z-50 pointer-events-auto cursor-pointer py-3.5 rounded-xl bg-gradient-to-r from-teal-400 to-indigo-500 text-white font-bold text-[15px] glow-teal active:scale-95 transition-transform touch-manipulation ${className}`}
+  >{children}</button>
+);
+
+const GhostBtn = ({ children, onClick, className = '' }) => (
+  <button onClick={onClick}
+    className={`relative z-50 pointer-events-auto cursor-pointer py-3.5 rounded-xl glass text-slate-400 font-semibold text-[15px] active:scale-95 transition-transform touch-manipulation ${className}`}
+  >{children}</button>
+);
+
 export function Onboarding({ onComplete }) {
   const { setUserProfile, setPlanConfig, setPlan } = useApp();
   const [step, setStep] = useState(0);
@@ -42,34 +70,6 @@ export function Onboarding({ onComplete }) {
     setPlanConfig({ goal: form.goal, trainingType: form.trainingType, trainingDays: form.trainingDays, dietStyle: form.dietStyle, mealsPerDay: form.mealsPerDay, cookTime: form.cookTime, cuisines: form.cuisines, restrictions: form.restrictions, activity: form.activity });
     setPlan(plan); setGenPlan(plan); setStep(5);
   };
-
-  // ---- Shared UI pieces ----
-  const Chip = ({ label, active, onClick }) => (
-    <motion.button whileTap={{ scale: 0.95 }} onClick={onClick}
-      className={`px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-colors ${
-        active ? 'bg-gradient-to-r from-teal-500 to-indigo-500 text-white glow-teal' : 'glass text-slate-400'
-      }`}>{label}</motion.button>
-  );
-
-  const Label = ({ children }) => <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-slate-500 mb-2">{children}</p>;
-
-  const Input = ({ ...props }) => (
-    <input {...props} className="w-full px-4 py-3 rounded-xl text-[15px] outline-none bg-white/[0.04] border border-white/[0.08] text-white placeholder-slate-600 focus:border-teal-500/50 transition-colors" />
-  );
-
-  const Card = ({ children, className = '' }) => <div className={`glass rounded-2xl p-5 ${className}`}>{children}</div>;
-
-  const PrimaryBtn = ({ children, onClick, className = '' }) => (
-    <button onClick={onClick}
-      className={`relative z-50 cursor-pointer py-3.5 rounded-xl bg-gradient-to-r from-teal-400 to-indigo-500 text-white font-bold text-[15px] glow-teal active:scale-95 transition-transform touch-manipulation ${className}`}
-    >{children}</button>
-  );
-
-  const GhostBtn = ({ children, onClick, className = '' }) => (
-    <button onClick={onClick}
-      className={`relative z-50 cursor-pointer py-3.5 rounded-xl glass text-slate-400 font-semibold text-[15px] active:scale-95 transition-transform touch-manipulation ${className}`}
-    >{children}</button>
-  );
 
   return (
     <div className="min-h-screen bg-[#0B0F1A] relative max-w-md mx-auto overflow-hidden">
@@ -144,7 +144,7 @@ export function Onboarding({ onComplete }) {
               </div>
 
               <Card>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div><Label>Name</Label><Input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Your name" /></div>
                   <div className="grid grid-cols-3 gap-3">
                     <div><Label>Age</Label><Input type="number" value={form.age} onChange={e => set('age', +e.target.value || 0)} /></div>
@@ -215,7 +215,7 @@ export function Onboarding({ onComplete }) {
               </div>
 
               <Card>
-                <div className="space-y-5">
+                <div className="space-y-6">
                   <div><Label>Training</Label><div className="flex flex-wrap gap-2">{['Strength', 'Cardio', 'Hybrid', 'Sport'].map(t => <Chip key={t} label={t} active={form.trainingType === t.toLowerCase()} onClick={() => set('trainingType', t.toLowerCase())} />)}</div></div>
                   <div><Label>Days / Week</Label>
                     <div className="flex items-center gap-4">
@@ -245,7 +245,7 @@ export function Onboarding({ onComplete }) {
               </div>
 
               <Card>
-                <div className="space-y-5">
+                <div className="space-y-6">
                   <div><Label>Meals / Day</Label><div className="flex gap-2">{[2,3,4,5,6].map(n => <Chip key={n} label={`${n}`} active={form.mealsPerDay === n} onClick={() => set('mealsPerDay', n)} />)}</div></div>
                   <div><Label>Cook Time</Label><div className="flex flex-wrap gap-2">{[{l:'Quick',v:'quick'},{l:'Moderate',v:'moderate'},{l:'Any',v:'any'}].map(t => <Chip key={t.v} label={t.l} active={form.cookTime === t.v} onClick={() => set('cookTime', t.v)} />)}</div></div>
                   <div><Label>Cuisines</Label><div className="flex flex-wrap gap-2">{['Italian','Asian','Mexican','Mediterranean','American','Indian'].map(c => <Chip key={c} label={c} active={form.cuisines.includes(c.toLowerCase())} onClick={() => togCuisine(c.toLowerCase())} />)}</div></div>
@@ -271,7 +271,7 @@ export function Onboarding({ onComplete }) {
                 </svg>
               </motion.div>
               <h2 className="text-[20px] font-bold text-white mb-8">Building your plan</h2>
-              <div className="w-full max-w-[220px] space-y-4">
+              <div className="w-full max-w-[220px] space-y-6">
                 {['Analyzing goals', 'Calculating macros', 'Selecting recipes', 'Optimizing nutrition', 'Finalizing'].map((l, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
                     className="flex items-center gap-3">
