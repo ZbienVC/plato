@@ -1,80 +1,45 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const TABS = [
-  {
-    key: 'home',
-    label: 'Home',
-    icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#10d9a0' : '#4a5580'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-    ),
-  },
-  {
-    key: 'log',
-    label: 'Log',
-    icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#10d9a0' : '#4a5580'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-    ),
-  },
-  {
-    key: 'meals',
-    label: 'Meals',
-    icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#10d9a0' : '#4a5580'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="3" width="7" height="7" rx="1" />
-        <rect x="3" y="14" width="7" height="7" rx="1" />
-        <rect x="14" y="14" width="7" height="7" rx="1" />
-      </svg>
-    ),
-  },
-  {
-    key: 'you',
-    label: 'You',
-    icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#10d9a0' : '#4a5580'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-        <circle cx="12" cy="7" r="4" />
-      </svg>
-    ),
-  },
+  { key: 'home', label: 'Home', d: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10' },
+  { key: 'log', label: 'Log', d: 'M12 5v14M5 12h14' },
+  { key: 'meals', label: 'Meals', d: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' },
+  { key: 'you', label: 'You', d: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z' },
 ];
 
-export function BottomNav({ activeTab, onTabChange, dark = true }) {
+export function BottomNav({ activeTab, onTabChange }) {
   return (
-    <div
-      className={`fixed bottom-0 left-1/2 -translate-x-1/2 w-full border-t ${
-        dark
-          ? 'bg-[#0a0f1e]/95 border-white/[0.06]'
-          : 'bg-white/95 border-slate-200'
-      } backdrop-blur-xl z-40`}
-      style={{ maxWidth: '430px' }}
-    >
-      <div className="flex items-center justify-around h-16 px-2">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-40
+      bg-[#0B0F1A]/90 backdrop-blur-xl border-t border-white/[0.06]">
+      <div className="flex items-center justify-around h-16 px-4">
         {TABS.map(tab => {
-          const isActive = activeTab === tab.key;
+          const active = activeTab === tab.key;
           return (
-            <button
+            <motion.button
               key={tab.key}
               onClick={() => onTabChange(tab.key)}
-              className="flex flex-col items-center justify-center gap-1 py-1 px-4 transition-all"
+              whileTap={{ scale: 0.9 }}
+              className="flex flex-col items-center justify-center gap-1 py-1 px-5"
             >
-              {tab.icon(isActive)}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke={active ? '#14B8A6' : '#475569'} strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round">
+                <path d={tab.d} />
+              </svg>
               <span className={`text-[10px] font-semibold tracking-wide ${
-                isActive ? 'text-emerald-400' : dark ? 'text-slate-500' : 'text-slate-400'
-              }`}>
-                {tab.label}
-              </span>
-            </button>
+                active ? 'text-teal-400' : 'text-slate-600'
+              }`}>{tab.label}</span>
+              {active && (
+                <motion.div layoutId="navIndicator"
+                  className="absolute -top-px h-[2px] w-8 bg-gradient-to-r from-teal-400 to-indigo-400 rounded-full"
+                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                />
+              )}
+            </motion.button>
           );
         })}
       </div>
-      {/* Home indicator safe area */}
       <div className="h-[env(safe-area-inset-bottom,0px)]" />
     </div>
   );

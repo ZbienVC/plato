@@ -79,7 +79,12 @@ export function AppProvider({ children }) {
   const [activeTab, setActiveTab] = useState('home');
   const [showVoiceLog, setShowVoiceLog] = useState(false);
   const [advancedMode, setAdvancedMode] = useState(() => loadState('advancedMode', false));
-  const [showMealImages, setShowMealImages] = useState(() => loadState('showMealImages', false));
+  // v2.1: force meal images off (clear old cached true value)
+  const [showMealImages, setShowMealImages] = useState(() => {
+    const v = loadState('_mealImgV', 0);
+    if (v < 1) { saveState('showMealImages', false); saveState('_mealImgV', 1); return false; }
+    return loadState('showMealImages', false);
+  });
 
   // === WEIGHT TRACKING ===
   const [weightEntries, setWeightEntries] = useState(() => loadState('weightEntries', []));

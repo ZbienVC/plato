@@ -1,9 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./animations.css";
 @import "./components.css";
 
-/* Base resets */
 * {
   margin: 0;
   padding: 0;
@@ -11,7 +11,6 @@
 }
 
 html {
-  font-family: var(--font-family);
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
 }

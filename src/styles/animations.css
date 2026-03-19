@@ -1,63 +1,16 @@
-/* ===== KEYFRAMES ===== */
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(100%); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-8px) rotate(1deg); }
-  66% { transform: translateY(4px) rotate(-1deg); }
-}
+/* Framer Motion handles most animations now. 
+   These are CSS-only fallbacks and ambient effects. */
 
 @keyframes float-slow {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(10px, -15px) scale(1.05); }
-  50% { transform: translate(-5px, -25px) scale(0.95); }
-  75% { transform: translate(-15px, -10px) scale(1.02); }
+  25% { transform: translate(8px, -12px) scale(1.03); }
+  50% { transform: translate(-4px, -20px) scale(0.97); }
+  75% { transform: translate(-10px, -8px) scale(1.01); }
 }
 
-@keyframes float-reverse {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(-12px, -20px) scale(0.98); }
-  50% { transform: translate(8px, -10px) scale(1.03); }
-  75% { transform: translate(15px, -18px) scale(0.97); }
-}
-
-@keyframes pulse-soft {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.05); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(16, 217, 160, 0.1); }
-  50% { box-shadow: 0 0 40px rgba(16, 217, 160, 0.25); }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+@keyframes breathe {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.2; transform: scale(1.15); }
 }
 
 @keyframes gradient-shift {
@@ -65,46 +18,15 @@
   50% { background-position: 100% 50%; }
 }
 
-@keyframes rotate-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
 }
 
-@keyframes breathe {
-  0%, 100% { transform: scale(1); opacity: 0.3; }
-  50% { transform: scale(1.2); opacity: 0.15; }
-}
-
-/* ===== ANIMATION CLASSES ===== */
-
-.animate-fadeIn { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-fadeInUp { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-fadeInScale { animation: fadeInScale 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-slideUp { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-slideDown { animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-float { animation: float 6s ease-in-out infinite; }
-.animate-float-slow { animation: float-slow 12s ease-in-out infinite; }
-.animate-float-reverse { animation: float-reverse 14s ease-in-out infinite; }
-.animate-pulse-soft { animation: pulse-soft 4s ease-in-out infinite; }
-.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+.animate-float-slow { animation: float-slow 14s ease-in-out infinite; }
 .animate-breathe { animation: breathe 8s ease-in-out infinite; }
-.animate-gradient { 
-  background-size: 200% 200%; 
-  animation: gradient-shift 6s ease infinite; 
-}
-.animate-rotate-slow { animation: rotate-slow 30s linear infinite; }
+.animate-gradient { background-size: 200% 200%; animation: gradient-shift 6s ease infinite; }
 
-/* Stagger children */
-.stagger > :nth-child(1) { animation-delay: 0ms; }
-.stagger > :nth-child(2) { animation-delay: 60ms; }
-.stagger > :nth-child(3) { animation-delay: 120ms; }
-.stagger > :nth-child(4) { animation-delay: 180ms; }
-.stagger > :nth-child(5) { animation-delay: 240ms; }
-.stagger > :nth-child(6) { animation-delay: 300ms; }
-.stagger > :nth-child(7) { animation-delay: 360ms; }
-.stagger > :nth-child(8) { animation-delay: 420ms; }
-
-/* Shimmer effect */
 .shimmer {
   position: relative;
   overflow: hidden;
@@ -112,21 +34,7 @@
 .shimmer::after {
   content: '';
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
   animation: shimmer 3s infinite;
-}
-
-/* Progress ring transition */
-.progress-ring {
-  transition: stroke-dashoffset 800ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Press effect */
-.press {
-  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.press:active:not(:disabled) {
-  transform: scale(0.97);
 }
