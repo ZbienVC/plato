@@ -173,7 +173,7 @@ export function Onboarding({ onComplete }) {
         </div>
       )}
 
-      <div className="relative z-[1] flex flex-col min-h-screen px-6">
+      <div className="relative z-[1] flex flex-col min-h-screen px-7">
 
         {/* === WELCOME === */}
         {step === 0 && (
@@ -217,85 +217,93 @@ export function Onboarding({ onComplete }) {
               This helps us build your perfect plan.
             </p>
 
-            <div className="space-y-6">
-              <div>
-                <SectionLabel>Name</SectionLabel>
-                <input
-                  placeholder="Your name"
-                  value={form.name}
-                  onChange={(e) => update('name', e.target.value)}
-                  className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none transition-all border ${
-                    dark
-                      ? 'bg-white/[0.04] border-white/[0.08] text-white placeholder-slate-600 focus:border-emerald-500/50'
-                      : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:border-emerald-500'
-                  }`}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+            {/* Personal Info Card */}
+            <div className={`p-5 rounded-2xl border mb-5 ${
+              dark ? 'bg-white/[0.015] border-white/[0.06]' : 'bg-white border-slate-100'
+            }`}>
+              <div className="space-y-5">
                 <div>
-                  <SectionLabel>Age</SectionLabel>
-                  <input type="number" value={form.age}
-                    onChange={(e) => update('age', parseInt(e.target.value) || 0)}
-                    className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none border ${
-                      dark ? 'bg-white/[0.04] border-white/[0.08] text-white focus:border-emerald-500/50'
-                        : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500'
+                  <SectionLabel>Name</SectionLabel>
+                  <input
+                    placeholder="Your name"
+                    value={form.name}
+                    onChange={(e) => update('name', e.target.value)}
+                    className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none transition-all border ${
+                      dark
+                        ? 'bg-white/[0.04] border-white/[0.08] text-white placeholder-slate-600 focus:border-emerald-500/50'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-emerald-500'
                     }`}
                   />
                 </div>
-                <div>
-                  <SectionLabel>Gender</SectionLabel>
-                  <div className="flex gap-2">
-                    {['Male', 'Female'].map(g => (
-                      <Pill key={g} label={g} selected={form.gender === g.toLowerCase()} onClick={() => update('gender', g.toLowerCase())} />
-                    ))}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <SectionLabel>Age</SectionLabel>
+                    <input type="number" value={form.age}
+                      onChange={(e) => update('age', parseInt(e.target.value) || 0)}
+                      className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none border ${
+                        dark ? 'bg-white/[0.04] border-white/[0.08] text-white focus:border-emerald-500/50'
+                          : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-500'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <SectionLabel>Gender</SectionLabel>
+                    <div className="flex gap-2 h-[50px] items-center">
+                      {['Male', 'Female'].map(g => (
+                        <Pill key={g} label={g} selected={form.gender === g.toLowerCase()} onClick={() => update('gender', g.toLowerCase())} />
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <SectionLabel>Height (ft)</SectionLabel>
+                    <input type="number" value={form.heightFeet}
+                      onChange={(e) => update('heightFeet', parseInt(e.target.value) || 0)}
+                      className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none border ${
+                        dark ? 'bg-white/[0.04] border-white/[0.08] text-white focus:border-emerald-500/50'
+                          : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-500'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <SectionLabel>Height (in)</SectionLabel>
+                    <input type="number" value={form.heightInches}
+                      onChange={(e) => update('heightInches', parseInt(e.target.value) || 0)}
+                      className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none border ${
+                        dark ? 'bg-white/[0.04] border-white/[0.08] text-white focus:border-emerald-500/50'
+                          : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-500'
+                      }`}
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <SectionLabel>Height (ft)</SectionLabel>
-                  <input type="number" value={form.heightFeet}
-                    onChange={(e) => update('heightFeet', parseInt(e.target.value) || 0)}
+                  <SectionLabel>Weight (lbs)</SectionLabel>
+                  <input type="number" value={form.weight} placeholder="180"
+                    onChange={(e) => update('weight', parseInt(e.target.value) || 0)}
                     className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none border ${
                       dark ? 'bg-white/[0.04] border-white/[0.08] text-white focus:border-emerald-500/50'
-                        : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-500'
                     }`}
                   />
                 </div>
-                <div>
-                  <SectionLabel>Height (in)</SectionLabel>
-                  <input type="number" value={form.heightInches}
-                    onChange={(e) => update('heightInches', parseInt(e.target.value) || 0)}
-                    className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none border ${
-                      dark ? 'bg-white/[0.04] border-white/[0.08] text-white focus:border-emerald-500/50'
-                        : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500'
-                    }`}
-                  />
-                </div>
               </div>
+            </div>
 
-              <div>
-                <SectionLabel>Weight (lbs)</SectionLabel>
-                <input type="number" value={form.weight} placeholder="180"
-                  onChange={(e) => update('weight', parseInt(e.target.value) || 0)}
-                  className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none border ${
-                    dark ? 'bg-white/[0.04] border-white/[0.08] text-white focus:border-emerald-500/50'
-                      : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500'
-                  }`}
-                />
-              </div>
-
-              <div>
-                <SectionLabel>Activity Level</SectionLabel>
-                <div className="space-y-2">
-                  <ActivityOption label="Sedentary" desc="Desk job, minimal exercise" value="sedentary" />
-                  <ActivityOption label="Lightly Active" desc="Light exercise 1–3 days/week" value="light" />
-                  <ActivityOption label="Moderately Active" desc="Exercise 3–5 days/week" value="moderate" />
-                  <ActivityOption label="Very Active" desc="Hard exercise 6–7 days/week" value="very" />
-                  <ActivityOption label="Elite Athlete" desc="Intense training, physical job" value="elite" />
-                </div>
+            {/* Activity Level Card */}
+            <div className={`p-5 rounded-2xl border ${
+              dark ? 'bg-white/[0.015] border-white/[0.06]' : 'bg-white border-slate-100'
+            }`}>
+              <SectionLabel>Activity Level</SectionLabel>
+              <div className="space-y-2.5">
+                <ActivityOption label="Sedentary" desc="Desk job, minimal exercise" value="sedentary" />
+                <ActivityOption label="Lightly Active" desc="Light exercise 1–3 days/week" value="light" />
+                <ActivityOption label="Moderately Active" desc="Exercise 3–5 days/week" value="moderate" />
+                <ActivityOption label="Very Active" desc="Hard exercise 6–7 days/week" value="very" />
+                <ActivityOption label="Elite Athlete" desc="Intense training, physical job" value="elite" />
               </div>
             </div>
 
@@ -317,53 +325,62 @@ export function Onboarding({ onComplete }) {
               We'll optimize your plan around this.
             </p>
 
-            <div className="grid grid-cols-2 gap-3 mb-8">
+            {/* Goal selection */}
+            <div className="grid grid-cols-2 gap-3 mb-5">
               <GoalCard label="Lose Fat" desc="Caloric deficit for fat loss" value="lose-fat" />
               <GoalCard label="Maintain" desc="Stay at current weight" value="maintain" />
               <GoalCard label="Build Muscle" desc="Caloric surplus for growth" value="build-muscle" />
               <GoalCard label="Athletic" desc="Performance focused" value="athletic" />
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <SectionLabel>Training Style</SectionLabel>
-                <div className="flex flex-wrap gap-2">
-                  {['Strength', 'Cardio', 'Hybrid', 'Sport'].map(t => (
-                    <Pill key={t} label={t} selected={form.trainingType === t.toLowerCase()} onClick={() => update('trainingType', t.toLowerCase())} />
-                  ))}
+            {/* Training card */}
+            <div className={`p-5 rounded-2xl border mb-5 ${
+              dark ? 'bg-white/[0.015] border-white/[0.06]' : 'bg-white border-slate-100'
+            }`}>
+              <div className="space-y-5">
+                <div>
+                  <SectionLabel>Training Style</SectionLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {['Strength', 'Cardio', 'Hybrid', 'Sport'].map(t => (
+                      <Pill key={t} label={t} selected={form.trainingType === t.toLowerCase()} onClick={() => update('trainingType', t.toLowerCase())} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <SectionLabel>Days Per Week</SectionLabel>
+                  <div className="flex items-center gap-5">
+                    <button onClick={() => update('trainingDays', Math.max(0, form.trainingDays - 1))}
+                      className={`w-12 h-12 rounded-xl font-bold text-lg flex items-center justify-center ${
+                        dark ? 'bg-white/[0.06] text-white' : 'bg-slate-100 text-slate-900'
+                      }`}>-</button>
+                    <span className={`text-3xl font-black tabular-nums w-8 text-center ${dark ? 'text-white' : 'text-slate-900'}`}>
+                      {form.trainingDays}
+                    </span>
+                    <button onClick={() => update('trainingDays', Math.min(7, form.trainingDays + 1))}
+                      className={`w-12 h-12 rounded-xl font-bold text-lg flex items-center justify-center ${
+                        dark ? 'bg-white/[0.06] text-white' : 'bg-slate-100 text-slate-900'
+                      }`}>+</button>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div>
-                <SectionLabel>Days Per Week</SectionLabel>
-                <div className="flex items-center gap-5">
-                  <button onClick={() => update('trainingDays', Math.max(0, form.trainingDays - 1))}
-                    className={`w-11 h-11 rounded-xl font-bold text-lg flex items-center justify-center ${
-                      dark ? 'bg-white/[0.06] text-white' : 'bg-slate-100 text-slate-900'
-                    }`}>-</button>
-                  <span className={`text-3xl font-black tabular-nums ${dark ? 'text-white' : 'text-slate-900'}`}>
-                    {form.trainingDays}
-                  </span>
-                  <button onClick={() => update('trainingDays', Math.min(7, form.trainingDays + 1))}
-                    className={`w-11 h-11 rounded-xl font-bold text-lg flex items-center justify-center ${
-                      dark ? 'bg-white/[0.06] text-white' : 'bg-slate-100 text-slate-900'
-                    }`}>+</button>
-                </div>
-              </div>
-
-              <div>
-                <SectionLabel>Diet Style</SectionLabel>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { l: 'High Protein', v: 'high-protein' },
-                    { l: 'Balanced', v: 'balanced' },
-                    { l: 'Low Carb', v: 'low-carb' },
-                    { l: 'Keto', v: 'keto' },
-                    { l: 'Plant-Based', v: 'plant-based' },
-                  ].map(d => (
-                    <Pill key={d.v} label={d.l} selected={form.dietStyle === d.v} onClick={() => update('dietStyle', d.v)} />
-                  ))}
-                </div>
+            {/* Diet style card */}
+            <div className={`p-5 rounded-2xl border ${
+              dark ? 'bg-white/[0.015] border-white/[0.06]' : 'bg-white border-slate-100'
+            }`}>
+              <SectionLabel>Diet Style</SectionLabel>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { l: 'High Protein', v: 'high-protein' },
+                  { l: 'Balanced', v: 'balanced' },
+                  { l: 'Low Carb', v: 'low-carb' },
+                  { l: 'Keto', v: 'keto' },
+                  { l: 'Plant-Based', v: 'plant-based' },
+                ].map(d => (
+                  <Pill key={d.v} label={d.l} selected={form.dietStyle === d.v} onClick={() => update('dietStyle', d.v)} />
+                ))}
               </div>
             </div>
 
@@ -389,49 +406,57 @@ export function Onboarding({ onComplete }) {
               Last step — tell us how you like to eat.
             </p>
 
-            <div className="space-y-6">
-              <div>
-                <SectionLabel>Meals Per Day</SectionLabel>
-                <div className="flex gap-2">
-                  {[2, 3, 4, 5, 6].map(n => (
-                    <Pill key={n} label={`${n}`} selected={form.mealsPerDay === n} onClick={() => update('mealsPerDay', n)} />
-                  ))}
+            {/* Meal preferences card */}
+            <div className={`p-5 rounded-2xl border mb-5 ${
+              dark ? 'bg-white/[0.015] border-white/[0.06]' : 'bg-white border-slate-100'
+            }`}>
+              <div className="space-y-5">
+                <div>
+                  <SectionLabel>Meals Per Day</SectionLabel>
+                  <div className="flex gap-2">
+                    {[2, 3, 4, 5, 6].map(n => (
+                      <Pill key={n} label={`${n}`} selected={form.mealsPerDay === n} onClick={() => update('mealsPerDay', n)} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <SectionLabel>Cook Time</SectionLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { l: 'Quick (<15 min)', v: 'quick' },
+                      { l: 'Moderate (~30 min)', v: 'moderate' },
+                      { l: 'Any time', v: 'any' },
+                    ].map(t => (
+                      <Pill key={t.v} label={t.l} selected={form.cookTime === t.v} onClick={() => update('cookTime', t.v)} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <SectionLabel>Cuisines You Enjoy</SectionLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {['Italian', 'Asian', 'Mexican', 'Mediterranean', 'American', 'Indian'].map(c => (
+                      <Pill key={c} label={c} selected={form.cuisines.includes(c.toLowerCase())} onClick={() => toggleCuisine(c.toLowerCase())} />
+                    ))}
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div>
-                <SectionLabel>Cook Time</SectionLabel>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { l: 'Quick (<15 min)', v: 'quick' },
-                    { l: 'Moderate (~30 min)', v: 'moderate' },
-                    { l: 'Any time', v: 'any' },
-                  ].map(t => (
-                    <Pill key={t.v} label={t.l} selected={form.cookTime === t.v} onClick={() => update('cookTime', t.v)} />
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <SectionLabel>Cuisines You Enjoy</SectionLabel>
-                <div className="flex flex-wrap gap-2">
-                  {['Italian', 'Asian', 'Mexican', 'Mediterranean', 'American', 'Indian'].map(c => (
-                    <Pill key={c} label={c} selected={form.cuisines.includes(c.toLowerCase())} onClick={() => toggleCuisine(c.toLowerCase())} />
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <SectionLabel>Allergies or Restrictions</SectionLabel>
-                <input placeholder="e.g., nuts, shellfish, dairy"
-                  value={form.restrictions}
-                  onChange={(e) => update('restrictions', e.target.value)}
-                  className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none border ${
-                    dark ? 'bg-white/[0.04] border-white/[0.08] text-white placeholder-slate-600 focus:border-emerald-500/50'
-                      : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:border-emerald-500'
-                  }`}
-                />
-              </div>
+            {/* Restrictions card */}
+            <div className={`p-5 rounded-2xl border ${
+              dark ? 'bg-white/[0.015] border-white/[0.06]' : 'bg-white border-slate-100'
+            }`}>
+              <SectionLabel>Allergies or Restrictions</SectionLabel>
+              <input placeholder="e.g., nuts, shellfish, dairy"
+                value={form.restrictions}
+                onChange={(e) => update('restrictions', e.target.value)}
+                className={`w-full px-4 py-3.5 rounded-xl text-[15px] outline-none border ${
+                  dark ? 'bg-white/[0.04] border-white/[0.08] text-white placeholder-slate-600 focus:border-emerald-500/50'
+                    : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-emerald-500'
+                }`}
+              />
             </div>
 
             <div className="flex gap-3 mt-8">

@@ -23,7 +23,7 @@ export function MainLayout({
         className="flex-1 overflow-y-auto overscroll-y-contain"
         style={{ paddingBottom: '88px' }}
       >
-        <div className="px-5 pt-14 pb-6">
+        <div className="px-6 pt-14 pb-6">
           {children}
         </div>
       </div>

@@ -1,77 +1,77 @@
 import React from 'react';
 import { ProgressRing } from '../molecules/ProgressRing';
 
-/**
- * Macro Dashboard — calorie ring + macro bars
- * Clean, no emojis, premium feel
- */
 export function MacroDashboard({ targets, current, dark = true }) {
   const calorieProgress = targets.calories > 0 ? Math.min(1, current.calories / targets.calories) : 0;
   const remaining = Math.max(0, targets.calories - current.calories);
 
   const macros = [
-    { label: 'Protein', current: current.protein, target: targets.protein, color: '#3b82f6', bgColor: 'bg-blue-500' },
-    { label: 'Carbs', current: current.carbs, target: targets.carbs, color: '#f59e0b', bgColor: 'bg-amber-500' },
-    { label: 'Fat', current: current.fat, target: targets.fat, color: '#a855f7', bgColor: 'bg-purple-500' },
+    { label: 'Protein', cur: current.protein, max: targets.protein, color: '#3b82f6', dot: 'bg-blue-400' },
+    { label: 'Carbs', cur: current.carbs, max: targets.carbs, color: '#f59e0b', dot: 'bg-amber-400' },
+    { label: 'Fat', cur: current.fat, max: targets.fat, color: '#a855f7', dot: 'bg-purple-400' },
   ];
 
   return (
-    <div className={`p-5 rounded-2xl border ${
+    <div className={`rounded-2xl border overflow-hidden ${
       dark ? 'bg-white/[0.02] border-white/[0.06]' : 'bg-white border-slate-100'
     }`}>
-      {/* Top row: ring + remaining */}
-      <div className="flex items-center gap-5 mb-5">
-        <ProgressRing
-          progress={calorieProgress}
-          size={90}
-          strokeWidth={8}
-          color="#10d9a0"
-          bgColor={dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)'}
-        >
-          <div className="text-center">
-            <p className={`text-[20px] font-black leading-none ${dark ? 'text-white' : 'text-slate-900'}`}>
+      {/* Calorie section */}
+      <div className="p-5 pb-4">
+        <div className="flex items-center gap-5">
+          <ProgressRing
+            progress={calorieProgress}
+            size={88}
+            strokeWidth={7}
+            color="#10d9a0"
+            bgColor={dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)'}
+          >
+            <p className={`text-[18px] font-black leading-none tabular-nums ${dark ? 'text-white' : 'text-slate-900'}`}>
               {current.calories}
             </p>
-            <p className={`text-[9px] font-semibold uppercase tracking-wider mt-1 ${dark ? 'text-slate-500' : 'text-slate-400'}`}>
+            <p className={`text-[8px] font-semibold uppercase tracking-wider mt-1 ${dark ? 'text-slate-500' : 'text-slate-400'}`}>
               eaten
             </p>
-          </div>
-        </ProgressRing>
+          </ProgressRing>
 
-        <div className="flex-1">
-          <p className={`text-[28px] font-black leading-none ${dark ? 'text-white' : 'text-slate-900'}`}>
-            {remaining}
-          </p>
-          <p className={`text-[12px] font-medium mt-1 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
-            calories remaining
-          </p>
-          <p className={`text-[11px] mt-0.5 ${dark ? 'text-slate-600' : 'text-slate-400'}`}>
-            of {targets.calories} daily goal
-          </p>
+          <div className="flex-1 min-w-0">
+            <p className={`text-[26px] font-black leading-none tabular-nums ${dark ? 'text-white' : 'text-slate-900'}`}>
+              {remaining}
+            </p>
+            <p className={`text-[12px] mt-1 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
+              calories remaining
+            </p>
+            <p className={`text-[11px] ${dark ? 'text-slate-600' : 'text-slate-400'}`}>
+              of {targets.calories} daily target
+            </p>
+          </div>
         </div>
       </div>
 
+      {/* Divider */}
+      <div className={`mx-5 ${dark ? 'border-t border-white/[0.06]' : 'border-t border-slate-100'}`} />
+
       {/* Macro bars */}
-      <div className="space-y-3">
+      <div className="p-5 pt-4 space-y-3.5">
         {macros.map(m => {
-          const progress = m.target > 0 ? Math.min(1, m.current / m.target) : 0;
+          const pct = m.max > 0 ? Math.min(1, m.cur / m.max) : 0;
           return (
             <div key={m.label}>
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${m.bgColor}`} />
-                  <span className={`text-[12px] font-medium ${dark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${m.dot}`} />
+                  <span className={`text-[12px] font-medium ${dark ? 'text-slate-300' : 'text-slate-600'}`}>
                     {m.label}
                   </span>
                 </div>
-                <span className={`text-[12px] font-bold tabular-nums ${dark ? 'text-white' : 'text-slate-900'}`}>
-                  {m.current}g <span className={`font-normal ${dark ? 'text-slate-500' : 'text-slate-400'}`}>/ {m.target}g</span>
+                <span className={`text-[12px] tabular-nums ${dark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  <span className="font-bold">{m.cur}g</span>
+                  <span className={`${dark ? 'text-slate-600' : 'text-slate-400'}`}> / {m.max}g</span>
                 </span>
               </div>
-              <div className={`h-2 rounded-full overflow-hidden ${dark ? 'bg-white/[0.04]' : 'bg-slate-100'}`}>
+              <div className={`h-[6px] rounded-full overflow-hidden ${dark ? 'bg-white/[0.04]' : 'bg-slate-100'}`}>
                 <div
                   className="h-full rounded-full transition-all duration-700 ease-out"
-                  style={{ width: `${progress * 100}%`, backgroundColor: m.color }}
+                  style={{ width: `${pct * 100}%`, backgroundColor: m.color }}
                 />
               </div>
             </div>

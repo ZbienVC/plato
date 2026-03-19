@@ -79,7 +79,7 @@ export function AppProvider({ children }) {
   const [activeTab, setActiveTab] = useState('home');
   const [showVoiceLog, setShowVoiceLog] = useState(false);
   const [advancedMode, setAdvancedMode] = useState(() => loadState('advancedMode', false));
-  const [showMealImages, setShowMealImages] = useState(() => loadState('showMealImages', true));
+  const [showMealImages, setShowMealImages] = useState(() => loadState('showMealImages', false));
 
   // === WEIGHT TRACKING ===
   const [weightEntries, setWeightEntries] = useState(() => loadState('weightEntries', []));
