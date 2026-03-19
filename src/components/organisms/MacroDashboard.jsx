@@ -12,9 +12,7 @@ export function MacroDashboard({ targets, current, dark = true }) {
   ];
 
   return (
-    <div className={`rounded-2xl border overflow-hidden ${
-      dark ? 'bg-white/[0.02] border-white/[0.06]' : 'bg-white border-slate-100'
-    }`}>
+    <div className="glass-card rounded-2xl overflow-hidden">
       {/* Calorie section */}
       <div className="p-5 pb-4">
         <div className="flex items-center gap-5">
@@ -48,7 +46,7 @@ export function MacroDashboard({ targets, current, dark = true }) {
       </div>
 
       {/* Divider */}
-      <div className={`mx-5 ${dark ? 'border-t border-white/[0.06]' : 'border-t border-slate-100'}`} />
+      <div className="mx-5 border-t border-white/[0.06]" />
 
       {/* Macro bars */}
       <div className="p-5 pt-4 space-y-3.5">

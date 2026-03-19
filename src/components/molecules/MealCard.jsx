@@ -26,12 +26,8 @@ export function MealCard({
   return (
     <div
       onClick={handleTap}
-      className={`rounded-2xl overflow-hidden transition-all border cursor-pointer ${
+      className={`glass-card rounded-2xl overflow-hidden transition-all cursor-pointer press hover:border-white/[0.12] ${
         logged ? 'opacity-50' : ''
-      } ${
-        dark
-          ? 'bg-white/[0.02] border-white/[0.06] hover:border-white/[0.12]'
-          : 'bg-white border-slate-100 hover:border-slate-200'
       } ${className}`}
     >
       {/* Food image */}
