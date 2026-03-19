@@ -1,13 +1,9 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React from 'react';
 import { BottomNav } from './BottomNav';
 import { FAB } from './FAB';
 
 /**
- * Main app shell with:
- * - Scrollable content area (420px max-width)
- * - Bottom tab navigation
- * - Floating action button
- * - Scroll-direction-aware nav visibility
+ * Main layout shell — safe area padding, scroll container, bottom nav
  */
 export function MainLayout({
   children,
@@ -18,40 +14,25 @@ export function MainLayout({
   shouldPulseFAB = false,
   dark = true,
 }) {
-  const [navVisible, setNavVisible] = useState(true);
-  const lastScrollY = useRef(0);
-  const scrollRef = useRef(null);
-
-  const handleScroll = useCallback((e) => {
-    const currentY = e.target.scrollTop;
-    const delta = currentY - lastScrollY.current;
-
-    // Show nav when scrolling up, hide when scrolling down
-    if (delta > 10 && currentY > 100) {
-      setNavVisible(false);
-    } else if (delta < -10 || currentY < 50) {
-      setNavVisible(true);
-    }
-
-    lastScrollY.current = currentY;
-  }, []);
-
   return (
-    <div className={`min-h-screen ${dark ? 'app-bg-dark' : 'app-bg-light'}`}>
-      {/* Scrollable content */}
+    <div className={`min-h-screen flex flex-col ${dark ? 'bg-[#080d1a]' : 'bg-[#f8f9fb]'}`}
+      style={{ maxWidth: '430px', margin: '0 auto', position: 'relative' }}
+    >
+      {/* Scrollable content area */}
       <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="max-w-[420px] mx-auto min-h-screen pb-24 overflow-y-auto"
+        className="flex-1 overflow-y-auto overscroll-y-contain"
+        style={{ paddingBottom: '88px' }}
       >
-        {children}
+        <div className="px-5 pt-14 pb-6">
+          {children}
+        </div>
       </div>
 
       {/* FAB */}
       {showFAB && (
         <FAB
           onClick={onFABPress}
-          shouldPulse={shouldPulseFAB}
+          pulse={shouldPulseFAB}
           dark={dark}
         />
       )}
@@ -60,7 +41,6 @@ export function MainLayout({
       <BottomNav
         activeTab={activeTab}
         onTabChange={onTabChange}
-        visible={navVisible}
         dark={dark}
       />
     </div>
