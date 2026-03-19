@@ -165,5 +165,3 @@ export const generateMealPlan = (targetCalories, macros, mealsPerDay, form) => {
 };
 
 // ========== END MEAL DATABASE + PLAN GENERATOR ==========
-
-export { MEAL_DATABASE, generateMealPlan };

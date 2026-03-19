@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { MealPlanViewer } from '../components/organisms/MealPlanViewer';
+import { RecipeBook } from '../components/organisms/RecipeBook';
+import { GroceryList } from '../components/organisms/GroceryList';
 import { Card } from '../components/atoms/Card';
 import { Button } from '../components/atoms/Button';
 
@@ -14,6 +16,8 @@ export function MealPlans() {
     setActiveTab
   } = useApp();
   const [mealStates, setMealStates] = useState({});
+  const [showRecipeBook, setShowRecipeBook] = useState(false);
+  const [showGroceryList, setShowGroceryList] = useState(false);
 
   const handleLogMeal = (meal, index) => {
     logMeal(meal);
@@ -49,9 +53,9 @@ export function MealPlans() {
         </p>
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
-            { emoji: '📖', label: 'Recipe Book' },
-            { emoji: '🔍', label: 'Find Recipes' },
-            { emoji: '▶️', label: 'YouTube' },
+            { emoji: '📖', label: 'Recipe Book', action: () => setShowRecipeBook(true) },
+            { emoji: '🔍', label: 'Find Recipes', action: () => {} },
+            { emoji: '▶️', label: 'YouTube', action: () => {} },
           ].map((item, i) => (
             <Card
               key={i}
@@ -59,6 +63,7 @@ export function MealPlans() {
               padding="md"
               dark={dark}
               hover
+              onClick={item.action}
               className="text-center"
             >
               <span className="text-2xl block mb-1">{item.emoji}</span>
@@ -77,13 +82,14 @@ export function MealPlans() {
         </p>
         <div className="space-y-2">
           {[
-            { label: 'Favorite Meals', count: favorites.length, emoji: '❤️' },
-            { label: 'Saved Recipes', count: recipes.length, emoji: '📕' },
-            { label: 'Saved Plans', count: savedPlans.length, emoji: '📋' },
-            { label: 'Grocery List', count: null, emoji: '🛒' },
+            { label: 'Favorite Meals', count: favorites.length, emoji: '❤️', action: () => {} },
+            { label: 'Saved Recipes', count: recipes.length, emoji: '📕', action: () => setShowRecipeBook(true) },
+            { label: 'Saved Plans', count: savedPlans.length, emoji: '📋', action: () => {} },
+            { label: 'Grocery List', count: null, emoji: '🛒', action: () => setShowGroceryList(true) },
           ].map((item, i) => (
             <button
               key={i}
+              onClick={item.action}
               className={`
                 w-full flex items-center justify-between p-4 rounded-xl transition-all
                 ${dark
@@ -108,6 +114,28 @@ export function MealPlans() {
           ))}
         </div>
       </div>
+
+      {/* Recipe Book Modal */}
+      {showRecipeBook && (
+        <RecipeBook
+          recipes={(plan?.meals || []).map(m => ({
+            title: m.name, calories: m.calories, protein: m.protein,
+            carbs: m.carbs, fat: m.fat, ingredients: m.ingredients,
+            instructions: m.instructions,
+          }))}
+          dark={dark}
+          onClose={() => setShowRecipeBook(false)}
+        />
+      )}
+
+      {/* Grocery List Modal */}
+      {showGroceryList && (
+        <GroceryList
+          meals={plan?.meals || []}
+          dark={dark}
+          onClose={() => setShowGroceryList(false)}
+        />
+      )}
     </div>
   );
 }

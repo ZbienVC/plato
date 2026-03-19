@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
 import { Card } from '../components/atoms/Card';
 import { StatTile } from '../components/molecules/StatTile';
 import { Button } from '../components/atoms/Button';
+import { WeightTracker } from '../components/organisms/WeightTracker';
+import { SettingsPanel } from '../components/organisms/SettingsPanel';
 import { calculateAge } from '../utils/formatters';
 
 /**
@@ -11,10 +13,12 @@ import { calculateAge } from '../utils/formatters';
  * Profile stats, weight chart, weekly summary, insights, achievements, settings
  */
 export function Profile() {
+  const [showWeightTracker, setShowWeightTracker] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const {
-    dark, userProfile, planConfig, plan, streak,
-    weightEntries, advancedMode, setAdvancedMode,
-    showMealImages, setShowMealImages, setDark,
+    dark, setDark, userProfile, planConfig, plan, streak,
+    weightEntries, logWeight, advancedMode, setAdvancedMode,
+    showMealImages, setShowMealImages, resetAll,
   } = useApp();
   const { targets, current } = useMacros();
 
@@ -92,7 +96,7 @@ export function Profile() {
                 </p>
               )}
             </div>
-            <Button variant="secondary" size="sm">
+            <Button variant="secondary" size="sm" onClick={() => setShowWeightTracker(true)}>
               + Log Weight
             </Button>
           </div>
@@ -213,14 +217,15 @@ export function Profile() {
 
           {/* Nav links */}
           {[
-            { label: 'Weekly Insights', emoji: '📊' },
-            { label: 'Nutrient Support', emoji: '💊' },
-            { label: 'Future You', emoji: '🎯' },
-            { label: 'Import / Export', emoji: '📤' },
-            { label: 'Settings', emoji: '⚙️' },
+            { label: 'Weekly Insights', emoji: '📊', action: () => {} },
+            { label: 'Nutrient Support', emoji: '💊', action: () => {} },
+            { label: 'Future You', emoji: '🎯', action: () => {} },
+            { label: 'Import / Export', emoji: '📤', action: () => {} },
+            { label: 'Settings', emoji: '⚙️', action: () => setShowSettings(true) },
           ].map((item, i) => (
             <button
               key={i}
+              onClick={item.action}
               className={`
                 w-full flex items-center justify-between p-4 rounded-xl transition-all
                 ${dark ? 'hover:bg-white/5' : 'hover:bg-slate-50'}
@@ -237,6 +242,31 @@ export function Profile() {
           ))}
         </div>
       </div>
+
+      {/* Weight Tracker Modal */}
+      {showWeightTracker && (
+        <WeightTracker
+          entries={weightEntries}
+          onLog={logWeight}
+          dark={dark}
+          onClose={() => setShowWeightTracker(false)}
+        />
+      )}
+
+      {/* Settings Panel Modal */}
+      {showSettings && (
+        <SettingsPanel
+          dark={dark}
+          onClose={() => setShowSettings(false)}
+          onReset={resetAll}
+          settings={{ darkMode: dark, showMealImages, advancedMode }}
+          onUpdateSettings={(s) => {
+            if (s.darkMode !== undefined) setDark(s.darkMode);
+            if (s.showMealImages !== undefined) setShowMealImages(s.showMealImages);
+            if (s.advancedMode !== undefined) setAdvancedMode(s.advancedMode);
+          }}
+        />
+      )}
     </div>
   );
 }

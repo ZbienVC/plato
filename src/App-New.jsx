@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { MainLayout } from './components/layout/MainLayout';
 import { VoiceLogModal } from './components/organisms/VoiceLogModal';
+import { Onboarding } from './pages/Onboarding';
 import { Home } from './pages/Home';
 import { LogMeal } from './pages/LogMeal';
 import { MealPlans } from './pages/MealPlans';
@@ -9,7 +10,8 @@ import { Profile } from './pages/Profile';
 import './styles/index.css';
 
 /**
- * App shell — renders active tab inside MainLayout
+ * App shell — manages onboarding vs main app flow
+ * After onboarding: renders active tab inside MainLayout
  * Manages voice log modal overlay
  */
 function AppContent() {
@@ -18,7 +20,20 @@ function AppContent() {
     activeTab, setActiveTab,
     showVoiceLog, setShowVoiceLog,
     logMeal, dailyLog,
+    userProfile, plan,
   } = useApp();
+
+  const [hasOnboarded, setHasOnboarded] = useState(false);
+
+  // Show onboarding if user hasn't completed it
+  // Check if user has a name (simplest proxy for "has onboarded")
+  const needsOnboarding = !hasOnboarded && !userProfile.name;
+
+  if (needsOnboarding) {
+    return (
+      <Onboarding onComplete={() => setHasOnboarded(true)} />
+    );
+  }
 
   // Check if user should be nudged to log (4+ hours since last log)
   const lastLogTime = dailyLog.meals.length > 0
@@ -45,7 +60,7 @@ function AppContent() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onFABPress={() => setShowVoiceLog(true)}
-        showFAB={activeTab !== 'log'} // Hide FAB on log tab (redundant)
+        showFAB={activeTab !== 'log'}
         shouldPulseFAB={shouldPulseFAB}
         dark={dark}
       >

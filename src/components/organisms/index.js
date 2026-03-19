@@ -3,3 +3,8 @@ export { VoiceLogModal } from './VoiceLogModal';
 export { RestaurantBrowser } from './RestaurantBrowser';
 export { MealPlanViewer } from './MealPlanViewer';
 export { MealLogger } from './MealLogger';
+export { RecipeBook } from './RecipeBook';
+export { GroceryList } from './GroceryList';
+export { WeightTracker } from './WeightTracker';
+export { SettingsPanel } from './SettingsPanel';
+export { Toast, useToast } from './Toast';
