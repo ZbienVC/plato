@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import { generateMealPlan } from '../services/mealGenerator';
 import { Input } from '../components/atoms/Input';
+import { Button, PrimaryButton, SecondaryButton } from '../components/atoms/Button';
 
 const page = { initial: { opacity: 0, x: 40 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -40 } };
 const trans = { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] };
@@ -18,18 +19,6 @@ const Chip = ({ label, active, onClick }) => (
 const Label = ({ children }) => <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-slate-500 mb-2">{children}</p>;
 
 const Card = ({ children, className = '' }) => <div className={`glass rounded-2xl p-5 ${className}`}>{children}</div>;
-
-const PrimaryBtn = ({ children, onClick, className = '' }) => (
-  <button onClick={onClick}
-    className={`relative z-50 pointer-events-auto cursor-pointer py-3.5 rounded-xl bg-gradient-to-r from-teal-400 to-indigo-500 text-white font-bold text-[15px] glow-teal active:scale-95 transition-transform touch-manipulation ${className}`}
-  >{children}</button>
-);
-
-const GhostBtn = ({ children, onClick, className = '' }) => (
-  <button onClick={onClick}
-    className={`relative z-50 pointer-events-auto cursor-pointer py-3.5 rounded-xl glass text-slate-400 font-semibold text-[15px] active:scale-95 transition-transform touch-manipulation ${className}`}
-  >{children}</button>
-);
 
 export function Onboarding({ onComplete }) {
   const { setUserProfile, setPlanConfig, setPlan } = useApp();
