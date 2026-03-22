@@ -61,8 +61,8 @@ export function Onboarding({ onComplete }) {
     <div className="min-h-screen bg-[#0B0F1A] relative max-w-md mx-auto overflow-hidden">
       {/* Ambient */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute w-72 h-72 rounded-full bg-teal-500/[0.06] blur-[100px] animate-float-slow" style={{ top: '-10%', right: '-20%' }} />
-        <div className="absolute w-56 h-56 rounded-full bg-indigo-500/[0.04] blur-[80px] animate-breathe" style={{ bottom: '15%', left: '-15%' }} />
+        <div className="absolute w-72 h-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.15)_0,transparent_70%)] animate-float-slow" style={{ top: '-10%', right: '-20%' }} />
+        <div className="absolute w-56 h-56 rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15)_0,transparent_70%)] animate-breathe" style={{ bottom: '15%', left: '-15%' }} />
       </div>
 
       {/* Progress */}
