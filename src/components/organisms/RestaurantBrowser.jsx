@@ -1,19 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { Card } from '../atoms/Card';
-import { Input } from '../atoms/Input';
-import { Button } from '../atoms/Button';
-import { RestaurantItem } from '../molecules/RestaurantItem';
+import { motion } from 'framer-motion';
+import { useApp } from '../../context/AppContext';
 import { RESTAURANTS } from '../../utils/constants';
 import { RESTAURANT_MENUS } from '../../services/restaurantData';
 
-/**
- * Restaurant browsing experience
- * Grid view → Menu view with macro filtering + inline logging
- */
-export function RestaurantBrowser({ onLog, onClose, dark = true }) {
+export function RestaurantBrowser({ onLog, onClose, dark = false }) {
+  const { logMeal } = useApp();
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('protein');
+
+  const handleLog = onLog || logMeal;
 
   const filters = [
     { id: 'protein', label: 'Most Protein' },
@@ -29,151 +26,103 @@ export function RestaurantBrowser({ onLog, onClose, dark = true }) {
   const menuItems = useMemo(() => {
     if (!selectedRestaurant) return [];
     const items = RESTAURANT_MENUS[selectedRestaurant.id] || [];
-    
-    const sorted = [...items].sort((a, b) => {
+    return [...items].sort((a, b) => {
       switch (activeFilter) {
         case 'protein': return b.protein - a.protein;
         case 'lowcal': return a.calories - b.calories;
         case 'macros': return (b.protein / b.calories) - (a.protein / a.calories);
-        case 'balanced': {
-          const balanceA = Math.abs(a.protein * 4 / a.calories - 0.3) + Math.abs(a.carbs * 4 / a.calories - 0.4);
-          const balanceB = Math.abs(b.protein * 4 / b.calories - 0.3) + Math.abs(b.carbs * 4 / b.calories - 0.4);
-          return balanceA - balanceB;
-        }
         default: return 0;
       }
     });
-
-    return sorted;
   }, [selectedRestaurant, activeFilter]);
 
-  const handleLog = (item) => {
-    if (onLog) {
-      onLog({
-        name: item.name,
-        calories: item.calories,
-        protein: item.protein,
-        carbs: item.carbs,
-        fat: item.fat,
-        type: 'lunch',
-        restaurant: selectedRestaurant?.name,
-      });
-    }
+  const doLog = (item) => {
+    handleLog({
+      name: item.name,
+      calories: item.calories,
+      protein: item.protein,
+      carbs: item.carbs,
+      fat: item.fat,
+      type: 'lunch',
+      restaurant: selectedRestaurant?.name,
+    });
   };
 
-  // === MENU VIEW ===
   if (selectedRestaurant) {
     return (
-      <div className="animate-fadeIn">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={() => setSelectedRestaurant(null)}
-            className={`p-2 rounded-xl ${dark ? 'hover:bg-white/5' : 'hover:bg-slate-100'}`}
-          >
-            <span className="text-lg">←</span>
-          </button>
-          <span className="text-2xl">{selectedRestaurant.emoji}</span>
-          <h2 className={`text-xl font-bold ${dark ? 'text-white' : 'text-slate-900'}`}>
-            {selectedRestaurant.name}
-          </h2>
+      <div>
+        <div className="flex items-center gap-3 mb-4">
+          <motion.button whileTap={{ scale: 0.95 }} onClick={() => setSelectedRestaurant(null)}
+            className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </motion.button>
+          <span className="text-xl">{selectedRestaurant.emoji}</span>
+          <h2 className="text-base font-bold text-slate-900">{selectedRestaurant.name}</h2>
         </div>
 
-        {/* Filter pills */}
-        <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide">
-          {filters.map(filter => (
-            <button
-              key={filter.id}
-              onClick={() => setActiveFilter(filter.id)}
-              className={`
-                px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all
-                ${activeFilter === filter.id
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
-                  : dark
-                    ? 'bg-white/5 text-slate-400 border border-white/10 hover:border-emerald-500/30'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }
-              `}
-            >
-              {filter.label}
+        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar mb-3">
+          {filters.map(f => (
+            <button key={f.id} onClick={() => setActiveFilter(f.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                activeFilter === f.id ? 'bg-green-500 text-white' : 'bg-white border border-slate-200 text-slate-600'
+              }`}>
+              {f.label}
             </button>
           ))}
         </div>
 
-        {/* Sort label */}
-        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-3">
-          Sorted by: {filters.find(f => f.id === activeFilter)?.label}
-        </p>
-
-        {/* Menu items */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {menuItems.map((item, i) => (
-            <RestaurantItem
-              key={item.name}
-              item={item}
-              rank={i < 3 ? i + 1 : undefined}
-              onLog={handleLog}
-              dark={dark}
-            />
+            <div key={i} className="app-card flex items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-800 truncate">{item.name}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs font-bold text-slate-900">{item.calories} cal</span>
+                  <span className="text-xs text-blue-500">{item.protein}g P</span>
+                  <span className="text-xs text-amber-500">{item.carbs}g C</span>
+                  <span className="text-xs text-rose-500">{item.fat}g F</span>
+                </div>
+              </div>
+              <motion.button whileTap={{ scale: 0.9 }} onClick={() => doLog(item)}
+                className="shrink-0 px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-semibold">
+                Log
+              </motion.button>
+            </div>
           ))}
+          {menuItems.length === 0 && (
+            <p className="text-center text-sm text-slate-400 py-6">Menu coming soon</p>
+          )}
         </div>
-
-        {menuItems.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-slate-500">Menu coming soon for {selectedRestaurant.name}</p>
-          </div>
-        )}
       </div>
     );
   }
 
-  // === GRID VIEW ===
   return (
-    <div className="animate-fadeIn">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className={`text-xl font-bold ${dark ? 'text-white' : 'text-slate-900'}`}>
-          🍽️ Restaurant Mode
-        </h2>
-        {onClose && (
-          <button onClick={onClose} className="text-slate-500 hover:text-white text-xl p-2">
-            ✕
-          </button>
-        )}
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-base font-bold text-slate-900">🍽️ Restaurant Mode</h2>
+        {onClose && <button onClick={onClose} className="text-slate-400 text-xl">✕</button>}
       </div>
 
-      {/* Search */}
-      <Input
-        type="search"
-        placeholder="Search restaurants..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        icon={<span>🔍</span>}
-        dark={dark}
-        className="mb-6"
-      />
+      <div className="relative mb-4">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search restaurants..."
+          className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100" />
+      </div>
 
-      {/* Restaurant grid */}
       <div className="grid grid-cols-2 gap-3">
         {filteredRestaurants.map(restaurant => (
-          <Card
-            key={restaurant.id}
-            variant="glass"
-            padding="md"
-            dark={dark}
-            hover
+          <motion.button key={restaurant.id} whileTap={{ scale: 0.97 }}
             onClick={() => setSelectedRestaurant(restaurant)}
-            className="text-center"
-          >
-            <div
-              className="w-full h-1 rounded-full mb-3"
-              style={{ background: restaurant.color }}
-            />
-            <span className="text-3xl mb-2 block">{restaurant.emoji}</span>
-            <p className={`font-bold text-sm ${dark ? 'text-white' : 'text-slate-900'}`}>
-              {restaurant.name}
-            </p>
-          </Card>
+            className="app-card flex flex-col items-center text-center py-4">
+            <div className="w-full h-1 rounded-full mb-3" style={{ background: restaurant.color }} />
+            <span className="text-3xl mb-2">{restaurant.emoji}</span>
+            <p className="text-sm font-bold text-slate-900">{restaurant.name}</p>
+          </motion.button>
         ))}
       </div>
     </div>

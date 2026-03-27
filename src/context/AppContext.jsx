@@ -22,7 +22,7 @@ function saveState(key, value) {
 
 export function AppProvider({ children }) {
   // === THEME ===
-  const [dark, setDark] = useState(() => loadState('dark', true));
+  const [dark, setDark] = useState(() => loadState('dark', false));
 
   // === USER PROFILE ===
   const [userProfile, setUserProfile] = useState(() => loadState('userProfile', {
@@ -93,6 +93,19 @@ export function AppProvider({ children }) {
   // === STREAK ===
   const [streak, setStreak] = useState(() => loadState('streak', 0));
 
+  // === SAVED RECIPES (alias) ===
+  const [savedRecipes, setSavedRecipes] = useState(() => loadState('savedRecipes', []));
+  const saveRecipeById = useCallback((recipe) => {
+    setSavedRecipes(prev => {
+      const updated = [...prev.filter(r => r.id !== recipe.id), recipe];
+      saveState('savedRecipes', updated);
+      return updated;
+    });
+  }, []);
+
+  // === GROCERY CHECKLIST ===
+  const [groceryChecked, setGroceryChecked] = useState(() => loadState('groceryChecked', {}));
+
   // === PERSIST STATE ON CHANGE ===
   useEffect(() => { saveState('dark', dark); }, [dark]);
   useEffect(() => { saveState('userProfile', userProfile); }, [userProfile]);
@@ -108,6 +121,8 @@ export function AppProvider({ children }) {
   useEffect(() => { saveState('showMealImages', showMealImages); }, [showMealImages]);
   useEffect(() => { saveState('weightEntries', weightEntries); }, [weightEntries]);
   useEffect(() => { saveState('streak', streak); }, [streak]);
+  useEffect(() => { saveState('savedRecipes', savedRecipes); }, [savedRecipes]);
+  useEffect(() => { saveState('groceryChecked', groceryChecked); }, [groceryChecked]);
 
   // === ACTIONS ===
   const logMeal = useCallback((meal) => {
@@ -205,7 +220,7 @@ export function AppProvider({ children }) {
   const resetAll = useCallback(() => {
     const keys = ['dark', 'userProfile', 'planConfig', 'plan', 'dailyLog', 'logHistory',
       'savedPlans', 'recipes', 'favorites', 'groceryList', 'advancedMode',
-      'showMealImages', 'weightEntries', 'streak'];
+      'showMealImages', 'weightEntries', 'streak', 'savedRecipes', 'groceryChecked'];
     keys.forEach(k => localStorage.removeItem(`plato_${k}`));
     window.location.reload();
   }, []);
@@ -236,6 +251,10 @@ export function AppProvider({ children }) {
     weightEntries, setWeightEntries, logWeight,
     // Streak
     streak, setStreak,
+    // Saved recipes (extended)
+    savedRecipes, setSavedRecipes, saveRecipeById,
+    // Grocery checklist
+    groceryChecked, setGroceryChecked,
     // Utils
     resetAll,
   };

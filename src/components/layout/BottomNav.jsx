@@ -10,30 +10,54 @@ const TABS = [
 
 export function BottomNav({ activeTab, onTabChange }) {
   return (
-    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-40
-      bg-[#0B0F1A]/90 backdrop-blur-xl border-t border-white/[0.06]">
-      <div className="flex items-center justify-around h-16 px-4">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-40
+      bg-white/95 backdrop-blur-xl border-t border-slate-100 shadow-[0_-1px_12px_rgba(0,0,0,0.06)]">
+      <div className="flex items-center justify-around h-16 px-2">
         {TABS.map(tab => {
           const active = activeTab === tab.key;
+          // Log tab gets FAB treatment — don't show normal item
+          if (tab.key === 'log') {
+            return (
+              <motion.button
+                key={tab.key}
+                onClick={() => onTabChange(tab.key)}
+                whileTap={{ scale: 0.9 }}
+                className="flex flex-col items-center justify-center gap-1 py-1 px-4"
+              >
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg -mt-6 ${
+                  active
+                    ? 'bg-green-500 shadow-green-200'
+                    : 'bg-green-500 shadow-green-200'
+                }`}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                    stroke="white" strokeWidth="2.5"
+                    strokeLinecap="round" strokeLinejoin="round">
+                    <path d={tab.d} />
+                  </svg>
+                </div>
+                <span className="text-[9px] font-semibold tracking-wide text-green-500">{tab.label}</span>
+              </motion.button>
+            );
+          }
           return (
             <motion.button
               key={tab.key}
               onClick={() => onTabChange(tab.key)}
               whileTap={{ scale: 0.9 }}
-              className="flex flex-col items-center justify-center gap-1 py-1 px-5"
+              className="flex flex-col items-center justify-center gap-1 py-1 px-5 relative"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                stroke={active ? '#14B8A6' : '#475569'} strokeWidth="2"
+                stroke={active ? '#22C55E' : '#94A3B8'} strokeWidth="2"
                 strokeLinecap="round" strokeLinejoin="round">
                 <path d={tab.d} />
               </svg>
               <span className={`text-[10px] font-semibold tracking-wide ${
-                active ? 'text-teal-400' : 'text-slate-600'
+                active ? 'text-green-500' : 'text-slate-400'
               }`}>{tab.label}</span>
               {active && (
-                <motion.div layoutId="navIndicator"
-                  className="absolute -top-px h-[2px] w-8 bg-gradient-to-r from-teal-400 to-indigo-400 rounded-full"
-                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                <motion.div layoutId="navDot"
+                  className="absolute bottom-0.5 w-1 h-1 rounded-full bg-green-500"
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
                 />
               )}
             </motion.button>

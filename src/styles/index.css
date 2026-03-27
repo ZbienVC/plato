@@ -2,27 +2,87 @@
 
 @layer base {
   body {
-    background-color: #0B0F1A;
-    color: #F8FAFC;
+    background-color: #F8FAFC;
+    color: #0F172A;
     overflow-x: hidden;
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: -apple-system, 'Inter', ui-sans-serif, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    max-width: 430px;
+    margin: 0 auto;
+  }
+
+  * {
+    scroll-behavior: smooth;
   }
 }
 
 @layer components {
+  /* Light card — replaces "glass" for new design */
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+    @apply bg-white border border-slate-100 rounded-2xl shadow-sm;
   }
   .glass-card {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl;
+    @apply bg-white border border-slate-100 rounded-2xl shadow-md;
+  }
+  .app-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 16px;
   }
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-blue-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-emerald-600;
   }
-  .glow-teal {
-    box-shadow: 0 0 20px rgba(20, 184, 166, 0.2), 0 4px 12px rgba(0,0,0,0.3);
+  .glow-green {
+    box-shadow: 0 0 20px rgba(34,197,94,0.25), 0 4px 12px rgba(0,0,0,0.08);
   }
   .premium-input {
-    @apply bg-white/5 border border-white/10 rounded-xl text-white px-4 py-3 focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 outline-none transition-all;
+    @apply bg-white border border-slate-200 rounded-xl text-slate-900 px-4 py-3 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all;
   }
+  /* Legacy dark compat */
+  .glow-teal {
+    box-shadow: 0 0 20px rgba(34,197,94,0.2), 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  /* Macro colors */
+  .macro-protein { color: #3B82F6; }
+  .macro-carbs { color: #F59E0B; }
+  .macro-fat { color: #F43F5E; }
+  .macro-calories { color: #0F172A; }
+
+  /* Progress bars */
+  .progress-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: #E2E8F0;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.5s ease;
+  }
+
+  /* No scrollbar */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Animations */
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+  .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+  .animate-breathe { animation: breathe 4s ease-in-out infinite; }
+  .animate-pulse-ring { animation: pulse-ring 1.5s ease-out infinite; }
 }

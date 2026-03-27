@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 
 const paddings = {
   none: '',
-  sm: 'p-4',
-  md: 'p-6',
-  lg: 'p-8',
+  sm: 'p-3',
+  md: 'p-4',
+  lg: 'p-5',
 };
 
 export function Card({
@@ -15,17 +15,19 @@ export function Card({
   onClick,
   className = '',
   delay = 0,
+  dark = false,
+  variant = 'default',
   ...props
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay, ease: [0.25, 0.1, 0.25, 1] }}
-      whileHover={hover ? { y: -2, scale: 1.01 } : {}}
+      transition={{ duration: 0.35, delay, ease: [0.25, 0.1, 0.25, 1] }}
+      whileHover={hover ? { y: -1 } : {}}
       onClick={onClick}
       className={`
-        bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl
+        bg-white border border-slate-100 rounded-2xl shadow-sm
         ${paddings[padding]}
         ${onClick || hover ? 'cursor-pointer' : ''}
         ${className}

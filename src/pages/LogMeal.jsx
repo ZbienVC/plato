@@ -1,66 +1,231 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../context/AppContext';
+import { MEAL_DATABASE } from '../services/mealGenerator';
 
 const stagger = { animate: { transition: { staggerChildren: 0.06 } } };
 const item = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
 
-export function LogMeal() {
-  const { setShowVoiceLog } = useApp();
+const QUICK_FOODS = [
+  { name: 'Scrambled Eggs (2)', calories: 180, protein: 12, carbs: 2, fat: 14, type: 'breakfast' },
+  { name: 'Protein Shake', calories: 160, protein: 30, carbs: 8, fat: 3, type: 'snack' },
+  { name: 'Greek Yogurt', calories: 100, protein: 17, carbs: 6, fat: 0, type: 'snack' },
+  { name: 'Chicken Breast 4oz', calories: 185, protein: 35, carbs: 0, fat: 4, type: 'lunch' },
+  { name: 'Banana', calories: 90, protein: 1, carbs: 23, fat: 0, type: 'snack' },
+  { name: 'Oatmeal (1 cup)', calories: 150, protein: 5, carbs: 27, fat: 3, type: 'breakfast' },
+  { name: 'Brown Rice (1 cup)', calories: 215, protein: 5, carbs: 45, fat: 2, type: 'lunch' },
+  { name: 'Almonds (1oz)', calories: 160, protein: 6, carbs: 6, fat: 14, type: 'snack' },
+];
 
-  const actions = [
-    { t: 'Voice Log', d: 'Speak your meal', c: 'from-teal-500/12 to-teal-500/5', ic: '#14B8A6',
-      svg: <><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></>,
-      action: () => setShowVoiceLog(true) },
-    { t: 'Scan Plate', d: 'Photo your meal', c: 'from-indigo-500/12 to-indigo-500/5', ic: '#6366F1',
-      svg: <><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></>,
-      action: () => {} },
-    { t: 'Barcode', d: 'Scan a product', c: 'from-amber-500/12 to-amber-500/5', ic: '#F59E0B',
-      svg: <><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="8" x2="7" y2="16"/><line x1="11" y1="8" x2="11" y2="16"/><line x1="15" y1="8" x2="15" y2="16"/></>,
-      action: () => {} },
-    { t: 'Restaurant', d: 'Browse menus', c: 'from-rose-500/12 to-rose-500/5', ic: '#F43F5E',
-      svg: <><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 21V9"/></>,
-      action: () => {} },
-    { t: 'Manual Entry', d: 'Type macros', c: 'from-purple-500/12 to-purple-500/5', ic: '#A855F7',
-      svg: <><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></>,
-      action: () => {} },
-    { t: 'Quick Add', d: 'Recent meals', c: 'from-cyan-500/12 to-cyan-500/5', ic: '#06B6D4',
-      svg: <><polyline points="12 8 12 12 14 14"/><circle cx="12" cy="12" r="10"/></>,
-      action: () => {} },
-  ];
+export function LogMeal() {
+  const { logMeal, setShowVoiceLog, setActiveTab, dailyLog } = useApp();
+  const [activeTab, setTab] = useState('manual');
+  const [search, setSearch] = useState('');
+  const [customName, setCustomName] = useState('');
+  const [customCals, setCustomCals] = useState('');
+  const [customProtein, setCustomProtein] = useState('');
+  const [customCarbs, setCustomCarbs] = useState('');
+  const [customFat, setCustomFat] = useState('');
+  const [logged, setLogged] = useState(null);
+
+  const recentMeals = dailyLog?.meals?.slice(-4) || [];
+
+  const searchResults = search.length > 1
+    ? MEAL_DATABASE.filter(m => m.name.toLowerCase().includes(search.toLowerCase())).slice(0, 8)
+    : [];
+
+  const handleLog = (meal) => {
+    logMeal(meal);
+    setLogged(meal.name);
+    setTimeout(() => setLogged(null), 2000);
+  };
+
+  const handleCustomLog = () => {
+    if (!customName) return;
+    handleLog({
+      name: customName,
+      calories: parseInt(customCals) || 0,
+      protein: parseInt(customProtein) || 0,
+      carbs: parseInt(customCarbs) || 0,
+      fat: parseInt(customFat) || 0,
+      type: 'lunch',
+    });
+    setCustomName(''); setCustomCals(''); setCustomProtein(''); setCustomCarbs(''); setCustomFat('');
+  };
+
+  const TABS = ['manual', 'voice', 'scan', 'quick'];
 
   return (
-    <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-6 pb-4">
+    <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-4 pb-4">
+      {/* Header */}
       <motion.div variants={item}>
-        <h1 className="text-[24px] font-extrabold tracking-tight text-white">Log a meal</h1>
-        <p className="text-[13px] text-slate-500 mt-1">Search, scan, or speak what you ate.</p>
+        <h1 className="text-2xl font-bold text-slate-900">Log a Meal</h1>
+        <p className="text-sm text-slate-400 mt-0.5">Search, scan, or speak what you ate.</p>
       </motion.div>
 
-      {/* Search */}
-      <motion.div variants={item} className="relative">
-        <svg className="absolute left-4 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24"
-          fill="none" stroke="#475569" strokeWidth="2" strokeLinecap="round">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        <input placeholder="Search food..."
-          className="w-full pl-11 pr-4 py-3.5 rounded-2xl text-[14px] outline-none glass text-white placeholder-slate-600 focus:border-teal-500/40 transition-colors"
-        />
-      </motion.div>
-
-      {/* Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        {actions.map((a, i) => (
-          <motion.button key={i} variants={item} whileTap={{ scale: 0.97 }} onClick={a.action}
-            className="glass rounded-2xl p-5 text-left hover:border-white/[0.12] transition-colors">
-            <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${a.c} flex items-center justify-center mb-3`}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={a.ic}
-                strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">{a.svg}</svg>
-            </div>
-            <p className="text-[14px] font-bold text-white">{a.t}</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">{a.d}</p>
-          </motion.button>
+      {/* Tab bar */}
+      <motion.div variants={item} className="flex bg-slate-100 rounded-xl p-1 gap-1">
+        {TABS.map(t => (
+          <button key={t} onClick={() => setTab(t)}
+            className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all ${
+              activeTab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+            }`}>
+            {t === 'quick' ? 'Quick Add' : t.charAt(0).toUpperCase() + t.slice(1)}
+          </button>
         ))}
-      </div>
+      </motion.div>
+
+      {/* Success toast */}
+      <AnimatePresence>
+        {logged && (
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span className="text-sm font-semibold text-green-700">Logged: {logged}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* MANUAL TAB */}
+      {activeTab === 'manual' && (
+        <motion.div variants={item} className="space-y-4">
+          {/* Search */}
+          <div className="relative">
+            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24"
+              fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search food database..."
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all"
+            />
+          </div>
+
+          {/* Search results */}
+          {searchResults.length > 0 && (
+            <div className="app-card space-y-1 p-3">
+              {searchResults.map((m, i) => (
+                <motion.button key={i} whileTap={{ scale: 0.98 }} onClick={() => handleLog({ name: m.name, calories: m.calories, protein: m.protein, carbs: m.carbs, fat: m.fat, type: m.type || 'lunch' })}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div className="text-left">
+                    <p className="text-sm font-semibold text-slate-800">{m.name}</p>
+                    <p className="text-xs text-slate-400">{m.protein}P · {m.carbs}C · {m.fat}F</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-slate-900 tabular-nums">{m.calories}</span>
+                    <span className="text-xs text-slate-400">cal</span>
+                    <div className="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          )}
+
+          {/* Recent meals */}
+          {recentMeals.length > 0 && search.length < 2 && (
+            <div className="app-card">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Recent</p>
+              <div className="space-y-2">
+                {recentMeals.map((m, i) => (
+                  <motion.button key={i} whileTap={{ scale: 0.98 }} onClick={() => handleLog(m)}
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-slate-800">{m.name}</p>
+                      <p className="text-xs text-slate-400">{new Date(m.loggedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                    <span className="text-sm font-bold text-slate-900 tabular-nums">{m.calories} cal</span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Custom entry */}
+          <div className="app-card">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Custom Entry</p>
+            <div className="space-y-2">
+              <input value={customName} onChange={e => setCustomName(e.target.value)} placeholder="Food name"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100" />
+              <div className="grid grid-cols-4 gap-2">
+                {[['Cal', customCals, setCustomCals], ['Pro', customProtein, setCustomProtein], ['Carb', customCarbs, setCustomCarbs], ['Fat', customFat, setCustomFat]].map(([label, val, setter]) => (
+                  <div key={label}>
+                    <p className="text-xs text-slate-400 text-center mb-1">{label}</p>
+                    <input value={val} onChange={e => setter(e.target.value)} type="number" placeholder="0"
+                      className="w-full px-2 py-2 rounded-lg border border-slate-200 bg-slate-50 text-sm text-center text-slate-900 outline-none focus:border-green-400" />
+                  </div>
+                ))}
+              </div>
+              <motion.button whileTap={{ scale: 0.97 }} onClick={handleCustomLog}
+                className="w-full py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold mt-1">
+                Add Food
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* VOICE TAB */}
+      {activeTab === 'voice' && (
+        <motion.div variants={item} className="app-card flex flex-col items-center py-10 gap-6">
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={() => setShowVoiceLog(true)}
+            className="relative w-24 h-24 rounded-full bg-green-500 shadow-xl shadow-green-300/60 flex items-center justify-center"
+          >
+            <div className="absolute inset-0 rounded-full bg-green-500 animate-pulse-ring opacity-40" />
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+            </svg>
+          </motion.button>
+          <div className="text-center">
+            <p className="text-base font-semibold text-slate-800">Tap to speak your meal</p>
+            <p className="text-sm text-slate-400 mt-1">e.g. "I had grilled chicken with rice and broccoli"</p>
+          </div>
+        </motion.div>
+      )}
+
+      {/* SCAN TAB */}
+      {activeTab === 'scan' && (
+        <motion.div variants={item} className="app-card flex flex-col items-center py-10 gap-4">
+          <div className="w-20 h-20 rounded-2xl bg-slate-100 flex items-center justify-center">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </div>
+          <div className="text-center">
+            <p className="text-base font-semibold text-slate-800">Scan Coming Soon</p>
+            <p className="text-sm text-slate-400 mt-1">Photo recognition & barcode scanning</p>
+          </div>
+          <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">Coming Soon</span>
+        </motion.div>
+      )}
+
+      {/* QUICK ADD TAB */}
+      {activeTab === 'quick' && (
+        <motion.div variants={item} className="app-card">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Common Foods</p>
+          <div className="grid grid-cols-2 gap-2">
+            {QUICK_FOODS.map((food, i) => (
+              <motion.button key={i} whileTap={{ scale: 0.96 }}
+                onClick={() => handleLog(food)}
+                className="text-left p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-green-200 transition-colors">
+                <p className="text-sm font-semibold text-slate-800 leading-tight">{food.name}</p>
+                <p className="text-xs text-green-500 font-bold mt-1">{food.calories} cal</p>
+                <p className="text-xs text-slate-400 mt-0.5">{food.protein}P · {food.carbs}C · {food.fat}F</p>
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

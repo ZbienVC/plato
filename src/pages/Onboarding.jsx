@@ -2,23 +2,26 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import { generateMealPlan } from '../services/mealGenerator';
-import { Input } from '../components/atoms/Input';
-import { Button, PrimaryButton, SecondaryButton } from '../components/atoms/Button';
 
 const page = { initial: { opacity: 0, x: 40 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -40 } };
 const trans = { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] };
 
-// ---- Shared UI pieces ----
 const Chip = ({ label, active, onClick }) => (
   <motion.button whileTap={{ scale: 0.95 }} onClick={onClick}
-    className={`px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-colors ${
-      active ? 'bg-gradient-to-r from-teal-500 to-indigo-500 text-white glow-teal' : 'glass text-slate-400'
+    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
+      active ? 'bg-green-500 text-white border-green-500 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-green-300'
     }`}>{label}</motion.button>
 );
 
-const Label = ({ children }) => <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-slate-500 mb-2">{children}</p>;
+const Label = ({ children }) => <p className="text-xs font-semibold uppercase tracking-[1.5px] text-slate-400 mb-2">{children}</p>;
 
-const Card = ({ children, className = '' }) => <div className={`glass rounded-2xl p-5 ${className}`}>{children}</div>;
+const Field = ({ label, ...props }) => (
+  <div>
+    {label && <Label>{label}</Label>}
+    <input {...props}
+      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all" />
+  </div>
+);
 
 export function Onboarding({ onComplete }) {
   const { setUserProfile, setPlanConfig, setPlan } = useApp();
@@ -57,96 +60,96 @@ export function Onboarding({ onComplete }) {
     setPlan(plan); setGenPlan(plan); setStep(5);
   };
 
-  return (
-    <div className="min-h-screen bg-[#0B0F1A] relative max-w-md mx-auto overflow-hidden">
-      {/* Ambient */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute w-72 h-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.15)_0,transparent_70%)] animate-float-slow" style={{ top: '-10%', right: '-20%' }} />
-        <div className="absolute w-56 h-56 rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15)_0,transparent_70%)] animate-breathe" style={{ bottom: '15%', left: '-15%' }} />
-      </div>
+  const TOTAL_STEPS = 3;
 
-      {/* Progress */}
-      {step >= 1 && step <= 3 && (
-        <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md z-20 px-5 pt-4 pb-2 bg-gradient-to-b from-[#0B0F1A] to-transparent">
+  return (
+    <div className="min-h-screen bg-slate-50 relative max-w-[430px] mx-auto overflow-hidden">
+      {/* Progress bar */}
+      {step >= 1 && step <= TOTAL_STEPS && (
+        <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-20 px-5 pt-4 bg-slate-50">
           <div className="flex gap-1.5">
-            {[1, 2, 3].map(s => (
-              <motion.div key={s} className="h-1 rounded-full flex-1"
-                initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
-                style={{ background: s <= step ? 'linear-gradient(to right, #14B8A6, #6366F1)' : 'rgba(255,255,255,0.06)', originX: 0 }}
-                transition={{ duration: 0.4, delay: s * 0.1 }}
-              />
+            {Array.from({ length: TOTAL_STEPS }).map((_, s) => (
+              <div key={s} className="h-1 rounded-full flex-1 overflow-hidden bg-slate-200">
+                <motion.div
+                  className="h-full bg-green-500 rounded-full"
+                  initial={{ width: '0%' }}
+                  animate={{ width: s < step ? '100%' : s === step - 1 ? '100%' : '0%' }}
+                  transition={{ duration: 0.4 }}
+                />
+              </div>
             ))}
           </div>
-          <p className="text-[11px] text-slate-500 text-center mt-2">Step {step} of 3</p>
+          <p className="text-xs text-slate-400 text-center mt-2">Step {step} of {TOTAL_STEPS}</p>
         </div>
       )}
 
       <div className="relative z-10 flex flex-col min-h-screen px-5">
         <AnimatePresence mode="wait">
 
-          {/* ===== WELCOME ===== */}
+          {/* WELCOME */}
           {step === 0 && (
             <motion.div key="welcome" {...page} transition={trans}
               className="flex-1 flex flex-col items-center justify-center text-center py-16">
-              {/* Logo */}
               <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6, ease: 'easeOut' }}
-                className="relative mb-10">
-                <div className="absolute inset-0 w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-400/20 to-indigo-500/20 blur-2xl" />
-                <div className="relative w-20 h-20 rounded-2xl glass flex items-center justify-center glow-teal">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                    <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#14B8A6"/><stop offset="100%" stopColor="#6366F1"/></linearGradient></defs>
-                    <path d="M18 8h1a4 4 0 0 1 0 8h-1" stroke="url(#lg)" strokeWidth="1.5"/>
-                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" stroke="url(#lg)" strokeWidth="1.5"/>
-                    <line x1="6" y1="1" x2="6" y2="4" stroke="url(#lg)" strokeWidth="1.5"/>
-                    <line x1="10" y1="1" x2="10" y2="4" stroke="url(#lg)" strokeWidth="1.5"/>
-                    <line x1="14" y1="1" x2="14" y2="4" stroke="url(#lg)" strokeWidth="1.5"/>
-                  </svg>
-                </div>
+                transition={{ duration: 0.6 }}
+                className="w-20 h-20 rounded-2xl bg-green-500 flex items-center justify-center mb-8 shadow-xl shadow-green-200">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8h1a4 4 0 0 1 0 8h-1" stroke="white" strokeWidth="1.5"/>
+                  <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" stroke="white" strokeWidth="1.5"/>
+                  <line x1="6" y1="1" x2="6" y2="4" stroke="white" strokeWidth="1.5"/>
+                  <line x1="10" y1="1" x2="10" y2="4" stroke="white" strokeWidth="1.5"/>
+                  <line x1="14" y1="1" x2="14" y2="4" stroke="white" strokeWidth="1.5"/>
+                </svg>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}>
-                <h1 className="text-5xl font-black tracking-tight gradient-text mb-3">PLATO</h1>
-                <p className="text-teal-400/80 text-[15px] font-semibold mb-3">AI-Powered Nutrition</p>
-                <p className="text-slate-400 text-[14px] leading-relaxed max-w-[260px] mx-auto">
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                <h1 className="text-5xl font-black tracking-tight text-slate-900 mb-2">PLATO</h1>
+                <p className="text-green-500 text-base font-semibold mb-3">AI-Powered Nutrition</p>
+                <p className="text-slate-400 text-sm leading-relaxed max-w-[260px] mx-auto">
                   Personalized meal plans, intelligent logging, and insights that adapt to you.
                 </p>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}
-                className="mt-12 w-full max-w-[280px] relative z-50 pointer-events-auto">
-                <PrimaryBtn onClick={() => setStep(1)} className="w-full">Let's Go!</PrimaryBtn>
-                <p className="text-[12px] text-slate-600 mt-3 relative z-50">Free · No account needed</p>
+              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+                className="mt-12 w-full max-w-[280px]">
+                <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(1)}
+                  className="w-full py-3.5 rounded-xl bg-green-500 text-white font-bold text-base shadow-lg shadow-green-200">
+                  Let's Go! 🚀
+                </motion.button>
+                <p className="text-xs text-slate-400 mt-3">Free · No account needed</p>
               </motion.div>
             </motion.div>
           )}
 
-          {/* ===== STEP 1 ===== */}
+          {/* STEP 1 — About you */}
           {step === 1 && (
-            <motion.div key="step1" {...page} transition={trans} className="flex-1 flex flex-col justify-center py-10 space-y-6">
-              <div className="mb-2">
-                <h2 className="text-[26px] font-extrabold tracking-tight text-white">About you</h2>
-                <p className="text-[14px] text-slate-400 mt-1">Used to calculate your daily targets.</p>
+            <motion.div key="step1" {...page} transition={trans} className="flex-1 flex flex-col justify-center pt-20 pb-10 space-y-5">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">About you</h2>
+                <p className="text-sm text-slate-400 mt-1">Used to calculate your daily targets.</p>
               </div>
 
-              <Card>
-                <div className="space-y-6">
-                  <div><Input label="Name" value={form.name} onChange={e => set('name', e.target.value)} placeholder="Your name" /></div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div><Input label="Age" type="number" value={form.age} onChange={e => set('age', +e.target.value || 0)} /></div>
-                    <div><Input label="Ft" type="number" value={form.heightFeet} onChange={e => set('heightFeet', +e.target.value || 0)} /></div>
-                    <div><Input label="In" type="number" value={form.heightInches} onChange={e => set('heightInches', +e.target.value || 0)} /></div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div><Input label="Weight (lbs)" type="number" value={form.weight} onChange={e => set('weight', +e.target.value || 0)} /></div>
-                    <div><Label>Gender</Label><div className="flex gap-2 pt-0.5">{['Male', 'Female'].map(g => <Chip key={g} label={g} active={form.gender === g.toLowerCase()} onClick={() => set('gender', g.toLowerCase())} />)}</div></div>
+              <div className="app-card space-y-4">
+                <Field label="Name" value={form.name} onChange={e => set('name', e.target.value)} placeholder="Your name" />
+                <div className="grid grid-cols-3 gap-2">
+                  <Field label="Age" type="number" value={form.age} onChange={e => set('age', +e.target.value || 0)} />
+                  <Field label="Ft" type="number" value={form.heightFeet} onChange={e => set('heightFeet', +e.target.value || 0)} />
+                  <Field label="In" type="number" value={form.heightInches} onChange={e => set('heightInches', +e.target.value || 0)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Weight (lbs)" type="number" value={form.weight} onChange={e => set('weight', +e.target.value || 0)} />
+                  <div>
+                    <Label>Gender</Label>
+                    <div className="flex gap-2">
+                      {['Male', 'Female'].map(g => <Chip key={g} label={g} active={form.gender === g.toLowerCase()} onClick={() => set('gender', g.toLowerCase())} />)}
+                    </div>
                   </div>
                 </div>
-              </Card>
+              </div>
 
-              <Card>
+              <div className="app-card">
                 <Label>Activity Level</Label>
-                <div className="space-y-2 mt-1">
+                <div className="space-y-2">
                   {[
                     { v: 'sedentary', l: 'Sedentary', d: 'Desk job, minimal exercise' },
                     { v: 'light', l: 'Light', d: '1–3 days/week' },
@@ -155,144 +158,185 @@ export function Onboarding({ onComplete }) {
                     { v: 'elite', l: 'Elite', d: 'Intense daily training' },
                   ].map(a => (
                     <motion.button key={a.v} whileTap={{ scale: 0.98 }} onClick={() => set('activity', a.v)}
-                      className={`w-full p-3.5 rounded-xl text-left flex items-center justify-between transition-all ${
-                        form.activity === a.v
-                          ? 'bg-teal-500/10 border border-teal-500/30'
-                          : 'bg-white/[0.02] border border-white/[0.04]'
+                      className={`w-full p-3 rounded-xl text-left flex items-center justify-between border transition-all ${
+                        form.activity === a.v ? 'bg-green-50 border-green-300' : 'bg-white border-slate-200'
                       }`}>
                       <div>
-                        <p className={`text-[13px] font-semibold ${form.activity === a.v ? 'text-teal-400' : 'text-white'}`}>{a.l}</p>
-                        <p className="text-[11px] text-slate-500">{a.d}</p>
+                        <p className={`text-sm font-semibold ${form.activity === a.v ? 'text-green-700' : 'text-slate-800'}`}>{a.l}</p>
+                        <p className="text-xs text-slate-400">{a.d}</p>
                       </div>
-                      {form.activity === a.v && <div className="w-5 h-5 rounded-full bg-teal-500 flex items-center justify-center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></div>}
+                      {form.activity === a.v && (
+                        <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                      )}
                     </motion.button>
                   ))}
                 </div>
-              </Card>
+              </div>
 
-              <PrimaryBtn onClick={() => setStep(2)} className="w-full max-w-[280px] mx-auto block">Continue</PrimaryBtn>
-              <button onClick={onComplete} className="block mx-auto text-[12px] text-slate-600 mt-1">Skip</button>
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(2)}
+                className="w-full py-3.5 rounded-xl bg-green-500 text-white font-bold text-base">
+                Continue
+              </motion.button>
+              <button onClick={onComplete} className="block mx-auto text-sm text-slate-400">Skip for now</button>
             </motion.div>
           )}
 
-          {/* ===== STEP 2 ===== */}
+          {/* STEP 2 — Goal */}
           {step === 2 && (
-            <motion.div key="step2" {...page} transition={trans} className="flex-1 flex flex-col justify-center py-10 space-y-6">
-              <div className="mb-2">
-                <h2 className="text-[26px] font-extrabold tracking-tight text-white">Your goal</h2>
-                <p className="text-[14px] text-slate-400 mt-1">We'll optimize everything for this.</p>
+            <motion.div key="step2" {...page} transition={trans} className="flex-1 flex flex-col justify-center pt-20 pb-10 space-y-5">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">Your goal</h2>
+                <p className="text-sm text-slate-400 mt-1">We'll optimize everything for this.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { v: 'lose-fat', l: 'Lose Fat', d: 'Caloric deficit' },
-                  { v: 'maintain', l: 'Maintain', d: 'Stay balanced' },
-                  { v: 'build-muscle', l: 'Build Muscle', d: 'Surplus for growth' },
-                  { v: 'athletic', l: 'Athletic', d: 'Performance focus' },
+                  { v: 'lose-fat', l: 'Lose Fat', d: 'Caloric deficit', e: '🔥' },
+                  { v: 'maintain', l: 'Maintain', d: 'Stay balanced', e: '⚖️' },
+                  { v: 'build-muscle', l: 'Build Muscle', d: 'Surplus for growth', e: '💪' },
+                  { v: 'athletic', l: 'Athletic', d: 'Performance focus', e: '🏃' },
                 ].map(g => (
                   <motion.button key={g.v} whileTap={{ scale: 0.97 }} onClick={() => set('goal', g.v)}
-                    className={`p-4 rounded-2xl text-left transition-all ${
-                      form.goal === g.v ? 'bg-teal-500/10 border border-teal-500/30 glow-teal' : 'glass'
+                    className={`p-4 rounded-2xl text-left border transition-all ${
+                      form.goal === g.v ? 'bg-green-50 border-green-300' : 'bg-white border-slate-200'
                     }`}>
-                    <p className={`text-[14px] font-bold ${form.goal === g.v ? 'text-teal-400' : 'text-white'}`}>{g.l}</p>
-                    <p className="text-[11px] text-slate-500 mt-1">{g.d}</p>
+                    <span className="text-2xl">{g.e}</span>
+                    <p className={`text-sm font-bold mt-2 ${form.goal === g.v ? 'text-green-700' : 'text-slate-800'}`}>{g.l}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{g.d}</p>
                   </motion.button>
                 ))}
               </div>
 
-              <Card>
-                <div className="space-y-6">
-                  <div><Label>Training</Label><div className="flex flex-wrap gap-2">{['Strength', 'Cardio', 'Hybrid', 'Sport'].map(t => <Chip key={t} label={t} active={form.trainingType === t.toLowerCase()} onClick={() => set('trainingType', t.toLowerCase())} />)}</div></div>
-                  <div><Label>Days / Week</Label>
-                    <div className="flex items-center gap-4">
-                      <motion.button whileTap={{ scale: 0.9 }} onClick={() => set('trainingDays', Math.max(0, form.trainingDays - 1))} className="w-10 h-10 rounded-xl glass text-white font-bold flex items-center justify-center">−</motion.button>
-                      <span className="text-[28px] font-black tabular-nums text-white w-6 text-center">{form.trainingDays}</span>
-                      <motion.button whileTap={{ scale: 0.9 }} onClick={() => set('trainingDays', Math.min(7, form.trainingDays + 1))} className="w-10 h-10 rounded-xl glass text-white font-bold flex items-center justify-center">+</motion.button>
-                    </div>
+              <div className="app-card space-y-5">
+                <div>
+                  <Label>Training</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Strength', 'Cardio', 'Hybrid', 'Sport'].map(t => <Chip key={t} label={t} active={form.trainingType === t.toLowerCase()} onClick={() => set('trainingType', t.toLowerCase())} />)}
                   </div>
-                  <div><Label>Diet Style</Label><div className="flex flex-wrap gap-2">{['High Protein', 'Balanced', 'Low Carb', 'Keto', 'Plant-Based'].map(d => <Chip key={d} label={d} active={form.dietStyle === d.toLowerCase().replace(' ', '-')} onClick={() => set('dietStyle', d.toLowerCase().replace(' ', '-'))} />)}</div></div>
                 </div>
-              </Card>
-
-              <div className="flex gap-3 max-w-[280px] mx-auto">
-                <GhostBtn onClick={() => setStep(1)} className="flex-1">Back</GhostBtn>
-                <PrimaryBtn onClick={() => setStep(3)} className="flex-1">Continue</PrimaryBtn>
+                <div>
+                  <Label>Days / Week</Label>
+                  <div className="flex items-center gap-4">
+                    <motion.button whileTap={{ scale: 0.9 }} onClick={() => set('trainingDays', Math.max(0, form.trainingDays - 1))}
+                      className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold text-lg flex items-center justify-center">−</motion.button>
+                    <span className="text-3xl font-black text-slate-900 w-8 text-center tabular-nums">{form.trainingDays}</span>
+                    <motion.button whileTap={{ scale: 0.9 }} onClick={() => set('trainingDays', Math.min(7, form.trainingDays + 1))}
+                      className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold text-lg flex items-center justify-center">+</motion.button>
+                  </div>
+                </div>
+                <div>
+                  <Label>Diet Style</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {['High Protein', 'Balanced', 'Low Carb', 'Keto', 'Plant-Based'].map(d => <Chip key={d} label={d} active={form.dietStyle === d.toLowerCase().replace(' ', '-')} onClick={() => set('dietStyle', d.toLowerCase().replace(' ', '-'))} />)}
+                  </div>
+                </div>
               </div>
-              <button onClick={onComplete} className="block mx-auto text-[12px] text-slate-600 mt-1">Skip</button>
+
+              <div className="flex gap-3">
+                <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(1)}
+                  className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold text-sm">Back</motion.button>
+                <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(3)}
+                  className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold text-sm">Continue</motion.button>
+              </div>
+              <button onClick={onComplete} className="block mx-auto text-sm text-slate-400">Skip for now</button>
             </motion.div>
           )}
 
-          {/* ===== STEP 3 ===== */}
+          {/* STEP 3 — Preferences */}
           {step === 3 && (
-            <motion.div key="step3" {...page} transition={trans} className="flex-1 flex flex-col justify-center py-10 space-y-6">
-              <div className="mb-2">
-                <h2 className="text-[26px] font-extrabold tracking-tight text-white">Preferences</h2>
-                <p className="text-[14px] text-slate-400 mt-1">Last step — how do you eat?</p>
+            <motion.div key="step3" {...page} transition={trans} className="flex-1 flex flex-col justify-center pt-20 pb-10 space-y-5">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">Preferences</h2>
+                <p className="text-sm text-slate-400 mt-1">Last step — how do you eat?</p>
               </div>
 
-              <Card>
-                <div className="space-y-6">
-                  <div><Label>Meals / Day</Label><div className="flex gap-2">{[2,3,4,5,6].map(n => <Chip key={n} label={`${n}`} active={form.mealsPerDay === n} onClick={() => set('mealsPerDay', n)} />)}</div></div>
-                  <div><Label>Cook Time</Label><div className="flex flex-wrap gap-2">{[{l:'Quick',v:'quick'},{l:'Moderate',v:'moderate'},{l:'Any',v:'any'}].map(t => <Chip key={t.v} label={t.l} active={form.cookTime === t.v} onClick={() => set('cookTime', t.v)} />)}</div></div>
-                  <div><Label>Cuisines</Label><div className="flex flex-wrap gap-2">{['Italian','Asian','Mexican','Mediterranean','American','Indian'].map(c => <Chip key={c} label={c} active={form.cuisines.includes(c.toLowerCase())} onClick={() => togCuisine(c.toLowerCase())} />)}</div></div>
-                  <div><Input label="Restrictions" value={form.restrictions} onChange={e => set('restrictions', e.target.value)} placeholder="e.g., nuts, dairy" /></div>
+              <div className="app-card space-y-5">
+                <div>
+                  <Label>Meals / Day</Label>
+                  <div className="flex gap-2">
+                    {[2,3,4,5,6].map(n => <Chip key={n} label={`${n}`} active={form.mealsPerDay === n} onClick={() => set('mealsPerDay', n)} />)}
+                  </div>
                 </div>
-              </Card>
+                <div>
+                  <Label>Cook Time</Label>
+                  <div className="flex gap-2">
+                    {[{l:'Quick',v:'quick'},{l:'Moderate',v:'moderate'},{l:'Any',v:'any'}].map(t => <Chip key={t.v} label={t.l} active={form.cookTime === t.v} onClick={() => set('cookTime', t.v)} />)}
+                  </div>
+                </div>
+                <div>
+                  <Label>Cuisines</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Italian','Asian','Mexican','Mediterranean','American','Indian'].map(c => <Chip key={c} label={c} active={form.cuisines.includes(c.toLowerCase())} onClick={() => togCuisine(c.toLowerCase())} />)}
+                  </div>
+                </div>
+                <Field label="Restrictions" value={form.restrictions} onChange={e => set('restrictions', e.target.value)} placeholder="e.g., nuts, dairy" />
+              </div>
 
-              <div className="flex gap-3 max-w-[280px] mx-auto">
-                <GhostBtn onClick={() => setStep(2)} className="flex-1">Back</GhostBtn>
-                <PrimaryBtn onClick={generate} className="flex-1">Build Plan</PrimaryBtn>
+              <div className="flex gap-3">
+                <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(2)}
+                  className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold text-sm">Back</motion.button>
+                <motion.button whileTap={{ scale: 0.97 }} onClick={generate}
+                  className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold text-sm">Build Plan ✨</motion.button>
               </div>
             </motion.div>
           )}
 
-          {/* ===== GENERATING ===== */}
+          {/* GENERATING */}
           {step === 4 && (
             <motion.div key="gen" {...page} transition={trans}
               className="flex-1 flex flex-col items-center justify-center text-center py-16">
-              <motion.div initial={{ scale: 0.9 }} animate={{ scale: [0.9, 1.05, 1] }} transition={{ duration: 0.6 }}
-                className="w-16 h-16 rounded-2xl glass flex items-center justify-center mb-8 glow-teal">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14B8A6" strokeWidth="1.5" className="animate-pulse">
+              <div className="w-16 h-16 rounded-2xl bg-green-500 flex items-center justify-center mb-8 shadow-xl shadow-green-200">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" className="animate-pulse">
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                 </svg>
-              </motion.div>
-              <h2 className="text-[20px] font-bold text-white mb-8">Building your plan</h2>
-              <div className="w-full max-w-[220px] space-y-6">
+              </div>
+              <h2 className="text-xl font-bold text-slate-900 mb-8">Building your plan</h2>
+              <div className="w-full max-w-[220px] space-y-4">
                 {['Analyzing goals', 'Calculating macros', 'Selecting recipes', 'Optimizing nutrition', 'Finalizing'].map((l, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
                     className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
-                      i < genStep ? 'bg-teal-500' : i === genStep ? 'border-2 border-teal-500' : 'border border-white/10'
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      i < genStep ? 'bg-green-500' : i === genStep ? 'border-2 border-green-500' : 'border border-slate-200'
                     }`}>
                       {i < genStep && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
-                      {i === genStep && <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1.5 h-1.5 bg-teal-500 rounded-full" />}
+                      {i === genStep && <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1.5 h-1.5 bg-green-500 rounded-full" />}
                     </div>
-                    <span className={`text-[13px] ${i <= genStep ? 'text-white' : 'text-slate-600'}`}>{l}</span>
+                    <span className={`text-sm ${i <= genStep ? 'text-slate-900' : 'text-slate-300'}`}>{l}</span>
                   </motion.div>
                 ))}
               </div>
             </motion.div>
           )}
 
-          {/* ===== READY ===== */}
+          {/* READY */}
           {step === 5 && genPlan && (
             <motion.div key="ready" {...page} transition={trans}
               className="flex-1 flex flex-col items-center justify-center text-center py-16">
               <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }}
-                className="w-14 h-14 rounded-2xl bg-teal-500/10 flex items-center justify-center mb-6">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14B8A6" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                className="w-16 h-16 rounded-2xl bg-green-50 border-2 border-green-300 flex items-center justify-center mb-6">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
               </motion.div>
-              <h2 className="text-[26px] font-extrabold text-white mb-2">Plan ready</h2>
-              <p className="text-[14px] text-slate-400 mb-8">Optimized for {form.goal.replace('-', ' ')}</p>
-              <Card className="w-full mb-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-1">Plan ready! 🎉</h2>
+              <p className="text-sm text-slate-400 mb-8">Optimized for {form.goal.replace('-', ' ')}</p>
+
+              <div className="w-full app-card mb-8">
                 <div className="grid grid-cols-4 gap-2 text-center">
-                  {[{l:'Cal',v:genPlan.calories,c:'text-teal-400'},{l:'Protein',v:`${genPlan.protein}g`,c:'text-blue-400'},{l:'Carbs',v:`${genPlan.carbs}g`,c:'text-amber-400'},{l:'Fat',v:`${genPlan.fat}g`,c:'text-purple-400'}].map(m =>
-                    <div key={m.l}><p className={`text-[20px] font-black tabular-nums ${m.c}`}>{m.v}</p><p className="text-[9px] text-slate-500 font-semibold uppercase mt-1">{m.l}</p></div>
+                  {[{l:'Cal',v:genPlan.calories,c:'#22C55E'},{l:'Protein',v:`${genPlan.protein}g`,c:'#3B82F6'},{l:'Carbs',v:`${genPlan.carbs}g`,c:'#F59E0B'},{l:'Fat',v:`${genPlan.fat}g`,c:'#F43F5E'}].map(m =>
+                    <div key={m.l}>
+                      <p className="text-xl font-black tabular-nums" style={{ color: m.c }}>{m.v}</p>
+                      <p className="text-[9px] text-slate-400 font-semibold uppercase mt-1">{m.l}</p>
+                    </div>
                   )}
                 </div>
-                <div className="mt-4 pt-3 border-t border-white/[0.06] text-[12px] text-slate-500">{genPlan.meals.length} meals · 7 days</div>
-              </Card>
-              <PrimaryBtn onClick={onComplete} className="w-full max-w-[280px]">Start Tracking</PrimaryBtn>
+                <div className="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-400">{genPlan.meals.length} meals · 7 days</div>
+              </div>
+
+              <motion.button whileTap={{ scale: 0.97 }} onClick={onComplete}
+                className="w-full max-w-[280px] py-3.5 rounded-xl bg-green-500 text-white font-bold text-base shadow-lg shadow-green-200">
+                Start Tracking 🚀
+              </motion.button>
             </motion.div>
           )}
         </AnimatePresence>
