@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { TrendingDown, Scale, Dumbbell, Zap, Flame, BarChart3, ChefHat, Clock, Beef, Leaf, Globe, Ban, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { generateMealPlan } from '../services/mealGenerator';
+
+const GOAL_OPTIONS = [
+  { v: 'lose-fat', l: 'Lose Fat', d: 'Caloric deficit', Icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-50 border-rose-200' },
+  { v: 'maintain', l: 'Maintain', d: 'Stay balanced', Icon: Scale, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
+  { v: 'build-muscle', l: 'Build Muscle', d: 'Surplus for growth', Icon: Dumbbell, color: 'text-violet-600', bg: 'bg-violet-50 border-violet-200' },
+  { v: 'athletic', l: 'Athletic', d: 'Performance focus', Icon: Zap, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
+];
 
 const page = { initial: { opacity: 0, x: 40 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -40 } };
 const trans = { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] };
@@ -192,18 +200,15 @@ export function Onboarding({ onComplete }) {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {[
-                  { v: 'lose-fat', l: 'Lose Fat', d: 'Caloric deficit', e: '🔥' },
-                  { v: 'maintain', l: 'Maintain', d: 'Stay balanced', e: '⚖️' },
-                  { v: 'build-muscle', l: 'Build Muscle', d: 'Surplus for growth', e: '💪' },
-                  { v: 'athletic', l: 'Athletic', d: 'Performance focus', e: '🏃' },
-                ].map(g => (
+                {GOAL_OPTIONS.map(g => (
                   <motion.button key={g.v} whileTap={{ scale: 0.97 }} onClick={() => set('goal', g.v)}
-                    className={`p-4 rounded-2xl text-left border transition-all ${
-                      form.goal === g.v ? 'bg-green-50 border-green-300' : 'bg-white border-slate-200'
+                    className={`p-4 rounded-2xl text-left border-2 transition-all ${
+                      form.goal === g.v ? 'bg-green-50 border-green-400 shadow-sm' : 'bg-white border-slate-200'
                     }`}>
-                    <span className="text-2xl">{g.e}</span>
-                    <p className={`text-sm font-bold mt-2 ${form.goal === g.v ? 'text-green-700' : 'text-slate-800'}`}>{g.l}</p>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 border ${g.bg}`}>
+                      <g.Icon className={`w-5 h-5 ${form.goal === g.v ? 'text-green-600' : g.color}`} />
+                    </div>
+                    <p className={`text-sm font-bold ${form.goal === g.v ? 'text-green-700' : 'text-slate-800'}`}>{g.l}</p>
                     <p className="text-xs text-slate-400 mt-0.5">{g.d}</p>
                   </motion.button>
                 ))}
@@ -344,3 +349,4 @@ export function Onboarding({ onComplete }) {
     </div>
   );
 }
+

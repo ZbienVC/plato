@@ -7,7 +7,7 @@ import { Card } from '../atoms/Card';
  * Shows recipes from meal plan + saved recipes
  */
 export function RecipeBook({ recipes = [], dark = true, onClose }) {
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(initialPage || 0);
   const [flipping, setFlipping] = useState(null);
   const total = recipes.length;
   const recipe = recipes[page] || null;
@@ -157,3 +157,4 @@ export function RecipeBook({ recipes = [], dark = true, onClose }) {
     </div>
   );
 }
+

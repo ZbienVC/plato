@@ -25,6 +25,7 @@ export function MealPlans() {
   const { plan, logMeal, savedPlans, recipes, favorites, setActiveTab, saveRecipe } = useApp();
   const [activeTab, setTab] = useState('plan');
   const [showRecipes, setShowRecipes] = useState(false);
+  const [recipeIndex, setRecipeIndex] = useState(0);
   const [showGrocery, setShowGrocery] = useState(false);
   const [showYT, setShowYT] = useState(false);
   const [showRestaurant, setShowRestaurant] = useState(false);
@@ -205,7 +206,7 @@ export function MealPlans() {
                       </div>
                     </div>
                     <motion.button whileTap={{ scale: 0.92 }}
-                      onClick={() => setShowRecipes(true)}
+                      onClick={() => { setRecipeIndex(i); setShowRecipes(true); }}
                       className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600">
                       View
                     </motion.button>
@@ -228,6 +229,7 @@ export function MealPlans() {
       {showRecipes && (
         <RecipeBook
           recipes={(plan?.meals || []).map(m => ({ title: m.name, calories: m.calories, protein: m.protein, carbs: m.carbs, fat: m.fat, ingredients: m.ingredients, instructions: m.instructions }))}
+          initialPage={recipeIndex}
           dark={false}
           onClose={() => setShowRecipes(false)}
         />
