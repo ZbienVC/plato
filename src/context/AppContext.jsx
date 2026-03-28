@@ -81,12 +81,7 @@ export function AppProvider({ children }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showVoiceLog, setShowVoiceLog] = useState(false);
   const [advancedMode, setAdvancedMode] = useState(() => loadState('advancedMode', false));
-  // v3: force meal images off
-  const [showMealImages, setShowMealImages] = useState(() => {
-    const v = loadState('_mealImgV', 0);
-    if (v < 3) { saveState('showMealImages', false); saveState('_mealImgV', 3); return false; }
-    return loadState('showMealImages', false);
-  });
+  const [showMealImages, setShowMealImages] = useState(() => loadState('showMealImages', true));
 
   // === WEIGHT TRACKING ===
   const [weightEntries, setWeightEntries] = useState(() => loadState('weightEntries', []));

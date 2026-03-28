@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Salad, Utensils, Apple, Plus } from 'lucide-react';
+import { Coffee, Salad, Utensils, Apple, RefreshCw, Image as ImageIcon } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { FoodImage } from '../components/molecules/FoodImage';
 import { RecipeBook } from '../components/organisms/RecipeBook';
@@ -22,7 +22,7 @@ const MEAL_TYPE_ICONS = {
 const getMealIcon = (type) => MEAL_TYPE_ICONS[type?.toLowerCase()] || <Utensils className="w-4 h-4 text-slate-400" />;
 
 export function MealPlans() {
-  const { plan, logMeal, savedPlans, recipes, favorites, setActiveTab, saveRecipe } = useApp();
+  const { plan, logMeal, savedPlans, recipes, favorites, setActiveTab, saveRecipe, swapMeal, showMealImages } = useApp();
   const [activeTab, setTab] = useState('plan');
   const [showRecipes, setShowRecipes] = useState(false);
   const [recipeIndex, setRecipeIndex] = useState(0);
@@ -99,17 +99,22 @@ export function MealPlans() {
           {hasPlan && dayMeals.length > 0 && (
             <motion.div variants={item} className="space-y-3">
               {dayMeals.map((meal, i) => (
-                <div key={i} className="app-card">
+                <div key={i} className="app-card overflow-hidden">
+                  {showMealImages && (
+                    <div className="mb-3">
+                      <FoodImage mealName={meal.name} mealType={meal.type || slots[i]?.toLowerCase() || 'default'} size="lg" />
+                    </div>
+                  )}
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3">
-                      <FoodImage mealName={meal.name} mealType={meal.type || slots[i]?.toLowerCase() || 'default'} size="md" />
-                      <div>
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      {!showMealImages && <FoodImage mealName={meal.name} mealType={meal.type || slots[i]?.toLowerCase() || 'default'} size="md" />}
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 mb-0.5">
                           {getMealIcon(meal.type)}
                           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{slots[i] || `Meal ${i+1}`}</p>
                         </div>
-                        <p className="text-sm font-bold text-slate-900">{meal.name}</p>
-                        <div className="flex items-center gap-3 mt-1.5">
+                        <p className="text-sm font-bold text-slate-900 truncate">{meal.name}</p>
+                        <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                           <span className="text-xs font-bold text-slate-900 tabular-nums">{meal.calories} cal</span>
                           <span className="text-xs text-blue-500 tabular-nums font-medium">{meal.protein}g P</span>
                           <span className="text-xs text-amber-500 tabular-nums font-medium">{meal.carbs}g C</span>
@@ -117,13 +122,23 @@ export function MealPlans() {
                         </div>
                       </div>
                     </div>
-                    <motion.button
-                      whileTap={{ scale: 0.92 }}
-                      onClick={() => logMeal({ name: meal.name, calories: meal.calories, protein: meal.protein, carbs: meal.carbs, fat: meal.fat, type: meal.type })}
-                      className="px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-semibold shrink-0"
-                    >
-                      Log
-                    </motion.button>
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <motion.button
+                        whileTap={{ scale: 0.92 }}
+                        onClick={() => logMeal({ name: meal.name, calories: meal.calories, protein: meal.protein, carbs: meal.carbs, fat: meal.fat, type: meal.type })}
+                        className="px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-semibold"
+                      >
+                        Log
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.92 }}
+                        onClick={() => swapMeal(i, meal)}
+                        className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1"
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        Swap
+                      </motion.button>
+                    </div>
                   </div>
                   {meal.ingredients?.length > 0 && (
                     <div className="mt-3 pt-2 border-t border-slate-50">
