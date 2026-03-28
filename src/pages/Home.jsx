@@ -1,10 +1,20 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Flame, Coffee, Salad, Utensils, Apple, Plus, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
+import { FoodImage } from '../components/molecules/FoodImage';
 
 const stagger = { animate: { transition: { staggerChildren: 0.07 } } };
 const item = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0, transition: { duration: 0.35 } } };
+
+const MEAL_ICONS = {
+  breakfast: <Coffee className="w-4 h-4 text-amber-600" />,
+  lunch: <Salad className="w-4 h-4 text-green-600" />,
+  dinner: <Utensils className="w-4 h-4 text-slate-600" />,
+  snack: <Apple className="w-4 h-4 text-red-500" />,
+};
+const getMealIcon = (type) => MEAL_ICONS[type?.toLowerCase()] || <Utensils className="w-4 h-4 text-slate-400" />;
 
 /** Animated SVG progress ring */
 function CalorieRing({ current, target }) {
@@ -15,9 +25,7 @@ function CalorieRing({ current, target }) {
 
   return (
     <svg width="180" height="180" viewBox="0 0 180 180" className="rotate-[-90deg]">
-      {/* Track */}
       <circle cx="90" cy="90" r={r} fill="none" stroke="#E2E8F0" strokeWidth="12" />
-      {/* Progress */}
       <motion.circle
         cx="90" cy="90" r={r}
         fill="none"
@@ -34,7 +42,7 @@ function CalorieRing({ current, target }) {
 }
 
 /** Horizontal macro progress bar */
-function MacroBar({ label, current, target, color, bg }) {
+function MacroBar({ label, current, target, color }) {
   const pct = target > 0 ? Math.min(current / target, 1) * 100 : 0;
   return (
     <div>
@@ -55,44 +63,44 @@ function MacroBar({ label, current, target, color, bg }) {
   );
 }
 
-const MEAL_EMOJIS = { breakfast: '🍳', lunch: '🥗', dinner: '🍽️', snack: '🍎' };
+const slots = ['breakfast', 'lunch', 'dinner', 'snack', 'snack'];
 
 export function Home() {
-  const { plan, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak, swapMeal } = useApp();
+  const { plan, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak } = useApp();
   const { targets, current } = useMacros();
   const hasPlan = plan?.meals?.length > 0;
   const todayMeals = dailyLog?.meals || [];
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  const greetingEmoji = hour < 12 ? '🌅' : hour < 17 ? '☀️' : '🌙';
   const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   const dayIndex = Math.floor((Date.now() - new Date(plan?.createdAt || Date.now()).getTime()) / 86400000) % 7;
   const todaysPlanned = hasPlan ? plan.meals.slice(dayIndex * (plan.mealsPerDay || 3), (dayIndex + 1) * (plan.mealsPerDay || 3)) : [];
-  const slots = ['breakfast', 'lunch', 'dinner', 'snack', 'snack'];
 
   return (
     <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-4 pb-4">
-      {/* Header */}
-      <motion.div variants={item}>
-        <h1 className="text-2xl font-bold text-slate-900">
-          {greeting}{userProfile?.name ? `, ${userProfile.name}` : ''} {greetingEmoji}
+      {/* Header with gradient */}
+      <motion.div variants={item} className="header-gradient rounded-2xl p-5">
+        <p className="text-slate-500 text-sm">{dateStr}</p>
+        <h1 className="text-2xl font-bold text-slate-900 mt-0.5">
+          {greeting}{userProfile?.name ? `, ${userProfile.name}` : ''}
         </h1>
-        <p className="text-sm text-slate-400 mt-0.5">{dateStr}</p>
       </motion.div>
 
       {/* Calorie Ring Card */}
-      <motion.div variants={item} className="app-card flex flex-col items-center py-5">
-        <div className="relative">
-          <CalorieRing current={current.calories} target={targets.calories} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-black text-slate-900 tabular-nums">{current.calories.toLocaleString()}</span>
-            <span className="text-xs text-slate-400 font-medium">/ {targets.calories.toLocaleString()} cal</span>
+      <motion.div variants={item} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div className="flex items-center justify-center relative">
+          <div className="ring-glow">
+            <CalorieRing current={current.calories} target={targets.calories} />
+          </div>
+          <div className="absolute text-center">
+            <p className="text-3xl font-black text-slate-900 tabular-nums">{current.calories.toLocaleString()}</p>
+            <p className="text-xs text-slate-400 font-medium">of {targets.calories.toLocaleString()} kcal</p>
             {targets.calories > 0 && (
-              <span className="text-xs font-semibold text-green-500 mt-1">
+              <p className="text-xs font-semibold text-green-500 mt-1">
                 {Math.max(0, targets.calories - current.calories)} remaining
-              </span>
+              </p>
             )}
           </div>
         </div>
@@ -100,7 +108,9 @@ export function Home() {
 
       {/* Macros */}
       <motion.div variants={item} className="app-card space-y-3">
-        <h2 className="text-sm font-semibold text-slate-900">Macros Today</h2>
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-base font-bold text-slate-900">Macros Today</h2>
+        </div>
         <MacroBar label="Protein" current={current.protein} target={targets.protein} color="#3B82F6" />
         <MacroBar label="Carbs" current={current.carbs} target={targets.carbs} color="#F59E0B" />
         <MacroBar label="Fat" current={current.fat} target={targets.fat} color="#F43F5E" />
@@ -109,12 +119,16 @@ export function Home() {
       {/* Today's Logged Meals */}
       {todayMeals.length > 0 && (
         <motion.div variants={item} className="app-card">
-          <h2 className="text-sm font-semibold text-slate-900 mb-3">Today's Log</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-bold text-slate-900">Today's Log</h2>
+          </div>
           <div className="space-y-2">
             {todayMeals.map((m, i) => (
               <div key={i} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">{MEAL_EMOJIS[m.type] || '🍴'}</span>
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                    {getMealIcon(m.type)}
+                  </div>
                   <div>
                     <p className="text-sm font-semibold text-slate-800 truncate max-w-[160px]">{m.name}</p>
                     <p className="text-xs text-slate-400">{new Date(m.loggedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
@@ -129,7 +143,7 @@ export function Home() {
           </div>
           <motion.button
             whileTap={{ scale: 0.98 }}
-            onClick={() => setShowVoiceLog(true)}
+            onClick={() => setActiveTab('log')}
             className="mt-3 w-full py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold"
           >
             + Log Meal
@@ -141,8 +155,8 @@ export function Home() {
       {hasPlan && todaysPlanned.length > 0 && (
         <motion.div variants={item} className="app-card">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-slate-900">Today's Plan</h2>
-            <button onClick={() => setActiveTab('meals')} className="text-xs font-semibold text-green-500">View All</button>
+            <h2 className="text-base font-bold text-slate-900">Today's Plan</h2>
+            <button onClick={() => setActiveTab('meals')} className="text-sm text-green-600 font-medium">View All</button>
           </div>
           <div className="space-y-2">
             {todaysPlanned.map((meal, i) => {
@@ -153,7 +167,7 @@ export function Home() {
                   logged ? 'bg-green-50 border-green-100' : 'bg-slate-50 border-slate-100'
                 }`}>
                   <div className="flex items-center gap-3">
-                    <span className="text-xl">{MEAL_EMOJIS[meal.type] || MEAL_EMOJIS[slot] || '🍴'}</span>
+                    <FoodImage mealName={meal.name} mealType={meal.type || slot} size="sm" />
                     <div>
                       <p className="text-sm font-semibold text-slate-800 truncate max-w-[140px]">{meal.name}</p>
                       <p className="text-xs text-slate-400 capitalize">{meal.type || slot}</p>
@@ -170,12 +184,12 @@ export function Home() {
                         onClick={() => logMeal({ name: meal.name, calories: meal.calories, protein: meal.protein, carbs: meal.carbs, fat: meal.fat, type: meal.type || slot })}
                         className="w-7 h-7 rounded-lg bg-green-500 flex items-center justify-center shrink-0"
                       >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><path d="M12 5v14M5 12h14"/></svg>
+                        <Plus className="w-3 h-3 text-white" />
                       </motion.button>
                     )}
                     {logged && (
                       <div className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
                       </div>
                     )}
                   </div>
@@ -202,7 +216,7 @@ export function Home() {
               className="flex-1 py-2.5 rounded-xl bg-green-500 text-white font-semibold text-sm">
               Get a Plan
             </motion.button>
-            <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowVoiceLog(true)}
+            <motion.button whileTap={{ scale: 0.97 }} onClick={() => setActiveTab('log')}
               className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-semibold text-sm">
               Log Meal
             </motion.button>
@@ -212,7 +226,7 @@ export function Home() {
 
       {/* Log meal CTA if no meals logged yet but plan exists */}
       {hasPlan && todayMeals.length === 0 && (
-        <motion.button variants={item} whileTap={{ scale: 0.98 }} onClick={() => setShowVoiceLog(true)}
+        <motion.button variants={item} whileTap={{ scale: 0.98 }} onClick={() => setActiveTab('log')}
           className="w-full app-card flex items-center gap-3 text-left">
           <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2" strokeLinecap="round">
@@ -247,13 +261,10 @@ export function Home() {
       {streak > 0 && (
         <motion.div variants={item} className="app-card flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round">
-              <path d="M12 12c-2-2.67-4-4-4-6a4 4 0 0 1 8 0c0 2-2 3.33-4 6z"/>
-              <path d="M12 21a9 9 0 0 0 9-9c0-3-1-5.5-3-8l-3 3-3-3c-2 2.5-3 5-3 8a9 9 0 0 0 9 9z"/>
-            </svg>
+            <Flame className="w-5 h-5 text-orange-500" />
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-900">🔥 {streak} day streak</p>
+            <p className="text-sm font-bold text-slate-900">{streak} day streak</p>
             <p className="text-xs text-slate-400">Keep it up!</p>
           </div>
         </motion.div>

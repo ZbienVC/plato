@@ -114,7 +114,7 @@ export function Onboarding({ onComplete }) {
                 className="mt-12 w-full max-w-[280px]">
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(1)}
                   className="w-full py-3.5 rounded-xl bg-green-500 text-white font-bold text-base shadow-lg shadow-green-200">
-                  Let's Go! 🚀
+                  Let's Go!
                 </motion.button>
                 <p className="text-xs text-slate-400 mt-3">Free · No account needed</p>
               </motion.div>

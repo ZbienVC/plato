@@ -78,6 +78,7 @@ export function AppProvider({ children }) {
 
   // === UI STATE (not persisted) ===
   const [activeTab, setActiveTab] = useState('home');
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [showVoiceLog, setShowVoiceLog] = useState(false);
   const [advancedMode, setAdvancedMode] = useState(() => loadState('advancedMode', false));
   // v3: force meal images off
@@ -244,6 +245,7 @@ export function AppProvider({ children }) {
     groceryList, setGroceryList,
     // UI
     activeTab, setActiveTab,
+    drawerOpen, setDrawerOpen,
     showVoiceLog, setShowVoiceLog,
     advancedMode, setAdvancedMode,
     showMealImages, setShowMealImages,

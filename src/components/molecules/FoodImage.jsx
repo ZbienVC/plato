@@ -1,132 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Utensils, Coffee, Salad, Apple, ChefHat } from 'lucide-react';
 
-/**
- * Extract keyword from meal name for TheMealDB ingredient search
- */
-function getMealIngredientKey(mealName) {
-  if (!mealName) return null;
-  const lower = mealName.toLowerCase();
-  const keywords = [
-    'chicken', 'salmon', 'beef', 'tuna', 'shrimp', 'pork', 'turkey', 'lamb',
-    'egg', 'oat', 'pasta', 'rice', 'quinoa', 'tofu', 'lentil', 'bean',
-    'potato', 'broccoli', 'spinach', 'avocado', 'banana', 'strawberry',
-  ];
-  for (const kw of keywords) {
-    if (lower.includes(kw)) return kw;
-  }
-  return null;
-}
+const MEAL_GRADIENTS = {
+  breakfast: { gradient: 'from-amber-400 to-orange-500', icon: Coffee },
+  lunch: { gradient: 'from-green-400 to-emerald-500', icon: Salad },
+  dinner: { gradient: 'from-violet-500 to-purple-600', icon: Utensils },
+  snack: { gradient: 'from-pink-400 to-rose-500', icon: Apple },
+  default: { gradient: 'from-slate-400 to-slate-600', icon: ChefHat },
+};
 
-/**
- * Simple string hash for consistent selection
- */
-function strHash(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
-  return Math.abs(h);
-}
-
-/**
- * Color gradient pairs for fallback
- */
-const GRADIENT_PAIRS = [
-  ['#10d9a0', '#059669'],
-  ['#6366f1', '#4f46e5'],
-  ['#f59e0b', '#d97706'],
-  ['#ef4444', '#dc2626'],
-  ['#3b82f6', '#2563eb'],
-  ['#8b5cf6', '#7c3aed'],
+const FOOD_GRADIENTS = [
+  'from-green-400 to-teal-500',
+  'from-blue-400 to-indigo-500',
+  'from-orange-400 to-amber-500',
+  'from-rose-400 to-pink-500',
+  'from-violet-400 to-purple-500',
+  'from-cyan-400 to-sky-500',
 ];
 
-/**
- * FoodImage — fetches a food photo from TheMealDB
- * Falls back to a gradient with a food emoji
- *
- * @param {string} name - Meal/recipe name
- * @param {string} height - CSS height (default 180px)
- * @param {string} rounded - Tailwind rounding class
- * @param {boolean} showOverlay - Show bottom gradient for text readability
- */
-export function FoodImage({
-  name,
-  height = '180px',
-  rounded = 'rounded-t-xl',
-  showOverlay = true,
-  className = '',
-}) {
-  const [imgSrc, setImgSrc] = useState(null);
-  const [imgLoaded, setImgLoaded] = useState(false);
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash) + str.charCodeAt(i);
+  return Math.abs(hash);
+}
 
-  useEffect(() => {
-    if (!name) return;
-    setImgSrc(null);
-    setImgLoaded(false);
+export function FoodImage({ mealName = '', mealType = 'default', size = 'md', name = '' }) {
+  // Support legacy 'name' prop
+  const resolvedName = mealName || name;
+  const config = MEAL_GRADIENTS[mealType?.toLowerCase()] || MEAL_GRADIENTS.default;
+  const gradientIndex = hashString(resolvedName) % FOOD_GRADIENTS.length;
+  const gradient = resolvedName ? FOOD_GRADIENTS[gradientIndex] : config.gradient;
+  const Icon = config.icon;
 
-    const hash = strHash(name);
-    const ingredient = getMealIngredientKey(name);
+  const sizes = {
+    sm: 'w-12 h-12 rounded-xl',
+    md: 'w-16 h-16 rounded-2xl',
+    lg: 'w-full h-40 rounded-2xl',
+    hero: 'w-full h-52 rounded-3xl',
+  };
 
-    const fetchImage = async () => {
-      try {
-        if (ingredient) {
-          // Search by ingredient first
-          const res = await fetch(
-            `https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(ingredient)}`
-          );
-          const data = await res.json();
-          if (data.meals?.length > 0) {
-            setImgSrc(data.meals[hash % data.meals.length].strMealThumb);
-            return;
-          }
-        }
-        // Fallback: search by name
-        const first = name.split(' ').slice(0, 2).join(' ');
-        const res = await fetch(
-          `https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(first)}`
-        );
-        const data = await res.json();
-        if (data.meals?.length > 0) {
-          setImgSrc(data.meals[hash % data.meals.length].strMealThumb);
-        }
-      } catch {
-        // Silent fail — gradient fallback shows
-      }
-    };
-
-    fetchImage();
-  }, [name]);
-
-  const colorPair = GRADIENT_PAIRS[(name ? name.charCodeAt(0) : 0) % GRADIENT_PAIRS.length];
+  const iconSizes = { sm: 'w-5 h-5', md: 'w-7 h-7', lg: 'w-10 h-10', hero: 'w-14 h-14' };
 
   return (
-    <div
-      className={`relative overflow-hidden flex-shrink-0 ${rounded} ${className}`}
-      style={{ width: '100%', height }}
-    >
-      {/* Gradient fallback (always behind) */}
-      <div
-        className="absolute inset-0 flex items-center justify-center"
-        style={{ background: `linear-gradient(135deg, ${colorPair[0]}, ${colorPair[1]})` }}
-      >
-        <span className="text-5xl opacity-25">🍽️</span>
-      </div>
-
-      {/* Real photo (fades in on load) */}
-      {imgSrc && (
-        <img
-          src={imgSrc}
-          alt={name}
-          onLoad={() => setImgLoaded(true)}
-          onError={() => setImgLoaded(false)}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-            imgLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-      )}
-
-      {/* Bottom overlay for text readability */}
-      {showOverlay && (
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
-      )}
+    <div className={`bg-gradient-to-br ${gradient} ${sizes[size] || sizes.md} flex items-center justify-center flex-shrink-0 shadow-sm`}>
+      <Icon className={`${iconSizes[size] || iconSizes.md} text-white/80`} />
     </div>
   );
 }

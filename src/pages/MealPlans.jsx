@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Coffee, Salad, Utensils, Apple, Plus } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { FoodImage } from '../components/molecules/FoodImage';
 import { RecipeBook } from '../components/organisms/RecipeBook';
 import { GroceryList } from '../components/organisms/GroceryList';
 import { YouTubeImporter } from '../components/organisms/YouTubeImporter';
@@ -10,7 +12,14 @@ const stagger = { animate: { transition: { staggerChildren: 0.06 } } };
 const item = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
 
 const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const MEAL_EMOJIS = { breakfast: '🍳', lunch: '🥗', dinner: '🍽️', snack: '🍎' };
+
+const MEAL_TYPE_ICONS = {
+  breakfast: <Coffee className="w-4 h-4 text-amber-600" />,
+  lunch: <Salad className="w-4 h-4 text-green-600" />,
+  dinner: <Utensils className="w-4 h-4 text-slate-600" />,
+  snack: <Apple className="w-4 h-4 text-red-500" />,
+};
+const getMealIcon = (type) => MEAL_TYPE_ICONS[type?.toLowerCase()] || <Utensils className="w-4 h-4 text-slate-400" />;
 
 export function MealPlans() {
   const { plan, logMeal, savedPlans, recipes, favorites, setActiveTab, saveRecipe } = useApp();
@@ -90,12 +99,15 @@ export function MealPlans() {
             <motion.div variants={item} className="space-y-3">
               {dayMeals.map((meal, i) => (
                 <div key={i} className="app-card">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
-                      <span className="text-2xl mt-0.5">{MEAL_EMOJIS[meal.type] || '🍴'}</span>
+                      <FoodImage mealName={meal.name} mealType={meal.type || slots[i]?.toLowerCase() || 'default'} size="md" />
                       <div>
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{slots[i] || `Meal ${i+1}`}</p>
-                        <p className="text-sm font-bold text-slate-900 mt-0.5">{meal.name}</p>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          {getMealIcon(meal.type)}
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{slots[i] || `Meal ${i+1}`}</p>
+                        </div>
+                        <p className="text-sm font-bold text-slate-900">{meal.name}</p>
                         <div className="flex items-center gap-3 mt-1.5">
                           <span className="text-xs font-bold text-slate-900 tabular-nums">{meal.calories} cal</span>
                           <span className="text-xs text-blue-500 tabular-nums font-medium">{meal.protein}g P</span>
@@ -182,9 +194,7 @@ export function MealPlans() {
               {(plan?.meals || []).map((meal, i) => (
                 <div key={i} className="app-card">
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 text-2xl">
-                      {MEAL_EMOJIS[meal.type] || '🍽️'}
-                    </div>
+                    <FoodImage mealName={meal.name} mealType={meal.type || 'default'} size="md" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-slate-900 truncate">{meal.name}</p>
                       <div className="flex items-center gap-2 mt-1">

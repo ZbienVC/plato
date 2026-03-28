@@ -1,23 +1,27 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { BottomNav } from './BottomNav';
-import { FAB } from './FAB';
+import { TopBar } from './TopBar';
+import { Drawer } from './Drawer';
 
-export function MainLayout({
-  children, activeTab, onTabChange,
-  onFABPress, showFAB = true, shouldPulseFAB = false,
-}) {
+export function MainLayout({ children, activeTab, onTabChange }) {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 relative max-w-[430px] mx-auto">
-      <div className="flex-1 overflow-y-auto overscroll-y-contain relative z-10"
-        style={{ paddingBottom: '90px' }}>
-        <div className="px-4 pt-12 pb-6 space-y-5 flex flex-col justify-start">
+    <div className="max-w-[430px] mx-auto bg-slate-50 min-h-screen flex flex-col relative">
+      <Drawer />
+      
+      {/* Top bar — sticky */}
+      <TopBar activeTab={activeTab} />
+
+      {/* Scrollable page content */}
+      <div className="flex-1 overflow-y-auto overscroll-contain" style={{ paddingBottom: '72px' }}>
+        <div className="px-4 py-4">
           {children}
         </div>
       </div>
 
-      {showFAB && <FAB onClick={onFABPress} pulse={shouldPulseFAB} />}
-      <BottomNav activeTab={activeTab} onTabChange={onTabChange} />
+      {/* Bottom nav — fixed */}
+      <div className="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-40">
+        <BottomNav activeTab={activeTab} onTabChange={onTabChange} />
+      </div>
     </div>
   );
 }
