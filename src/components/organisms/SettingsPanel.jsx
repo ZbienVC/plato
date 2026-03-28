@@ -1,248 +1,164 @@
 import React, { useState } from 'react';
-import { Card } from '../atoms/Card';
-import { Button } from '../atoms/Button';
-import { Input } from '../atoms/Input';
+import { Bell, Ruler, Trash2, Info, ChevronRight, Moon, Sun, ArrowLeft } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 
-/**
- * Settings Panel — user preferences, data management, about
- */
-export function SettingsPanel({ dark = true, onClose, onReset, settings = {}, onUpdateSettings }) {
-  const [confirmReset, setConfirmReset] = useState(false);
-  const [activeSection, setActiveSection] = useState('general');
-
-  const Section = ({ title, children }) => (
-    <div className="mb-6">
-      <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 mb-3">
-        {title}
-      </p>
-      {children}
-    </div>
+function Toggle({ value, onChange }) {
+  return (
+    <button
+      onClick={() => onChange(!value)}
+      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${value ? 'bg-green-500' : 'bg-slate-200'}`}
+    >
+      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${value ? 'translate-x-6' : 'translate-x-1'}`} />
+    </button>
   );
+}
 
-  const Toggle = ({ label, description, value, onChange }) => (
-    <div className={`flex items-center justify-between p-3 rounded-xl mb-2 ${
-      dark ? 'bg-white/5' : 'bg-slate-50'
-    }`}>
-      <div className="flex-1 mr-4">
-        <p className={`text-sm font-semibold ${dark ? 'text-white' : 'text-slate-900'}`}>{label}</p>
-        {description && <p className="text-xs text-slate-500 mt-0.5">{description}</p>}
-      </div>
-      <button
-        onClick={() => onChange(!value)}
-        className={`relative w-11 h-6 rounded-full transition-all ${
-          value ? 'bg-emerald-500' : dark ? 'bg-slate-700' : 'bg-slate-300'
-        }`}
-      >
-        <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-all ${
-          value ? 'left-[22px]' : 'left-0.5'
-        }`} />
-      </button>
-    </div>
-  );
+export function SettingsPanel() {
+  const { dark, setDark, setActiveTab } = useApp();
+  const [mealReminders, setMealReminders] = useState(true);
+  const [weeklyReports, setWeeklyReports] = useState(true);
+  const [units, setUnits] = useState('imperial');
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const handleReset = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className={`w-full max-w-[420px] max-h-[85vh] flex flex-col rounded-2xl overflow-hidden ${
-        dark ? 'bg-[#0f1629]' : 'bg-white'
-      } shadow-2xl`}>
-        
-        {/* Header */}
-        <div className="px-5 py-4 flex items-center justify-between flex-shrink-0 border-b border-white/[0.06]">
-          <h2 className={`text-lg font-bold ${dark ? 'text-white' : 'text-slate-900'}`}>
-            ⚙️ Settings
-          </h2>
-          <button onClick={onClose} className="text-slate-500 hover:text-white text-xl p-2">✕</button>
-        </div>
+    <div className="space-y-5 pb-6">
+      {/* Header with back button */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setActiveTab('home')}
+          className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5 text-slate-600" />
+        </button>
+        <h1 className="text-xl font-bold text-slate-900">Settings</h1>
+      </div>
 
-        {/* Tab bar */}
-        <div className="flex px-5 pt-3 gap-2 border-b border-white/[0.06]">
-          {[
-            { key: 'general', label: 'General' },
-            { key: 'display', label: 'Display' },
-            { key: 'data', label: 'Data' },
-            { key: 'about', label: 'About' },
-          ].map(tab => (
+      {/* Appearance */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-slate-50">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Appearance</p>
+        </div>
+        <div className="divide-y divide-slate-50">
+          <div className="flex items-center justify-between px-4 py-3.5">
+            <div className="flex items-center gap-3">
+              {dark ? <Moon className="w-5 h-5 text-slate-500" /> : <Sun className="w-5 h-5 text-slate-500" />}
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Dark Mode</p>
+                <p className="text-xs text-slate-400">Switch app appearance</p>
+              </div>
+            </div>
+            <Toggle value={dark} onChange={setDark} />
+          </div>
+        </div>
+      </div>
+
+      {/* Notifications */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-slate-50">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Notifications</p>
+        </div>
+        <div className="divide-y divide-slate-50">
+          <div className="flex items-center justify-between px-4 py-3.5">
+            <div className="flex items-center gap-3">
+              <Bell className="w-5 h-5 text-slate-500" />
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Meal Reminders</p>
+                <p className="text-xs text-slate-400">Remind me to log meals</p>
+              </div>
+            </div>
+            <Toggle value={mealReminders} onChange={setMealReminders} />
+          </div>
+          <div className="flex items-center justify-between px-4 py-3.5">
+            <div className="flex items-center gap-3">
+              <Bell className="w-5 h-5 text-slate-500" />
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Weekly Reports</p>
+                <p className="text-xs text-slate-400">Summary of your nutrition week</p>
+              </div>
+            </div>
+            <Toggle value={weeklyReports} onChange={setWeeklyReports} />
+          </div>
+        </div>
+      </div>
+
+      {/* Units */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-slate-50">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Units</p>
+        </div>
+        <div className="px-4 py-4">
+          <div className="flex gap-2">
             <button
-              key={tab.key}
-              onClick={() => setActiveSection(tab.key)}
-              className={`px-3 py-2 text-xs font-bold rounded-t-lg transition-all ${
-                activeSection === tab.key
-                  ? 'bg-emerald-500/10 text-emerald-400 border-b-2 border-emerald-500'
-                  : dark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'
-              }`}
+              onClick={() => setUnits('imperial')}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'imperial' ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600'}`}
             >
-              {tab.label}
+              Imperial (lbs/ft)
             </button>
+            <button
+              onClick={() => setUnits('metric')}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'metric' ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600'}`}
+            >
+              Metric (kg/cm)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* About */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-slate-50">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">About</p>
+        </div>
+        <div className="divide-y divide-slate-50">
+          {[
+            { label: 'Version', value: '2.0.0' },
+            { label: 'Privacy Policy', value: '' },
+            { label: 'Terms of Service', value: '' },
+          ].map(item => (
+            <div key={item.label} className="flex items-center justify-between px-4 py-3.5">
+              <div className="flex items-center gap-3">
+                <Info className="w-5 h-5 text-slate-400" />
+                <p className="text-sm font-medium text-slate-700">{item.label}</p>
+              </div>
+              {item.value
+                ? <span className="text-sm text-slate-400">{item.value}</span>
+                : <ChevronRight className="w-4 h-4 text-slate-300" />
+              }
+            </div>
           ))}
         </div>
+      </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-5 py-4">
-
-          {activeSection === 'general' && (
-            <>
-              <Section title="Notifications">
-                <Toggle
-                  label="Meal Reminders"
-                  description="Remind me to log meals"
-                  value={settings.mealReminders ?? true}
-                  onChange={(v) => onUpdateSettings?.({ ...settings, mealReminders: v })}
-                />
-                <Toggle
-                  label="Weekly Reports"
-                  description="Summary of your nutrition week"
-                  value={settings.weeklyReports ?? true}
-                  onChange={(v) => onUpdateSettings?.({ ...settings, weeklyReports: v })}
-                />
-              </Section>
-
-              <Section title="Units">
-                <div className="flex gap-2 mb-2">
-                  {['Imperial (lbs/ft)', 'Metric (kg/cm)'].map((unit, i) => (
-                    <button
-                      key={i}
-                      onClick={() => onUpdateSettings?.({ ...settings, units: i === 0 ? 'imperial' : 'metric' })}
-                      className={`flex-1 p-3 rounded-xl text-sm font-bold transition-all ${
-                        (settings.units || 'imperial') === (i === 0 ? 'imperial' : 'metric')
-                          ? 'bg-emerald-500/10 border-2 border-emerald-500 text-emerald-400'
-                          : dark
-                            ? 'bg-white/5 border-2 border-transparent text-slate-400'
-                            : 'bg-slate-100 border-2 border-transparent text-slate-600'
-                      }`}
-                    >
-                      {unit}
-                    </button>
-                  ))}
-                </div>
-              </Section>
-            </>
-          )}
-
-          {activeSection === 'display' && (
-            <>
-              <Section title="Appearance">
-                <Toggle
-                  label="Dark Mode"
-                  description="Toggle dark/light theme"
-                  value={settings.darkMode ?? true}
-                  onChange={(v) => onUpdateSettings?.({ ...settings, darkMode: v })}
-                />
-                <Toggle
-                  label="Meal Images"
-                  description="Show food images in meal cards"
-                  value={settings.showMealImages ?? true}
-                  onChange={(v) => onUpdateSettings?.({ ...settings, showMealImages: v })}
-                />
-                <Toggle
-                  label="Advanced Macros"
-                  description="Show micronutrients and fiber"
-                  value={settings.advancedMode ?? false}
-                  onChange={(v) => onUpdateSettings?.({ ...settings, advancedMode: v })}
-                />
-              </Section>
-
-              <Section title="Dashboard">
-                <Toggle
-                  label="Compact View"
-                  description="Smaller cards on home screen"
-                  value={settings.compactView ?? false}
-                  onChange={(v) => onUpdateSettings?.({ ...settings, compactView: v })}
-                />
-              </Section>
-            </>
-          )}
-
-          {activeSection === 'data' && (
-            <>
-              <Section title="Data Management">
-                <Card variant="glass" padding="md" dark={dark} className="mb-3">
-                  <p className={`text-sm font-semibold mb-1 ${dark ? 'text-white' : 'text-slate-900'}`}>
-                    Export Data
-                  </p>
-                  <p className="text-xs text-slate-500 mb-3">
-                    Download all your data as JSON
-                  </p>
-                  <Button variant="secondary" size="sm" onClick={() => {
-                    const data = {};
-                    for (let i = 0; i < localStorage.length; i++) {
-                      const key = localStorage.key(i);
-                      if (key.startsWith('plato_')) {
-                        data[key] = JSON.parse(localStorage.getItem(key));
-                      }
-                    }
-                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `plato-backup-${new Date().toISOString().split('T')[0]}.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }}>
-                    📥 Export JSON
-                  </Button>
-                </Card>
-
-                <Card variant="glass" padding="md" dark={dark} className="mb-3">
-                  <p className={`text-sm font-semibold mb-1 text-red-400`}>
-                    Reset All Data
-                  </p>
-                  <p className="text-xs text-slate-500 mb-3">
-                    Delete everything and start fresh. This cannot be undone.
-                  </p>
-                  {confirmReset ? (
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="sm" className="flex-1" onClick={() => setConfirmReset(false)}>
-                        Cancel
-                      </Button>
-                      <button
-                        onClick={onReset}
-                        className="flex-1 px-4 py-2 rounded-xl text-sm font-bold bg-red-500 text-white hover:bg-red-600 transition-all"
-                      >
-                        Yes, Delete Everything
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setConfirmReset(true)}
-                      className="px-4 py-2 rounded-xl text-sm font-bold border-2 border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all"
-                    >
-                      🗑️ Reset All Data
-                    </button>
-                  )}
-                </Card>
-              </Section>
-            </>
-          )}
-
-          {activeSection === 'about' && (
-            <Section title="About Plato">
-              <Card variant="glass" padding="lg" dark={dark} className="text-center">
-                <span className="text-4xl block mb-3">🍽️</span>
-                <h3 className={`text-xl font-extrabold mb-1 ${dark ? 'text-white' : 'text-slate-900'}`}>
-                  PLATO
-                </h3>
-                <p className="text-emerald-400 text-sm font-semibold mb-1">
-                  AI Nutrition Companion
-                </p>
-                <p className="text-xs text-slate-500 mb-4">
-                  Version 2.0.0 · Modular Architecture
-                </p>
-                <div className="space-y-1">
-                  <p className="text-xs text-slate-500">Built with React + Vite + Tailwind</p>
-                  <p className="text-xs text-slate-500">Designed for performance and extensibility</p>
-                  <p className="text-xs text-slate-400 mt-3">© 2026 Plato · All rights reserved</p>
-                </div>
-              </Card>
-            </Section>
-          )}
+      {/* Danger Zone */}
+      <div className="bg-white rounded-2xl border border-red-100 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-red-50">
+          <p className="text-xs font-semibold text-red-400 uppercase tracking-widest">Danger Zone</p>
         </div>
-
-        {/* Footer */}
-        <div className="px-5 py-3 flex-shrink-0 border-t border-white/[0.06]">
-          <Button variant="ghost" fullWidth onClick={onClose}>
-            Close
-          </Button>
-        </div>
+        {!showResetConfirm ? (
+          <button
+            onClick={() => setShowResetConfirm(true)}
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-red-50 transition-colors"
+          >
+            <Trash2 className="w-5 h-5 text-red-500" />
+            <div>
+              <p className="text-sm font-semibold text-red-600">Reset All Data</p>
+              <p className="text-xs text-slate-400">Clears all your logs and settings</p>
+            </div>
+          </button>
+        ) : (
+          <div className="p-4 space-y-3">
+            <p className="text-sm text-slate-700 font-medium">Are you sure? This cannot be undone.</p>
+            <div className="flex gap-2">
+              <button onClick={() => setShowResetConfirm(false)} className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Cancel</button>
+              <button onClick={handleReset} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold">Reset</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

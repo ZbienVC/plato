@@ -58,7 +58,9 @@ export function RestaurantBrowser({ onLog, onClose, dark = false }) {
               <polyline points="15 18 9 12 15 6"/>
             </svg>
           </motion.button>
-          <span className="text-xl">{selectedRestaurant.emoji}</span>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: selectedRestaurant.color }}>
+            <span className="text-white font-black text-sm">{selectedRestaurant.name.charAt(0)}</span>
+          </div>
           <h2 className="text-base font-bold text-slate-900">{selectedRestaurant.name}</h2>
         </div>
 
@@ -102,7 +104,7 @@ export function RestaurantBrowser({ onLog, onClose, dark = false }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-bold text-slate-900">🍽️ Restaurant Mode</h2>
+        <h2 className="text-base font-bold text-slate-900">Restaurant Mode</h2>
         {onClose && <button onClick={onClose} className="text-slate-400 text-xl">✕</button>}
       </div>
 
@@ -118,10 +120,16 @@ export function RestaurantBrowser({ onLog, onClose, dark = false }) {
         {filteredRestaurants.map(restaurant => (
           <motion.button key={restaurant.id} whileTap={{ scale: 0.97 }}
             onClick={() => setSelectedRestaurant(restaurant)}
-            className="app-card flex flex-col items-center text-center py-4">
+            className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col items-center text-center hover:border-slate-200 hover:shadow-md transition-all">
+            {/* Brand color top bar */}
             <div className="w-full h-1 rounded-full mb-3" style={{ background: restaurant.color }} />
-            <span className="text-3xl mb-2">{restaurant.emoji}</span>
-            <p className="text-sm font-bold text-slate-900">{restaurant.name}</p>
+            {/* Brand logo badge */}
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-2 shadow-sm" style={{ background: restaurant.color }}>
+              <span className="text-white font-black text-xl leading-none">
+                {restaurant.name.charAt(0)}
+              </span>
+            </div>
+            <p className="text-sm font-bold text-slate-900 text-center leading-tight">{restaurant.name}</p>
           </motion.button>
         ))}
       </div>
