@@ -8,15 +8,33 @@ const stagger = { animate: { transition: { staggerChildren: 0.06 } } };
 const item = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
 
 const QUICK_FOODS = [
-  { name: 'Scrambled Eggs (2)', calories: 180, protein: 12, carbs: 2, fat: 14, type: 'breakfast' },
-  { name: 'Protein Shake', calories: 160, protein: 30, carbs: 8, fat: 3, type: 'snack' },
-  { name: 'Greek Yogurt', calories: 100, protein: 17, carbs: 6, fat: 0, type: 'snack' },
-  { name: 'Chicken Breast 4oz', calories: 185, protein: 35, carbs: 0, fat: 4, type: 'lunch' },
-  { name: 'Banana', calories: 90, protein: 1, carbs: 23, fat: 0, type: 'snack' },
-  { name: 'Oatmeal (1 cup)', calories: 150, protein: 5, carbs: 27, fat: 3, type: 'breakfast' },
-  { name: 'Brown Rice (1 cup)', calories: 215, protein: 5, carbs: 45, fat: 2, type: 'lunch' },
-  { name: 'Almonds (1oz)', calories: 160, protein: 6, carbs: 6, fat: 14, type: 'snack' },
+  // Breakfast
+  { name: 'Scrambled Eggs (2)', calories: 180, protein: 12, carbs: 2, fat: 14, type: 'breakfast', category: 'Breakfast' },
+  { name: 'Oatmeal (1 cup)', calories: 150, protein: 5, carbs: 27, fat: 3, type: 'breakfast', category: 'Breakfast' },
+  { name: 'Greek Yogurt (7oz)', calories: 100, protein: 17, carbs: 6, fat: 0, type: 'breakfast', category: 'Breakfast' },
+  { name: 'Whole Wheat Toast (2)', calories: 160, protein: 6, carbs: 30, fat: 2, type: 'breakfast', category: 'Breakfast' },
+  { name: 'Avocado Toast', calories: 250, protein: 6, carbs: 26, fat: 14, type: 'breakfast', category: 'Breakfast' },
+  // Protein
+  { name: 'Chicken Breast (4oz)', calories: 185, protein: 35, carbs: 0, fat: 4, type: 'lunch', category: 'Protein' },
+  { name: 'Salmon Fillet (4oz)', calories: 208, protein: 29, carbs: 0, fat: 10, type: 'dinner', category: 'Protein' },
+  { name: 'Ground Beef 90/10 (4oz)', calories: 196, protein: 24, carbs: 0, fat: 11, type: 'dinner', category: 'Protein' },
+  { name: 'Tuna (1 can)', calories: 130, protein: 30, carbs: 0, fat: 1, type: 'lunch', category: 'Protein' },
+  { name: 'Hard Boiled Egg (1)', calories: 78, protein: 6, carbs: 1, fat: 5, type: 'snack', category: 'Protein' },
+  // Carbs
+  { name: 'Brown Rice (1 cup)', calories: 215, protein: 5, carbs: 45, fat: 2, type: 'lunch', category: 'Carbs' },
+  { name: 'Sweet Potato (medium)', calories: 103, protein: 2, carbs: 24, fat: 0, type: 'lunch', category: 'Carbs' },
+  { name: 'White Rice (1 cup)', calories: 200, protein: 4, carbs: 44, fat: 0, type: 'lunch', category: 'Carbs' },
+  { name: 'Pasta (2oz dry)', calories: 200, protein: 7, carbs: 40, fat: 1, type: 'dinner', category: 'Carbs' },
+  { name: 'Banana (medium)', calories: 105, protein: 1, carbs: 27, fat: 0, type: 'snack', category: 'Carbs' },
+  // Snacks
+  { name: 'Protein Shake', calories: 160, protein: 30, carbs: 8, fat: 3, type: 'snack', category: 'Snacks' },
+  { name: 'Almonds (1oz)', calories: 160, protein: 6, carbs: 6, fat: 14, type: 'snack', category: 'Snacks' },
+  { name: 'Apple (medium)', calories: 95, protein: 0, carbs: 25, fat: 0, type: 'snack', category: 'Snacks' },
+  { name: 'Cottage Cheese (½ cup)', calories: 90, protein: 13, carbs: 4, fat: 2, type: 'snack', category: 'Snacks' },
+  { name: 'Peanut Butter (2 tbsp)', calories: 190, protein: 7, carbs: 7, fat: 16, type: 'snack', category: 'Snacks' },
 ];
+
+const QUICK_CATEGORIES = ['All', 'Breakfast', 'Protein', 'Carbs', 'Snacks'];
 
 function parseMealFromText(text) {
   const raw = (text || '').trim();
@@ -63,6 +81,8 @@ export function LogMeal() {
   const [customCarbs, setCustomCarbs] = useState('');
   const [customFat, setCustomFat] = useState('');
   const [logged, setLogged] = useState(null);
+  const [quickCategory, setQuickCategory] = useState('All');
+  const [quickSearch, setQuickSearch] = useState('');
   const [voiceText, setVoiceText] = useState('');
   const [photoPreview, setPhotoPreview] = useState('');
   const [photoMealName, setPhotoMealName] = useState('');
@@ -293,16 +313,68 @@ export function LogMeal() {
       )}
 
       {activeTab === 'quick' && (
-        <motion.div variants={item} className="app-card">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Common Foods</p>
-          <div className="grid grid-cols-2 gap-2">
-            {QUICK_FOODS.map((food, i) => (
-              <motion.button key={i} whileTap={{ scale: 0.96 }} onClick={() => handleLog(food)} className="text-left p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-green-200 transition-colors">
-                <p className="text-sm font-semibold text-slate-800 leading-tight">{food.name}</p>
-                <p className="text-xs text-green-500 font-bold mt-1">{food.calories} cal</p>
-                <p className="text-xs text-slate-400 mt-0.5">{food.protein}P · {food.carbs}C · {food.fat}F</p>
-              </motion.button>
-            ))}
+        <motion.div variants={item} className="space-y-3">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              value={quickSearch}
+              onChange={e => setQuickSearch(e.target.value)}
+              placeholder="Filter foods..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all"
+            />
+          </div>
+          {/* Category tabs */}
+          {quickSearch.length < 1 && (
+            <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
+              {QUICK_CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setQuickCategory(cat)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex-shrink-0 ${
+                    quickCategory === cat
+                      ? 'bg-green-500 text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
+          {/* Food grid */}
+          <div className="app-card">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
+              {quickSearch.length > 0 ? `Results for "${quickSearch}"` : quickCategory === 'All' ? 'All Foods' : quickCategory}
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {QUICK_FOODS
+                .filter(food => {
+                  const matchSearch = quickSearch.length < 1 || food.name.toLowerCase().includes(quickSearch.toLowerCase());
+                  const matchCat = quickSearch.length > 0 || quickCategory === 'All' || food.category === quickCategory;
+                  return matchSearch && matchCat;
+                })
+                .map((food, i) => (
+                  <motion.button
+                    key={i}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => handleLog(food)}
+                    className="text-left p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-green-200 hover:bg-green-50 transition-colors active:bg-green-100"
+                  >
+                    <p className="text-sm font-semibold text-slate-800 leading-tight">{food.name}</p>
+                    <p className="text-xs text-green-600 font-bold mt-1">{food.calories} cal</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{food.protein}P · {food.carbs}C · {food.fat}F</p>
+                  </motion.button>
+                ))
+              }
+            </div>
+            {QUICK_FOODS.filter(food => {
+              const matchSearch = quickSearch.length < 1 || food.name.toLowerCase().includes(quickSearch.toLowerCase());
+              const matchCat = quickSearch.length > 0 || quickCategory === 'All' || food.category === quickCategory;
+              return matchSearch && matchCat;
+            }).length === 0 && (
+              <p className="text-sm text-slate-400 text-center py-4">No foods match your search.</p>
+            )}
           </div>
         </motion.div>
       )}

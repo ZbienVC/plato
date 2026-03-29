@@ -75,6 +75,12 @@ export function Home() {
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
+  // Streak tier
+  const streakTier = streak >= 30 ? 'legendary' : streak >= 14 ? 'on-fire' : streak >= 7 ? 'hot' : streak >= 3 ? 'building' : 'start';
+  const streakEmoji = { legendary: '🔥', 'on-fire': '🔥', hot: '🔥', building: '🔥', start: '✨' }[streakTier];
+  const streakColor = streak >= 7 ? '#f97316' : streak >= 3 ? '#fb923c' : '#22c55e';
+  const streakBg = streak >= 7 ? 'from-orange-50 to-amber-50 border-orange-100' : streak >= 3 ? 'from-amber-50 to-yellow-50 border-amber-100' : 'from-green-50 to-emerald-50 border-green-100';
+
   const dayIndex = Math.floor((Date.now() - new Date(plan?.createdAt || Date.now()).getTime()) / 86400000) % 7;
   const todaysPlanned = hasPlan ? plan.meals.slice(dayIndex * (plan.mealsPerDay || 3), (dayIndex + 1) * (plan.mealsPerDay || 3)) : [];
 
@@ -86,6 +92,48 @@ export function Home() {
         <h1 className="text-2xl font-bold text-slate-900 mt-0.5">
           {greeting}{userProfile?.name ? `, ${userProfile.name}` : ''}
         </h1>
+      </motion.div>
+
+      {/* Streak Banner — always visible */}
+      <motion.div
+        variants={item}
+        className={`bg-gradient-to-r ${streakBg} border rounded-2xl p-4 flex items-center gap-3`}
+      >
+        <motion.div
+          animate={streak > 0 ? { scale: [1, 1.15, 1], rotate: [-3, 3, -3, 0] } : {}}
+          transition={{ duration: 0.6, repeat: streak > 0 ? Infinity : 0, repeatDelay: 3 }}
+          className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl shrink-0"
+          style={{ background: `${streakColor}18` }}
+        >
+          {streakEmoji}
+        </motion.div>
+        <div className="flex-1 min-w-0">
+          {streak > 0 ? (
+            <>
+              <p className="text-sm font-bold text-slate-900">
+                {streak} day streak{streak >= 7 ? ' 🎉' : ''}
+              </p>
+              <p className="text-xs text-slate-500">
+                {streak >= 30 ? 'Legendary! You\'re unstoppable.' :
+                 streak >= 14 ? 'Two weeks strong. Keep going!' :
+                 streak >= 7 ? 'One week! You\'re on fire.' :
+                 streak >= 3 ? 'Getting hot — don\'t break the chain!' :
+                 'Nice start! Log meals daily to build your streak.'}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-bold text-slate-900">Start your streak today</p>
+              <p className="text-xs text-slate-500">Log a meal to begin your streak and build a healthy habit.</p>
+            </>
+          )}
+        </div>
+        {streak > 0 && (
+          <div className="text-right shrink-0">
+            <p className="text-2xl font-black tabular-nums" style={{ color: streakColor }}>{streak}</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">days</p>
+          </div>
+        )}
       </motion.div>
 
       {/* Calorie Ring Card */}
@@ -257,18 +305,7 @@ export function Home() {
         ))}
       </motion.div>
 
-      {/* Streak */}
-      {streak > 0 && (
-        <motion.div variants={item} className="app-card flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
-            <Flame className="w-5 h-5 text-orange-500" />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-slate-900">{streak} day streak</p>
-            <p className="text-xs text-slate-400">Keep it up!</p>
-          </div>
-        </motion.div>
-      )}
+      {/* Streak widget removed — promoted to top banner */}
     </motion.div>
   );
 }
