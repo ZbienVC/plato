@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Coffee, Salad, Utensils, Apple, Plus, CheckCircle2, Mic } from 'lucide-react';
+import { Flame, Coffee, Salad, Utensils, Apple, Plus, CheckCircle2, Mic, Lock } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
 import { FoodImage } from '../components/molecules/FoodImage';
@@ -84,10 +84,11 @@ const PlanSkeletonCard = () => (
 );
 
 export function Home() {
-  const { plan, planLoading, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak } = useApp();
+  const { plan, planLoading, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak, isPremiumActive, openPremiumModal } = useApp();
   const { targets, current } = useMacros();
   const hasPlan = plan?.meals?.length > 0;
   const todayMeals = dailyLog?.meals || [];
+  const premiumUnlocked = isPremiumActive?.() ?? false;
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
@@ -186,17 +187,24 @@ export function Home() {
       <motion.button
         variants={item}
         whileTap={{ scale: 0.98 }}
-        onClick={() => setShowVoiceLog(true)}
-        className="app-card flex items-center gap-3 text-left"
+        onClick={() => (premiumUnlocked ? setShowVoiceLog(true) : openPremiumModal())}
+        className={`app-card flex items-center gap-3 text-left ${premiumUnlocked ? '' : 'border-amber-200 bg-amber-50/70'}`}
       >
-        <div className="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
-          <Mic className="w-5 h-5" />
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${premiumUnlocked ? 'bg-green-50 text-green-600' : 'bg-amber-100 text-amber-600'}`}>
+          {premiumUnlocked ? <Mic className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
         </div>
         <div className="flex-1">
+          {!premiumUnlocked && (
+            <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mb-1">
+              <Lock className="w-3 h-3" /> Premium
+            </div>
+          )}
           <p className="text-sm font-semibold text-slate-900">Voice Log</p>
           <p className="text-xs text-slate-500">Speak a meal to auto-fill calories & macros</p>
         </div>
-        <div className="text-xs font-semibold text-green-600">Tap</div>
+        <div className={`text-xs font-semibold ${premiumUnlocked ? 'text-green-600' : 'text-amber-600'}`}>
+          {premiumUnlocked ? 'Tap' : 'Unlock'}
+        </div>
       </motion.button>
 
       {/* Today's Logged Meals */}

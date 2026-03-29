@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Bell, Search, MoreHorizontal, X } from 'lucide-react';
 
@@ -16,14 +16,69 @@ const PAGE_TITLES = {
 };
 
 export function TopBar({ activeTab }) {
-  const { setDrawerOpen, userProfile, setActiveTab } = useApp();
+  const { setDrawerOpen, userProfile, setActiveTab, premium, isPremiumActive, openPremiumModal } = useApp();
   const title = PAGE_TITLES[activeTab] || 'Plato';
   const [showSearch, setShowSearch] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
+  const [trialCountdown, setTrialCountdown] = useState('');
+  const premiumActive = isPremiumActive?.() ?? false;
+
+  useEffect(() => {
+    if (premium?.status !== 'trial' || !premium?.trialExpiresAt) {
+      setTrialCountdown('');
+      return undefined;
+    }
+    const calc = () => {
+      const expires = new Date(premium.trialExpiresAt).getTime();
+      if (!Number.isFinite(expires)) {
+        setTrialCountdown('');
+        return;
+      }
+      const diff = Math.max(0, expires - Date.now());
+      const hours = Math.floor(diff / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      if (hours >= 24) {
+        const days = Math.floor(hours / 24);
+        const remHours = hours % 24;
+        setTrialCountdown(`${days}d ${remHours}h`);
+        return;
+      }
+      if (hours >= 1) {
+        setTrialCountdown(`${hours}h ${mins}m`);
+        return;
+      }
+      setTrialCountdown(`${Math.max(5, mins)}m`);
+    };
+    calc();
+    const interval = setInterval(calc, 60000);
+    return () => clearInterval(interval);
+  }, [premium?.status, premium?.trialExpiresAt]);
 
   const initials = userProfile?.name
     ? userProfile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : '?';
+
+  const premiumStatus = premium?.status || 'free';
+  const premiumCopy = premiumActive
+    ? 'Active'
+    : premiumStatus === 'trial'
+      ? `Trial · ${trialCountdown || '48h'}`
+      : 'Free tier';
+  const premiumSubtext = premiumActive
+    ? 'Voice + Restaurant unlocked'
+    : premiumStatus === 'trial'
+      ? '48h full access'
+      : 'Voice + Restaurant locked';
+  const premiumPillClasses = premiumActive
+    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+    : premiumStatus === 'trial'
+      ? 'border-amber-200 bg-amber-50 text-amber-700'
+      : 'border-slate-200 bg-slate-100 text-slate-500';
+
+  const handlePremiumClick = () => {
+    if (premiumActive) return;
+    openPremiumModal?.();
+  };
 
   // Right action by tab
   const renderRight = () => {
@@ -80,6 +135,25 @@ export function TopBar({ activeTab }) {
 
         {/* Right: Contextual action */}
         {renderRight()}
+      </div>
+
+      <div className="px-4 pb-2">
+        <button
+          type="button"
+          onClick={handlePremiumClick}
+          className={`w-full rounded-2xl border px-3 py-2 text-left transition-all flex items-center justify-between gap-3 ${premiumActive ? 'cursor-default' : 'cursor-pointer'} ${premiumPillClasses}`}
+        >
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em]">Premium</p>
+            <p className="text-sm font-semibold leading-tight">{premiumCopy}</p>
+            <p className="text-[11px] font-medium opacity-80">{premiumSubtext}</p>
+          </div>
+          {!premiumActive && (
+            <div className="rounded-xl bg-white/60 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">
+              Unlock
+            </div>
+          )}
+        </button>
       </div>
 
       {/* Notification panel */}

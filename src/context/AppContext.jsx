@@ -1,13 +1,19 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { MEAL_DATABASE } from '../services/mealGenerator';
 import { saveLogEntry } from '../lib/api';
 
 const AppContext = createContext(null);
+const STORAGE_PREFIX = 'plato_';
+const PREMIUM_STORAGE_KEY = 'plato.premium.v1';
+const DEFAULT_PREMIUM_STATE = { status: 'free', email: undefined, trialExpiresAt: undefined };
+const PREMIUM_CHECKOUT_URL = (import.meta.env?.VITE_PREMIUM_CHECKOUT_URL || '').trim();
+const PREMIUM_LEAD_WEBHOOK = (import.meta.env?.VITE_PREMIUM_LEAD_WEBHOOK || '').trim();
+const PREMIUM_CONTACT_EMAIL = 'hi@platoapp.com';
 
 // Helper: load from localStorage with fallback
 function loadState(key, fallback) {
   try {
-    const saved = localStorage.getItem(`plato_${key}`);
+    const saved = localStorage.getItem(`${STORAGE_PREFIX}${key}`);
     return saved ? JSON.parse(saved) : fallback;
   } catch {
     return fallback;
@@ -17,8 +23,31 @@ function loadState(key, fallback) {
 // Helper: save to localStorage
 function saveState(key, value) {
   try {
-    localStorage.setItem(`plato_${key}`, JSON.stringify(value));
+    localStorage.setItem(`${STORAGE_PREFIX}${key}`, JSON.stringify(value));
   } catch { /* quota exceeded, ignore */ }
+}
+
+function loadPremiumState() {
+  try {
+    const saved = localStorage.getItem(PREMIUM_STORAGE_KEY);
+    if (!saved) return { ...DEFAULT_PREMIUM_STATE };
+    const parsed = JSON.parse(saved);
+    if (parsed.status === 'trial' && parsed.trialExpiresAt) {
+      const expiresAt = new Date(parsed.trialExpiresAt).getTime();
+      if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) {
+        return { status: 'free', email: parsed.email };
+      }
+    }
+    return { ...DEFAULT_PREMIUM_STATE, ...parsed };
+  } catch {
+    return { ...DEFAULT_PREMIUM_STATE };
+  }
+}
+
+function savePremiumState(state) {
+  try {
+    localStorage.setItem(PREMIUM_STORAGE_KEY, JSON.stringify(state));
+  } catch { /* ignore */ }
 }
 
 function inferSlotFromTime(date = new Date()) {
@@ -92,6 +121,8 @@ export function AppProvider({ children }) {
   const [showVoiceLog, setShowVoiceLog] = useState(false);
   const [advancedMode, setAdvancedMode] = useState(() => loadState('advancedMode', false));
   const [showMealImages, setShowMealImages] = useState(() => loadState('showMealImages', true));
+  const [premium, setPremium] = useState(() => loadPremiumState());
+  const [premiumModalOpen, setPremiumModalOpen] = useState(false);
 
   // === WEIGHT TRACKING ===
   const [weightEntries, setWeightEntries] = useState(() => loadState('weightEntries', []));
@@ -129,6 +160,62 @@ export function AppProvider({ children }) {
   useEffect(() => { saveState('streak', streak); }, [streak]);
   useEffect(() => { saveState('savedRecipes', savedRecipes); }, [savedRecipes]);
   useEffect(() => { saveState('groceryChecked', groceryChecked); }, [groceryChecked]);
+  useEffect(() => { savePremiumState(premium); }, [premium]);
+
+  useEffect(() => {
+    if (premium.status !== 'trial' || !premium.trialExpiresAt) return undefined;
+    const expiresAt = new Date(premium.trialExpiresAt).getTime();
+    if (!Number.isFinite(expiresAt)) return undefined;
+    if (expiresAt <= Date.now()) {
+      setPremium(prev => ({ status: 'free', email: prev.email }));
+      return undefined;
+    }
+    const timer = setTimeout(() => {
+      setPremium(prev => ({ status: 'free', email: prev.email }));
+    }, expiresAt - Date.now());
+    return () => clearTimeout(timer);
+  }, [premium.status, premium.trialExpiresAt]);
+
+  const premiumIsActive = useMemo(() => (
+    premium.status === 'active'
+    || (premium.status === 'trial' && premium.trialExpiresAt && new Date(premium.trialExpiresAt).getTime() > Date.now())
+  ), [premium.status, premium.trialExpiresAt]);
+
+  const postPremiumLead = useCallback(async (payload) => {
+    if (!PREMIUM_LEAD_WEBHOOK) return;
+    try {
+      await fetch(PREMIUM_LEAD_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.warn('premium lead webhook failed', err);
+    }
+  }, []);
+
+  const startTrial = useCallback(async (email) => {
+    const normalizedEmail = (email || '').trim();
+    if (!normalizedEmail) throw new Error('Email is required');
+    const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    const nextState = { status: 'trial', email: normalizedEmail, trialExpiresAt: expiresAt };
+    setPremium(nextState);
+    await postPremiumLead({ email: normalizedEmail, status: 'trial', trialExpiresAt: expiresAt });
+    return nextState;
+  }, [postPremiumLead]);
+
+  const activatePremium = useCallback(async (email) => {
+    const normalizedEmail = (email || '').trim();
+    if (!normalizedEmail) throw new Error('Email is required');
+    const nextState = { status: 'active', email: normalizedEmail };
+    setPremium(nextState);
+    await postPremiumLead({ email: normalizedEmail, status: 'active' });
+    return nextState;
+  }, [postPremiumLead]);
+
+  const isPremiumActive = useCallback(() => premiumIsActive, [premiumIsActive]);
+  const openPremiumModal = useCallback(() => setPremiumModalOpen(true), []);
+  const closePremiumModal = useCallback(() => setPremiumModalOpen(false), []);
 
   // === ACTIONS ===
   const logMeal = useCallback((meal) => {
@@ -216,15 +303,15 @@ export function AppProvider({ children }) {
   const swapMeal = useCallback((mealSlotIndex, currentMeal) => {
     setPlan(prevPlan => {
       if (!prevPlan || !prevPlan.meals) return prevPlan;
-      
+
       const dayIndex = Math.floor((Date.now() - new Date(prevPlan.createdAt || Date.now()).getTime()) / 86400000) % 7;
       const absoluteIndex = dayIndex * (prevPlan.mealsPerDay || 3) + mealSlotIndex;
-      
+
       const sameTypeMeals = MEAL_DATABASE.filter(m => m.type === currentMeal.type && m.name !== currentMeal.name);
       if (sameTypeMeals.length === 0) return prevPlan;
-      
+
       const randomMeal = sameTypeMeals[Math.floor(Math.random() * sameTypeMeals.length)];
-      
+
       const scale = currentMeal.calories / randomMeal.calories;
       const scaledMeal = {
         ...randomMeal,
@@ -233,10 +320,10 @@ export function AppProvider({ children }) {
         carbs: Math.round(randomMeal.carbs * scale),
         fat: Math.round(randomMeal.fat * scale),
       };
-      
+
       const newMeals = [...prevPlan.meals];
       newMeals[absoluteIndex] = scaledMeal;
-      
+
       return { ...prevPlan, meals: newMeals };
     });
   }, []);
@@ -246,7 +333,8 @@ export function AppProvider({ children }) {
     const keys = ['dark', 'userProfile', 'planConfig', 'plan', 'dailyLog', 'logHistory',
       'savedPlans', 'recipes', 'favorites', 'groceryList', 'advancedMode',
       'showMealImages', 'weightEntries', 'streak', 'savedRecipes', 'groceryChecked'];
-    keys.forEach(k => localStorage.removeItem(`plato_${k}`));
+    keys.forEach(k => localStorage.removeItem(`${STORAGE_PREFIX}${k}`));
+    localStorage.removeItem(PREMIUM_STORAGE_KEY);
     window.location.reload();
   }, []);
 
@@ -284,6 +372,17 @@ export function AppProvider({ children }) {
     groceryChecked, setGroceryChecked,
     // Utils
     resetAll,
+    // Premium
+    premium,
+    startTrial,
+    activatePremium,
+    isPremiumActive,
+    premiumModalOpen,
+    setPremiumModalOpen,
+    openPremiumModal,
+    closePremiumModal,
+    premiumCheckoutUrl: PREMIUM_CHECKOUT_URL,
+    premiumContactEmail: PREMIUM_CONTACT_EMAIL,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

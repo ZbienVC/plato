@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Salad, Utensils, Apple, RefreshCw, Image as ImageIcon } from 'lucide-react';
+import { Coffee, Salad, Utensils, Apple, RefreshCw, Lock, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { FoodImage } from '../components/molecules/FoodImage';
 import { RecipeBook } from '../components/organisms/RecipeBook';
@@ -53,7 +53,7 @@ const PlanRowsSkeleton = () => (
 );
 
 export function MealPlans() {
-  const { plan, planLoading, logMeal, savedPlans, recipes, favorites, setActiveTab, saveRecipe, swapMeal, showMealImages } = useApp();
+  const { plan, planLoading, logMeal, savedPlans, recipes, favorites, setActiveTab, saveRecipe, swapMeal, showMealImages, isPremiumActive, openPremiumModal } = useApp();
   const [activeTab, setTab] = useState('plan');
   const [showRecipes, setShowRecipes] = useState(false);
   const [recipeIndex, setRecipeIndex] = useState(0);
@@ -63,12 +63,21 @@ export function MealPlans() {
   const [selDay, setSelDay] = useState(0);
 
   const hasPlan = plan?.meals?.length > 0;
+  const premiumUnlocked = isPremiumActive?.() ?? false;
   const mpd = plan?.mealsPerDay || 3;
   const days = hasPlan ? Math.ceil(plan.meals.length / mpd) : 0;
   const dayMeals = hasPlan ? plan.meals.slice(selDay * mpd, (selDay + 1) * mpd) : [];
   const slots = ['Breakfast', 'Lunch', 'Dinner', 'Snack 1', 'Snack 2'];
 
   const TABS = ['plan', 'recipes', 'restaurant'];
+
+  const handleSubTabChange = (tab) => {
+    if (tab === 'restaurant' && !premiumUnlocked) {
+      openPremiumModal();
+      return;
+    }
+    setTab(tab);
+  };
 
   return (
     <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-4 pb-4">
@@ -83,11 +92,14 @@ export function MealPlans() {
       {/* Sub-tab bar */}
       <motion.div variants={item} className="flex bg-slate-100 rounded-xl p-1 gap-1">
         {TABS.map(t => (
-          <button key={t} onClick={() => setTab(t)}
-            className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all ${
+          <button key={t} onClick={() => handleSubTabChange(t)}
+            className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all relative ${
               activeTab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
             }`}>
             {t === 'plan' ? 'My Plan' : t.charAt(0).toUpperCase() + t.slice(1)}
+            {t === 'restaurant' && !premiumUnlocked && (
+              <span className="absolute -top-1 right-2 text-[9px] font-black uppercase tracking-[0.2em] text-amber-600">Premium</span>
+            )}
           </button>
         ))}
       </motion.div>
@@ -274,9 +286,24 @@ export function MealPlans() {
 
       {/* RESTAURANT TAB */}
       {activeTab === 'restaurant' && (
-        <motion.div variants={item}>
-          <RestaurantBrowser onLog={logMeal} dark={false} />
-        </motion.div>
+        premiumUnlocked ? (
+          <motion.div variants={item}>
+            <RestaurantBrowser onLog={logMeal} dark={false} />
+          </motion.div>
+        ) : (
+          <motion.div variants={item} className="app-card text-center py-10 space-y-3">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600">
+              <Lock className="w-6 h-6" />
+            </div>
+            <p className="text-sm font-semibold text-slate-900">Restaurant Mode is Premium</p>
+            <p className="text-xs text-slate-500">Unlock real-menu macros, concierge swaps, and voice logging with a 48h trial.</p>
+            <motion.button whileTap={{ scale: 0.96 }} onClick={openPremiumModal}
+              className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 px-4 py-2 text-sm font-semibold text-white">
+              Start free trial
+              <Sparkles className="w-4 h-4" />
+            </motion.button>
+          </motion.div>
+        )
       )}
 
       {/* Modals */}

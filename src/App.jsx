@@ -11,6 +11,7 @@ import { WeightTracker } from './components/organisms/WeightTracker';
 import { GroceryList } from './components/organisms/GroceryList';
 import { SettingsPanel } from './components/organisms/SettingsPanel';
 import { VoiceLogOverlay } from './components/organisms/VoiceLogOverlay';
+import { PremiumPaywallModal } from './components/organisms/PremiumPaywallModal';
 import { useToast } from './components/organisms/Toast';
 import './styles/index.css';
 
@@ -106,6 +107,8 @@ function AppContent() {
     userProfile, plan,
     showVoiceLog, setShowVoiceLog,
     logMeal,
+    premiumModalOpen,
+    closePremiumModal,
   } = useApp();
   const { showToast, ToastContainer } = useToast();
 
@@ -157,6 +160,11 @@ function AppContent() {
           }}
         />
       )}
+      <PremiumPaywallModal
+        open={premiumModalOpen}
+        onClose={closePremiumModal}
+        showToast={showToast}
+      />
       <ToastContainer />
     </>
   );

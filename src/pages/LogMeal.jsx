@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, ImagePlus, Mic, MicOff, Search, Sparkles, Upload, Wand2 } from 'lucide-react';
+import { Camera, ImagePlus, Mic, MicOff, Search, Sparkles, Upload, Wand2, Lock } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { MEAL_DATABASE } from '../services/mealGenerator';
 import { FoodImage } from '../components/molecules/FoodImage';
@@ -73,7 +73,7 @@ function parseMealFromText(text) {
 }
 
 export function LogMeal() {
-  const { logMeal, dailyLog } = useApp();
+  const { logMeal, dailyLog, isPremiumActive, openPremiumModal } = useApp();
   const [activeTab, setTab] = useState('manual');
   const [search, setSearch] = useState('');
   const [customName, setCustomName] = useState('');
@@ -88,6 +88,7 @@ export function LogMeal() {
   const [photoPreview, setPhotoPreview] = useState('');
   const [photoMealName, setPhotoMealName] = useState('');
   const [isListening, setIsListening] = useState(false);
+  const premiumUnlocked = isPremiumActive?.() ?? false;
   const fileRef = useRef(null);
   const recognitionRef = useRef(null);
 
@@ -164,6 +165,14 @@ export function LogMeal() {
     if (parsed) handleLog({ ...parsed, photo: photoPreview });
   };
 
+  const handleTabChange = (nextTab) => {
+    if (nextTab === 'voice' && !premiumUnlocked) {
+      openPremiumModal();
+      return;
+    }
+    setTab(nextTab);
+  };
+
   const TABS = ['manual', 'voice', 'scan', 'quick'];
 
   return (
@@ -175,9 +184,12 @@ export function LogMeal() {
 
       <motion.div variants={item} className="flex bg-slate-100 rounded-xl p-1 gap-1">
         {TABS.map(t => (
-          <button key={t} onClick={() => setTab(t)}
-            className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all ${activeTab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>
+          <button key={t} onClick={() => handleTabChange(t)}
+            className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all relative ${activeTab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>
             {t === 'quick' ? 'Quick Add' : t === 'scan' ? 'Photo' : t.charAt(0).toUpperCase() + t.slice(1)}
+            {t === 'voice' && !premiumUnlocked && (
+              <span className="absolute -top-1 -right-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-600">Lock</span>
+            )}
           </button>
         ))}
       </motion.div>
@@ -255,29 +267,44 @@ export function LogMeal() {
       )}
 
       {activeTab === 'voice' && (
-        <motion.div variants={item} className="space-y-4">
-          <div className="app-card flex flex-col items-center py-8 gap-5">
-            <motion.button whileTap={{ scale: 0.92 }} onClick={isListening ? stopVoice : startVoice} className={`relative w-24 h-24 rounded-full shadow-xl flex items-center justify-center ${isListening ? 'bg-rose-500 shadow-rose-300/60' : 'bg-green-500 shadow-green-300/60'}`}>
-              {isListening ? <MicOff className="w-8 h-8 text-white" /> : <Mic className="w-8 h-8 text-white" />}
-            </motion.button>
-            <div className="text-center">
-              <p className="text-base font-semibold text-slate-800">{isListening ? 'Listening...' : 'Tap to dictate your meal'}</p>
-              <p className="text-sm text-slate-400 mt-1">Example: grilled chicken with rice and broccoli</p>
+        premiumUnlocked ? (
+          <motion.div variants={item} className="space-y-4">
+            <div className="app-card flex flex-col items-center py-8 gap-5">
+              <motion.button whileTap={{ scale: 0.92 }} onClick={isListening ? stopVoice : startVoice} className={`relative w-24 h-24 rounded-full shadow-xl flex items-center justify-center ${isListening ? 'bg-rose-500 shadow-rose-300/60' : 'bg-green-500 shadow-green-300/60'}`}>
+                {isListening ? <MicOff className="w-8 h-8 text-white" /> : <Mic className="w-8 h-8 text-white" />}
+              </motion.button>
+              <div className="text-center">
+                <p className="text-base font-semibold text-slate-800">{isListening ? 'Listening...' : 'Tap to dictate your meal'}</p>
+                <p className="text-sm text-slate-400 mt-1">Example: grilled chicken with rice and broccoli</p>
+              </div>
             </div>
-          </div>
 
-          <div className="app-card space-y-3">
-            <div className="flex items-center gap-2 text-slate-700">
-              <Sparkles className="w-4 h-4 text-green-500" />
-              <p className="text-sm font-semibold">Voice transcript</p>
+            <div className="app-card space-y-3">
+              <div className="flex items-center gap-2 text-slate-700">
+                <Sparkles className="w-4 h-4 text-green-500" />
+                <p className="text-sm font-semibold">Voice transcript</p>
+              </div>
+              <textarea value={voiceText} onChange={e => setVoiceText(e.target.value)} rows={4} placeholder="Speak or type your meal here..." className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100" />
+              <div className="flex gap-2">
+                <button onClick={() => setVoiceText('')} className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Clear</button>
+                <button onClick={handleVoiceLog} className="flex-1 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold">Log Meal</button>
+              </div>
             </div>
-            <textarea value={voiceText} onChange={e => setVoiceText(e.target.value)} rows={4} placeholder="Speak or type your meal here..." className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100" />
-            <div className="flex gap-2">
-              <button onClick={() => setVoiceText('')} className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Clear</button>
-              <button onClick={handleVoiceLog} className="flex-1 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold">Log Meal</button>
+          </motion.div>
+        ) : (
+          <motion.div variants={item} className="app-card text-center py-10 space-y-3">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600">
+              <Lock className="w-6 h-6" />
             </div>
-          </div>
-        </motion.div>
+            <p className="text-sm font-semibold text-slate-900">Voice logging is Premium</p>
+            <p className="text-xs text-slate-500">Start the 48h trial to unlock AI voice logging + restaurant macros.</p>
+            <motion.button whileTap={{ scale: 0.96 }} onClick={openPremiumModal}
+              className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 px-4 py-2 text-sm font-semibold text-white">
+              Unlock Premium
+              <Sparkles className="w-4 h-4" />
+            </motion.button>
+          </motion.div>
+        )
       )}
 
       {activeTab === 'scan' && (
