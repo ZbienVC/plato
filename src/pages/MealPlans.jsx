@@ -7,6 +7,7 @@ import { RecipeBook } from '../components/organisms/RecipeBook';
 import { GroceryList } from '../components/organisms/GroceryList';
 import { YouTubeImporter } from '../components/organisms/YouTubeImporter';
 import { RestaurantBrowser } from '../components/organisms/RestaurantBrowser';
+import { Skeleton } from '../components/atoms/Skeleton';
 
 const stagger = { animate: { transition: { staggerChildren: 0.06 } } };
 const item = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
@@ -21,8 +22,38 @@ const MEAL_TYPE_ICONS = {
 };
 const getMealIcon = (type) => MEAL_TYPE_ICONS[type?.toLowerCase()] || <Utensils className="w-4 h-4 text-slate-400" />;
 
+const MacroSkeletonCard = () => (
+  <div className="app-card">
+    <Skeleton className="h-4 w-28 mb-4" />
+    <div className="grid grid-cols-4 gap-2">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="text-center space-y-2">
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-3 w-2/3 mx-auto" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const PlanRowsSkeleton = () => (
+  <div className="space-y-3">
+    {[1, 2, 3].map((i) => (
+      <div key={i} className="app-card">
+        <div className="flex items-center gap-3">
+          <Skeleton className="w-16 h-16 rounded-2xl" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-3 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 export function MealPlans() {
-  const { plan, logMeal, savedPlans, recipes, favorites, setActiveTab, saveRecipe, swapMeal, showMealImages } = useApp();
+  const { plan, planLoading, logMeal, savedPlans, recipes, favorites, setActiveTab, saveRecipe, swapMeal, showMealImages } = useApp();
   const [activeTab, setTab] = useState('plan');
   const [showRecipes, setShowRecipes] = useState(false);
   const [recipeIndex, setRecipeIndex] = useState(0);
@@ -65,7 +96,11 @@ export function MealPlans() {
       {activeTab === 'plan' && (
         <>
           {/* Macro summary */}
-          {hasPlan && (
+          {planLoading ? (
+            <motion.div variants={item}>
+              <MacroSkeletonCard />
+            </motion.div>
+          ) : hasPlan && (
             <motion.div variants={item} className="app-card">
               <div className="grid grid-cols-4 gap-2 text-center">
                 {[
@@ -96,7 +131,11 @@ export function MealPlans() {
           )}
 
           {/* Day meals */}
-          {hasPlan && dayMeals.length > 0 && (
+          {planLoading ? (
+            <motion.div variants={item}>
+              <PlanRowsSkeleton />
+            </motion.div>
+          ) : hasPlan && dayMeals.length > 0 && (
             <motion.div variants={item} className="space-y-3">
               {dayMeals.map((meal, i) => (
                 <div key={i} className="app-card overflow-hidden">

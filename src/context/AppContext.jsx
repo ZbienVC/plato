@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { MEAL_DATABASE } from '../services/mealGenerator';
+import { saveLogEntry } from '../lib/api';
 
 const AppContext = createContext(null);
 
@@ -18,6 +19,14 @@ function saveState(key, value) {
   try {
     localStorage.setItem(`plato_${key}`, JSON.stringify(value));
   } catch { /* quota exceeded, ignore */ }
+}
+
+function inferSlotFromTime(date = new Date()) {
+  const hour = date.getHours();
+  if (hour < 11) return 'breakfast';
+  if (hour < 15) return 'lunch';
+  if (hour < 21) return 'dinner';
+  return 'snack';
 }
 
 export function AppProvider({ children }) {
@@ -50,6 +59,7 @@ export function AppProvider({ children }) {
 
   // === ACTIVE PLAN ===
   const [plan, setPlan] = useState(() => loadState('plan', null));
+  const [planLoading, setPlanLoading] = useState(false);
 
   // === DAILY LOG ===
   const today = new Date().toISOString().split('T')[0];
@@ -122,15 +132,34 @@ export function AppProvider({ children }) {
 
   // === ACTIONS ===
   const logMeal = useCallback((meal) => {
+    const loggedAt = new Date();
+    const baseSlot = meal.slot || meal.type || inferSlotFromTime(loggedAt);
+    const inferredSlot = typeof baseSlot === 'string' ? baseSlot.toLowerCase() : 'lunch';
+
+    const normalizedMeal = {
+      name: meal.name || 'Meal',
+      calories: Number(meal.calories) || 0,
+      protein: Number(meal.protein) || 0,
+      carbs: Number(meal.carbs) || 0,
+      fat: Number(meal.fat) || 0,
+      type: inferredSlot,
+      slot: inferredSlot,
+      loggedAt: loggedAt.toISOString(),
+      source: meal.source || 'manual',
+      notes: meal.notes || '',
+    };
+
     setDailyLog(prev => ({
       ...prev,
-      meals: [...prev.meals, { ...meal, loggedAt: new Date().toISOString() }],
-      totalCalories: prev.totalCalories + (meal.calories || 0),
-      totalProtein: prev.totalProtein + (meal.protein || 0),
-      totalCarbs: prev.totalCarbs + (meal.carbs || 0),
-      totalFat: prev.totalFat + (meal.fat || 0),
+      meals: [...prev.meals, normalizedMeal],
+      totalCalories: prev.totalCalories + normalizedMeal.calories,
+      totalProtein: prev.totalProtein + normalizedMeal.protein,
+      totalCarbs: prev.totalCarbs + normalizedMeal.carbs,
+      totalFat: prev.totalFat + normalizedMeal.fat,
     }));
-  }, []);
+
+    saveLogEntry(normalizedMeal).catch(() => {});
+  }, [setDailyLog]);
 
   const logWeight = useCallback((weight) => {
     const date = new Date().toISOString().split('T')[0];
@@ -230,6 +259,7 @@ export function AppProvider({ children }) {
     planConfig, setPlanConfig,
     // Plan
     plan, setPlan,
+    planLoading, setPlanLoading,
     // Daily
     dailyLog, setDailyLog, logMeal,
     logHistory, setLogHistory, archiveDailyLog,

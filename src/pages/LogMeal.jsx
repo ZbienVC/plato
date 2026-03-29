@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, ImagePlus, Mic, MicOff, Search, Sparkles, Upload, Wand2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { MEAL_DATABASE } from '../services/mealGenerator';
+import { FoodImage } from '../components/molecules/FoodImage';
 
 const stagger = { animate: { transition: { staggerChildren: 0.06 } } };
 const item = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
@@ -359,11 +360,14 @@ export function LogMeal() {
                     key={i}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => handleLog(food)}
-                    className="text-left p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-green-200 hover:bg-green-50 transition-colors active:bg-green-100"
+                    className="flex items-center gap-3 text-left p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-green-200 hover:bg-green-50 transition-colors active:bg-green-100"
                   >
-                    <p className="text-sm font-semibold text-slate-800 leading-tight">{food.name}</p>
-                    <p className="text-xs text-green-600 font-bold mt-1">{food.calories} cal</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{food.protein}P · {food.carbs}C · {food.fat}F</p>
+                    <FoodImage mealName={food.name} mealType={food.type} size="xs" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-800 leading-tight truncate">{food.name}</p>
+                      <p className="text-xs text-green-600 font-bold mt-0.5">{food.calories} cal</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 whitespace-nowrap">{food.protein}P · {food.carbs}C · {food.fat}F</p>
+                    </div>
                   </motion.button>
                 ))
               }

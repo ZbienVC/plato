@@ -10,6 +10,8 @@ import { Profile } from './pages/Profile';
 import { WeightTracker } from './components/organisms/WeightTracker';
 import { GroceryList } from './components/organisms/GroceryList';
 import { SettingsPanel } from './components/organisms/SettingsPanel';
+import { VoiceLogOverlay } from './components/organisms/VoiceLogOverlay';
+import { useToast } from './components/organisms/Toast';
 import './styles/index.css';
 
 // Simple Explore page
@@ -102,7 +104,10 @@ function AppContent() {
   const {
     activeTab, setActiveTab,
     userProfile, plan,
+    showVoiceLog, setShowVoiceLog,
+    logMeal,
   } = useApp();
+  const { showToast, ToastContainer } = useToast();
 
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const needsOnboarding = !hasOnboarded && !userProfile?.name;
@@ -128,19 +133,32 @@ function AppContent() {
   };
 
   return (
-    <MainLayout activeTab={activeTab} onTabChange={setActiveTab}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, x: 8 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -8 }}
-          transition={{ duration: 0.18, ease: 'easeOut' }}
-        >
-          {renderTab()}
-        </motion.div>
-      </AnimatePresence>
-    </MainLayout>
+    <>
+      <MainLayout activeTab={activeTab} onTabChange={setActiveTab}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+          >
+            {renderTab()}
+          </motion.div>
+        </AnimatePresence>
+      </MainLayout>
+      {showVoiceLog && (
+        <VoiceLogOverlay
+          onClose={() => setShowVoiceLog(false)}
+          onSave={(entry) => logMeal(entry)}
+          onSuccess={() => {
+            setShowVoiceLog(false);
+            showToast('Meal logged from voice!', 'success', 2400);
+          }}
+        />
+      )}
+      <ToastContainer />
+    </>
   );
 }
 

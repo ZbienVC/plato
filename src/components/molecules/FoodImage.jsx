@@ -1,64 +1,64 @@
 import React from 'react';
-import { Utensils, Coffee, Salad, Apple, ChefHat } from 'lucide-react';
+import breakfastOats from '../../images/breakfast-oats.jpg';
+import chickenSalad from '../../images/chicken-salad.jpg';
+import salmonBowl from '../../images/salmon-bowl.jpg';
+import smoothieGlass from '../../images/smoothie.jpg';
+import snackBoard from '../../images/snack-board.jpg';
+import pastaBowl from '../../images/pasta.jpg';
 
-const FOOD_EMOJI = {
-  breakfast: '☕',
-  lunch: '🥗',
-  dinner: '🍽️',
-  snack: '🍎',
-  default: '🍴',
-};
-
-const MEAL_GRADIENTS = {
-  breakfast: { gradient: 'from-amber-400 to-orange-500', icon: Coffee },
-  lunch: { gradient: 'from-green-400 to-emerald-500', icon: Salad },
-  dinner: { gradient: 'from-violet-500 to-purple-600', icon: Utensils },
-  snack: { gradient: 'from-pink-400 to-rose-500', icon: Apple },
-  default: { gradient: 'from-slate-400 to-slate-600', icon: ChefHat },
-};
-
-const FOOD_GRADIENTS = [
-  'from-green-400 to-teal-500',
-  'from-blue-400 to-indigo-500',
-  'from-orange-400 to-amber-500',
-  'from-rose-400 to-pink-500',
-  'from-violet-400 to-purple-500',
-  'from-cyan-400 to-sky-500',
+const KEYWORD_IMAGES = [
+  { tokens: ['oat', 'yogurt', 'breakfast', 'egg', 'toast', 'parfait'], src: breakfastOats },
+  { tokens: ['salmon', 'shrimp', 'tuna', 'poke', 'fish'], src: salmonBowl },
+  { tokens: ['chicken', 'turkey', 'salad', 'wrap', 'shawarma'], src: chickenSalad },
+  { tokens: ['smoothie', 'shake', 'drink'], src: smoothieGlass },
+  { tokens: ['snack', 'apple', 'almond', 'trail', 'cottage'], src: snackBoard },
+  { tokens: ['pasta', 'bowl', 'rice', 'curry'], src: pastaBowl },
 ];
 
-function hashString(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash) + str.charCodeAt(i);
-  return Math.abs(hash);
+const TYPE_FALLBACKS = {
+  breakfast: breakfastOats,
+  lunch: chickenSalad,
+  dinner: salmonBowl,
+  snack: snackBoard,
+  default: pastaBowl,
+};
+
+function getImageForMeal(name = '', mealType = 'default') {
+  const lower = name.toLowerCase();
+  const keywordMatch = KEYWORD_IMAGES.find(entry => entry.tokens.some(token => lower.includes(token)));
+  if (keywordMatch) return keywordMatch.src;
+  const typeKey = mealType?.toLowerCase?.() || 'default';
+  return TYPE_FALLBACKS[typeKey] || TYPE_FALLBACKS.default;
 }
+
+const SIZES = {
+  xs: 'w-10 h-10 rounded-lg',
+  sm: 'w-12 h-12 rounded-xl',
+  md: 'w-16 h-16 rounded-2xl',
+  lg: 'w-full h-40 rounded-2xl',
+  hero: 'w-full h-52 rounded-3xl',
+};
 
 export function FoodImage({ mealName = '', mealType = 'default', size = 'md', name = '' }) {
   const resolvedName = mealName || name;
-  const normalizedType = mealType?.toLowerCase();
-  const config = MEAL_GRADIENTS[normalizedType] || MEAL_GRADIENTS.default;
-  const gradientIndex = hashString(resolvedName) % FOOD_GRADIENTS.length;
-  const gradient = resolvedName ? FOOD_GRADIENTS[gradientIndex] : config.gradient;
-  const Icon = config.icon;
-  const emoji = FOOD_EMOJI[normalizedType] || FOOD_EMOJI.default;
-
-  const sizes = {
-    sm: 'w-12 h-12 rounded-xl',
-    md: 'w-16 h-16 rounded-2xl',
-    lg: 'w-full h-40 rounded-2xl',
-    hero: 'w-full h-52 rounded-3xl',
-  };
-
-  const iconSizes = { sm: 'w-5 h-5', md: 'w-7 h-7', lg: 'w-10 h-10', hero: 'w-14 h-14' };
-  const emojiSizes = { sm: 'text-lg', md: 'text-2xl', lg: 'text-5xl', hero: 'text-6xl' };
+  const imageSrc = getImageForMeal(resolvedName, mealType);
+  const sizeClass = SIZES[size] || SIZES.md;
+  const showLabel = size === 'lg' || size === 'hero';
+  const label = resolvedName || mealType;
 
   return (
-    <div className={`relative overflow-hidden bg-gradient-to-br ${gradient} ${sizes[size] || sizes.md} flex items-center justify-center flex-shrink-0 shadow-sm`}>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.28),transparent_45%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/10 to-transparent" />
-      {size === 'lg' || size === 'hero' ? (
-        <span className={`relative z-10 drop-shadow-sm ${emojiSizes[size] || emojiSizes.md}`}>{emoji}</span>
-      ) : (
-        <Icon className={`relative z-10 ${iconSizes[size] || iconSizes.md} text-white/85`} />
+    <div className={`relative overflow-hidden flex-shrink-0 bg-slate-200 shadow-sm ${sizeClass}`}>
+      <img
+        src={imageSrc}
+        alt={resolvedName || `${mealType} meal`}
+        className="absolute inset-0 w-full h-full object-cover"
+        loading="lazy"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/10 to-transparent" />
+      {showLabel && (
+        <div className="absolute bottom-3 left-3 right-3">
+          <p className="text-xs font-semibold text-white drop-shadow truncate">{label}</p>
+        </div>
       )}
     </div>
   );

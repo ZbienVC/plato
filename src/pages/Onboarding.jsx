@@ -32,7 +32,7 @@ const Field = ({ label, ...props }) => (
 );
 
 export function Onboarding({ onComplete }) {
-  const { setUserProfile, setPlanConfig, setPlan } = useApp();
+  const { setUserProfile, setPlanConfig, setPlan, setPlanLoading } = useApp();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: '', age: 25, gender: 'male', heightFeet: 5, heightInches: 8,
@@ -58,14 +58,19 @@ export function Onboarding({ onComplete }) {
   };
 
   const generate = async () => {
+    setPlanLoading(true);
     setStep(4);
-    for (let i = 0; i < 5; i++) { setGenStep(i); await new Promise(r => setTimeout(r, 450)); }
-    const macros = calcMacros();
-    const meals = generateMealPlan(macros.calories, macros, form.mealsPerDay, form);
-    const plan = { ...macros, name: form.name || 'My Plan', meals, mealsPerDay: form.mealsPerDay, createdAt: new Date().toISOString() };
-    setUserProfile({ name: form.name, age: form.age, gender: form.gender, height: { feet: form.heightFeet, inches: form.heightInches }, weight: form.weight, activityLevel: form.activity });
-    setPlanConfig({ goal: form.goal, trainingType: form.trainingType, trainingDays: form.trainingDays, dietStyle: form.dietStyle, mealsPerDay: form.mealsPerDay, cookTime: form.cookTime, cuisines: form.cuisines, restrictions: form.restrictions, activity: form.activity });
-    setPlan(plan); setGenPlan(plan); setStep(5);
+    try {
+      for (let i = 0; i < 5; i++) { setGenStep(i); await new Promise(r => setTimeout(r, 450)); }
+      const macros = calcMacros();
+      const meals = generateMealPlan(macros.calories, macros, form.mealsPerDay, form);
+      const plan = { ...macros, name: form.name || 'My Plan', meals, mealsPerDay: form.mealsPerDay, createdAt: new Date().toISOString() };
+      setUserProfile({ name: form.name, age: form.age, gender: form.gender, height: { feet: form.heightFeet, inches: form.heightInches }, weight: form.weight, activityLevel: form.activity });
+      setPlanConfig({ goal: form.goal, trainingType: form.trainingType, trainingDays: form.trainingDays, dietStyle: form.dietStyle, mealsPerDay: form.mealsPerDay, cookTime: form.cookTime, cuisines: form.cuisines, restrictions: form.restrictions, activity: form.activity });
+      setPlan(plan); setGenPlan(plan); setStep(5);
+    } finally {
+      setPlanLoading(false);
+    }
   };
 
   const TOTAL_STEPS = 3;

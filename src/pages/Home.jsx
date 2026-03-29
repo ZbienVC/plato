@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Coffee, Salad, Utensils, Apple, Plus, CheckCircle2 } from 'lucide-react';
+import { Flame, Coffee, Salad, Utensils, Apple, Plus, CheckCircle2, Mic } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
 import { FoodImage } from '../components/molecules/FoodImage';
+import { Skeleton } from '../components/atoms/Skeleton';
 
 const stagger = { animate: { transition: { staggerChildren: 0.07 } } };
 const item = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0, transition: { duration: 0.35 } } };
@@ -65,8 +66,25 @@ function MacroBar({ label, current, target, color }) {
 
 const slots = ['breakfast', 'lunch', 'dinner', 'snack', 'snack'];
 
+const PlanSkeletonCard = () => (
+  <div className="app-card">
+    <Skeleton className="h-4 w-24 mb-4" />
+    <div className="space-y-3">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="flex items-center gap-3">
+          <Skeleton className="w-14 h-14 rounded-2xl" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-3 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 export function Home() {
-  const { plan, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak } = useApp();
+  const { plan, planLoading, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak } = useApp();
   const { targets, current } = useMacros();
   const hasPlan = plan?.meals?.length > 0;
   const todayMeals = dailyLog?.meals || [];
@@ -164,6 +182,23 @@ export function Home() {
         <MacroBar label="Fat" current={current.fat} target={targets.fat} color="#F43F5E" />
       </motion.div>
 
+      {/* Voice Log CTA */}
+      <motion.button
+        variants={item}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => setShowVoiceLog(true)}
+        className="app-card flex items-center gap-3 text-left"
+      >
+        <div className="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
+          <Mic className="w-5 h-5" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-slate-900">Voice Log</p>
+          <p className="text-xs text-slate-500">Speak a meal to auto-fill calories & macros</p>
+        </div>
+        <div className="text-xs font-semibold text-green-600">Tap</div>
+      </motion.button>
+
       {/* Today's Logged Meals */}
       {todayMeals.length > 0 && (
         <motion.div variants={item} className="app-card">
@@ -200,7 +235,11 @@ export function Home() {
       )}
 
       {/* Today's Plan */}
-      {hasPlan && todaysPlanned.length > 0 && (
+      {planLoading ? (
+        <motion.div variants={item}>
+          <PlanSkeletonCard />
+        </motion.div>
+      ) : hasPlan && todaysPlanned.length > 0 && (
         <motion.div variants={item} className="app-card">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold text-slate-900">Today's Plan</h2>
