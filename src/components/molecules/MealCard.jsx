@@ -39,7 +39,7 @@ export function MealCard({ meal, mealSlot, time, onLog, onSwap, logged = false, 
         )}
         {logged && (
           <div className="w-8 h-8 rounded-xl bg-green-100 flex items-center justify-center">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="3">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
           </div>
@@ -48,7 +48,7 @@ export function MealCard({ meal, mealSlot, time, onLog, onSwap, logged = false, 
           <motion.button
             whileTap={{ scale: 0.92 }}
             onClick={e => { e.stopPropagation(); onSwap(meal); }}
-            className="p-2 rounded-xl bg-slate-100 text-slate-500"
+            className="p-2 rounded-xl app-card-soft text-slate-500"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
