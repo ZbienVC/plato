@@ -328,7 +328,7 @@ export function Onboarding({ onComplete }) {
                       i < genStep ? 'bg-emerald-500' : i === genStep ? 'border-2 border-emerald-500' : 'border border-slate-200'
                     }`}>
                       {i < genStep && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
-                      {i === genStep && <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1.5 h-1.5 bg-green-500 rounded-full" />}
+                      {i === genStep && <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1.5 h-1.5 rounded-full" style={{ background: "linear-gradient(135deg,#10b981,#6366f1)" }} />}
                     </div>
                     <span className={`text-sm ${i <= genStep ? 'text-slate-900' : 'text-slate-300'}`}>{l}</span>
                   </motion.div>
