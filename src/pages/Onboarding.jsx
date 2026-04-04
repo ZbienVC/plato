@@ -17,9 +17,9 @@ const trans = { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] };
 
 const Chip = ({ label, active, onClick }) => (
   <motion.button whileTap={{ scale: 0.95 }} onClick={onClick}
-    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
-      active ? 'text-white border-transparent shadow-md'  : 'border-slate-200 text-slate-600 hover:border-emerald-300'
-    }`}>{label}</motion.button>
+    className={px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ${active ? 'text-white border-transparent' : 'border-slate-200 text-slate-600 hover:border-emerald-300'}`}
+    style={active ? { background: 'linear-gradient(135deg,#10b981,#059669)' } : {}}
+  >{label}</motion.button>
 );
 
 const Label = ({ children }) => <p className="text-xs font-semibold uppercase tracking-[1.5px] text-slate-400 mb-2">{children}</p>;
@@ -146,7 +146,7 @@ export function Onboarding({ onComplete }) {
                   className="w-full py-3.5 rounded-xl text-white font-bold text-base" style={{ background: "linear-gradient(135deg,#10b981,#059669)", boxShadow: "0 6px 20px rgba(16,185,129,0.35)" }}>
                   Get Started
                 </motion.button>
-                <p className="text-xs text-slate-400 mt-3">Free · No account needed</p>
+                <p className="text-xs text-slate-400 mt-3">Free &middot; No account needed</p>
               </motion.div>
             </motion.div>
           )}
