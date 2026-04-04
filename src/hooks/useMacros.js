@@ -6,31 +6,53 @@ import { useApp } from '../context/AppContext';
  * Returns: { caloriesProgress, proteinProgress, carbsProgress, fatProgress, remaining, isOnTrack }
  */
 export function useMacros() {
-  const { plan, dailyLog } = useApp();
+  const { plan, dailyLog, planConfig, userProfile } = useApp();
 
   return useMemo(() => {
+    // Use planConfig targets if no active plan yet (set during onboarding)
+    const defaultTargets = {
+      calories: planConfig?.calories || (userProfile?.calorieTarget) || 2000,
+      protein:  planConfig?.protein  || (userProfile?.proteinTarget) || 150,
+      carbs:    planConfig?.carbs    || (userProfile?.carbTarget)    || 200,
+      fat:      planConfig?.fat      || (userProfile?.fatTarget)     || 65,
+    };
+
     if (!plan) {
+      const todayLog = dailyLog?.date === new Date().toISOString().split('T')[0] ? dailyLog : null;
+      const cur = { calories: todayLog?.totalCalories || 0, protein: todayLog?.totalProtein || 0, carbs: todayLog?.totalCarbs || 0, fat: todayLog?.totalFat || 0 };
       return {
-        targets: { calories: 2000, protein: 150, carbs: 200, fat: 65 },
-        current: { calories: 0, protein: 0, carbs: 0, fat: 0 },
-        remaining: { calories: 2000, protein: 150, carbs: 200, fat: 65 },
-        progress: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+        targets: defaultTargets,
+        current: cur,
+        remaining: {
+          calories: Math.max(0, defaultTargets.calories - cur.calories),
+          protein:  Math.max(0, defaultTargets.protein  - cur.protein),
+          carbs:    Math.max(0, defaultTargets.carbs    - cur.carbs),
+          fat:      Math.max(0, defaultTargets.fat      - cur.fat),
+        },
+        progress: {
+          calories: defaultTargets.calories > 0 ? Math.min(1, cur.calories / defaultTargets.calories) : 0,
+          protein:  defaultTargets.protein  > 0 ? Math.min(1, cur.protein  / defaultTargets.protein)  : 0,
+          carbs:    defaultTargets.carbs    > 0 ? Math.min(1, cur.carbs    / defaultTargets.carbs)    : 0,
+          fat:      defaultTargets.fat      > 0 ? Math.min(1, cur.fat      / defaultTargets.fat)      : 0,
+        },
         isOnTrack: true,
       };
     }
 
     const targets = {
-      calories: plan.calories || 2000,
-      protein: plan.protein || 150,
-      carbs: plan.carbs || 200,
-      fat: plan.fat || 65,
+      calories: plan.calories || defaultTargets.calories,
+      protein:  plan.protein  || defaultTargets.protein,
+      carbs:    plan.carbs    || defaultTargets.carbs,
+      fat:      plan.fat      || defaultTargets.fat,
     };
 
+    // Guard against stale log from a different day
+    const isToday = dailyLog?.date === new Date().toISOString().split('T')[0];
     const current = {
-      calories: dailyLog.totalCalories,
-      protein: dailyLog.totalProtein,
-      carbs: dailyLog.totalCarbs,
-      fat: dailyLog.totalFat,
+      calories: isToday ? (dailyLog?.totalCalories || 0) : 0,
+      protein:  isToday ? (dailyLog?.totalProtein  || 0) : 0,
+      carbs:    isToday ? (dailyLog?.totalCarbs    || 0) : 0,
+      fat:      isToday ? (dailyLog?.totalFat      || 0) : 0,
     };
 
     const remaining = {
