@@ -160,20 +160,25 @@ export function SettingsPanel() {
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Units</p>
         </div>
         <div className="px-4 py-4">
+          <div className="flex gap-2">
             <button
               onClick={() => setUnits('imperial')}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'imperial' ? 'text-white btn-primary' : 'text-slate-500 app-card-soft'}`}>
-              Imperial
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'imperial' ? 'bg-green-500 text-white' : 'app-card-soft text-slate-600'}`}
+            >
+              Imperial (lbs/ft)
             </button>
             <button
               onClick={() => setUnits('metric')}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'metric' ? 'text-white btn-primary' : 'text-slate-500 app-card-soft'}`}>
-              Metric
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'metric' ? 'bg-green-500 text-white' : 'app-card-soft text-slate-600'}`}
+            >
+              Metric (kg/cm)
             </button>
           </div>
         </div>
       </div>
 
+      {/* About */}
+      <div className="app-card">
         <div className="px-4 py-3 border-b border-slate-50">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">About</p>
         </div>
@@ -222,11 +227,11 @@ export function SettingsPanel() {
             </div>
           </div>
         )}
-
       {/* Custom Macro Goals */}
       <div className="app-card">
         <MacroGoalsEditor />
       </div>
+
       </div>
     </div>
   );
