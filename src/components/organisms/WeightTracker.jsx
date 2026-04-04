@@ -31,6 +31,37 @@ export function WeightTracker({ entries = [], onLog, dark = true, onClose }) {
   const max = chartEntries.length > 0 ? Math.max(...chartEntries.map(e => e.weight)) + 2 : 1;
   const range = max - min || 1;
 
+  const bmiCard = bmi ? (
+    <div className="app-card" style={{ marginBottom: 12 }}>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "#94a3b8" }}>Body Mass Index</p>
+        <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: bmiColor + "18", color: bmiColor }}>{bmiCategory}</span>
+      </div>
+      <div className="flex items-center gap-4">
+        <div>
+          <p className="text-3xl font-black" style={{ color: bmiColor }}>{bmi}</p>
+          <p className="text-xs" style={{ color: "#94a3b8" }}>BMI</p>
+        </div>
+        <div className="flex-1">
+          <div className="h-3 rounded-full overflow-hidden" style={{ background: "rgba(99,102,241,0.1)" }}>
+            <div className="h-full rounded-full transition-all" style={{
+              width: `${Math.min(100, ((bmi - 15) / 25) * 100)}%`,
+              background: bmiColor
+            }} />
+          </div>
+          <div className="flex justify-between text-[10px] mt-1" style={{ color: "#94a3b8" }}>
+            <span>15</span><span>18.5</span><span>25</span><span>30</span><span>40</span>
+          </div>
+        </div>
+      </div>
+      {idealWeightMin > 0 && (
+        <p className="text-xs mt-2" style={{ color: "#94a3b8" }}>
+          Ideal range: <span style={{ color: "#1e293b", fontWeight: 600 }}>{idealWeightMin}–{idealWeightMax} lbs</span>
+        </p>
+      )}
+    </div>
+  ) : null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className={`w-full max-w-[420px] max-h-[85vh] flex flex-col rounded-2xl overflow-hidden ${
@@ -107,7 +138,38 @@ export function WeightTracker({ entries = [], onLog, dark = true, onClose }) {
                 {chartEntries.map((entry, i) => {
                   const height = 8 + ((entry.weight - min) / range) * 80;
                   const isLatest = i === chartEntries.length - 1;
-                  return (
+                  const bmiCard = bmi ? (
+    <div className="app-card" style={{ marginBottom: 12 }}>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "#94a3b8" }}>Body Mass Index</p>
+        <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: bmiColor + "18", color: bmiColor }}>{bmiCategory}</span>
+      </div>
+      <div className="flex items-center gap-4">
+        <div>
+          <p className="text-3xl font-black" style={{ color: bmiColor }}>{bmi}</p>
+          <p className="text-xs" style={{ color: "#94a3b8" }}>BMI</p>
+        </div>
+        <div className="flex-1">
+          <div className="h-3 rounded-full overflow-hidden" style={{ background: "rgba(99,102,241,0.1)" }}>
+            <div className="h-full rounded-full transition-all" style={{
+              width: `${Math.min(100, ((bmi - 15) / 25) * 100)}%`,
+              background: bmiColor
+            }} />
+          </div>
+          <div className="flex justify-between text-[10px] mt-1" style={{ color: "#94a3b8" }}>
+            <span>15</span><span>18.5</span><span>25</span><span>30</span><span>40</span>
+          </div>
+        </div>
+      </div>
+      {idealWeightMin > 0 && (
+        <p className="text-xs mt-2" style={{ color: "#94a3b8" }}>
+          Ideal range: <span style={{ color: "#1e293b", fontWeight: 600 }}>{idealWeightMin}–{idealWeightMax} lbs</span>
+        </p>
+      )}
+    </div>
+  ) : null;
+
+  return (
                     <div
                       key={i}
                       className={`flex-1 rounded-sm transition-all ${
