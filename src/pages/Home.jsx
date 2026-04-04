@@ -236,7 +236,7 @@ export function Home() {
                     <Trash2 className="w-3.5 h-3.5" />
                   </motion.button>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
           <motion.button
