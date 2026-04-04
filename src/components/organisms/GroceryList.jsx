@@ -108,7 +108,7 @@ export function GroceryList({ meals = [], dark = true, onClose }) {
                         className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
                           checked
                             ? dark ? 'bg-emerald-500/5 opacity-50' : 'bg-emerald-50 opacity-50'
-                            : dark ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-50 hover:bg-slate-100'
+                            : dark ? 'bg-white/5 hover:bg-white/10' : 'app-card-soft hover:bg-slate-100'
                         }`}
                       >
                         <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
