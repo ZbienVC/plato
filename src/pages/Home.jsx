@@ -22,22 +22,29 @@ const getMealIcon = (type) => MEAL_ICONS[type?.toLowerCase()] || <Utensils class
 function CalorieRing({ current, target }) {
   const r = 70;
   const circ = 2 * Math.PI * r;
-  const pct = target > 0 ? Math.min(current / target, 1) : 0;
-  const dash = pct * circ;
+  const rawPct = target > 0 ? Math.min(current / target, 1) : 0;
+  const pct = rawPct; // show actual progress
+  const dash = Math.max(pct * circ, circ * 0.03); // minimum visible arc
 
   return (
     <svg width="180" height="180" viewBox="0 0 180 180" className="rotate-[-90deg]">
+      <defs>
+        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#10b981" />
+          <stop offset="100%" stopColor="#6366f1" />
+        </linearGradient>
+      </defs>
       <circle cx="90" cy="90" r={r} fill="none" stroke="rgba(99,102,241,0.1)" strokeWidth="12" />
       <motion.circle
         cx="90" cy="90" r={r}
         fill="none"
-        stroke="#10b981"
+        stroke="url(#ringGrad)"
         strokeWidth="12"
         strokeLinecap="round"
         strokeDasharray={`${circ}`}
         initial={{ strokeDashoffset: circ }}
         animate={{ strokeDashoffset: circ - dash }}
-        transition={{ duration: 1, ease: 'easeOut' }}
+        transition={{ duration: 1.2, ease: [0.34,1.56,0.64,1] }}
       />
     </svg>
   );
@@ -48,17 +55,17 @@ function MacroBar({ label, current, target, color }) {
   const pct = target > 0 ? Math.min(current / target, 1) * 100 : 0;
   return (
     <div>
-      <div className="flex justify-between mb-1">
-        <span className="text-xs font-semibold" style={{ color }}>{label}</span>
-        <span className="text-xs text-slate-400 tabular-nums">{current}g / {target}g</span>
+      <div className="flex justify-between mb-1.5">
+        <span className="text-xs font-bold" style={{ color }}>{label}</span>
+        <span className="text-xs text-slate-400 tabular-nums font-medium">{current}g <span className="text-slate-300">/</span> {target}g</span>
       </div>
-      <div className="progress-bar">
+      <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(99,102,241,0.08)" }}>
         <motion.div
-          className="progress-fill"
-          style={{ background: color }}
-          initial={{ width: '0%' }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="h-full rounded-full"
+          style={{ background: `linear-gradient(90deg, ${color}cc, ${color})` }}
+          initial={{ width: "0%" }}
+          animate={{ width: `${Math.max(pct, pct > 0 ? 3 : 0)}%` }}
+          transition={{ duration: 0.9, ease: [0.34,1.56,0.64,1] }}
         />
       </div>
     </div>
