@@ -18,6 +18,12 @@ function clearToken() {
   localStorage.removeItem('plato_token');
 }
 
+// Safe JSON parse — prevents "Unexpected end of JSON input" on empty responses
+async function safeJson(res: Response): Promise<Record<string, unknown>> {
+  const text = await res.text();
+  if (!text || !text.trim()) return {};
+  try { return JSON.parse(text); } catch { return {}; }
+}
 function authHeaders() {
   const token = getToken();
   return token
@@ -97,8 +103,8 @@ export const auth = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, username }),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Signup failed');
+    const data = await safeJson(res);
+    if (!res.ok) throw new Error((data.error as string) || 'Signup failed');
     setToken(data.token);
     return data;
   },
@@ -110,8 +116,8 @@ export const auth = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Login failed');
+    const data = await safeJson(res);
+    if (!res.ok) throw new Error((data.error as string) || 'Login failed');
     setToken(data.token);
     return data;
   },
