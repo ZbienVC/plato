@@ -175,8 +175,8 @@ export function Home() {
             <p className="text-3xl font-black text-slate-900 tabular-nums">{current.calories.toLocaleString()}</p>
             <p className="text-xs text-slate-400 font-medium">of {targets.calories.toLocaleString()} kcal</p>
             {targets.calories > 0 && (
-              <p className="text-xs font-semibold mt-1 gradient-text">
-                {Math.max(0, targets.calories - current.calories)} remaining
+              <p className="text-xs font-semibold mt-1" style={{ color: "#10b981" }}>
+                {Math.max(0, targets.calories - current.calories)} cal left
               </p>
             )}
           </div>
@@ -287,7 +287,7 @@ export function Home() {
               const slot = slots[i] || 'snack';
               return (
                 <div key={i} className={`flex items-center justify-between px-3 py-2.5 rounded-xl border ${
-                  logged ? 'border-l-2 border-emerald-400' : 'border-l-2 border-transparent'
+                  logged ? 'border-l-4 border-emerald-400 bg-emerald-50/50' : 'border-l-4 border-transparent'
                 }`}>
                   <div className="flex items-center gap-3">
                     <FoodImage mealName={meal.name} mealType={meal.type || slot} size="sm" />
@@ -373,7 +373,7 @@ export function Home() {
       {/* Quick stats */}
       <motion.div variants={item} className="grid grid-cols-3 gap-3">
         {[
-          { l: 'Meals', v: todayMeals.length, color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
+          { l: 'Meals', v: todayMeals.length, color: '#10b981', bg: 'rgba(16,185,129,0.07)' },
           { l: 'Protein', v: `${current.protein}g`, color: '#3B82F6', bg: '#EFF6FF' },
           { l: 'Progress', v: `${targets.calories > 0 ? Math.round(current.calories / targets.calories * 100) : 0}%`, color: '#F59E0B', bg: '#FFFBEB' },
         ].map(s => (
