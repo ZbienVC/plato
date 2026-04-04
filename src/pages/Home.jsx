@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Coffee, Salad, Utensils, Apple, Plus, CheckCircle2, Mic, Lock } from 'lucide-react';
+import { Flame, Coffee, Salad, Utensils, Apple, Plus, CheckCircle2, Mic, Lock, Trash2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
 import { FoodImage } from '../components/molecules/FoodImage';
@@ -84,7 +84,7 @@ const PlanSkeletonCard = () => (
 );
 
 export function Home() {
-  const { plan, planLoading, dailyLog, logMeal, userProfile, setActiveTab, setShowVoiceLog, streak, isPremiumActive, openPremiumModal } = useApp();
+  const { plan, planLoading, dailyLog, logMeal, removeMeal, userProfile, setActiveTab, setShowVoiceLog, streak, isPremiumActive, openPremiumModal, isLoggedIn, setAuthModalOpen } = useApp();
   const { targets, current } = useMacros();
   const hasPlan = plan?.meals?.length > 0;
   const todayMeals = dailyLog?.meals || [];
@@ -215,7 +215,7 @@ export function Home() {
           </div>
           <div className="space-y-2">
             {todayMeals.map((m, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+              <motion.div key={i} layout className="flex items-center justify-between py-2.5 px-1 border-b border-slate-50 last:border-0 group">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
                     {getMealIcon(m.type)}
