@@ -13,6 +13,7 @@ import { SettingsPanel } from './components/organisms/SettingsPanel';
 import { VoiceLogOverlay } from './components/organisms/VoiceLogOverlay';
 import { PremiumPaywallModal } from './components/organisms/PremiumPaywallModal';
 import { useToast } from './components/organisms/Toast';
+import { AuthModal } from './components/organisms/AuthModal';
 import './styles/index.css';
 
 // Simple Explore page
@@ -160,6 +161,11 @@ function AppContent() {
           }}
         />
       )}
+      <AuthModal
+        open={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        onSuccess={loginSuccess}
+      />
       <PremiumPaywallModal
         open={premiumModalOpen}
         onClose={closePremiumModal}
