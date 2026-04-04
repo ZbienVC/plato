@@ -116,12 +116,21 @@ function AppContent() {
   } = useApp();
   const { showToast, ToastContainer } = useToast();
 
-  const needsOnboarding = !userProfile?.name && !userProfile?.age;
+  // Onboarding gate: persisted in localStorage so refresh doesn't reset it
+  const [hasOnboarded, setHasOnboarded] = useState(
+    () => localStorage.getItem('plato_onboarded') === 'true' || !!userProfile?.name
+  );
+  const needsOnboarding = !hasOnboarded;
+
+  const completeOnboarding = () => {
+    localStorage.setItem('plato_onboarded', 'true');
+    setHasOnboarded(true);
+  };
 
   if (needsOnboarding) {
     return (
       <div>
-        <Onboarding onComplete={() => {}} />
+        <Onboarding onComplete={completeOnboarding} />
         <button
           onClick={() => setAuthModalOpen(true)}
           style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 200, background: 'rgba(34,197,94,0.9)', color: '#fff', border: 'none', borderRadius: 12, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}
