@@ -136,10 +136,15 @@ function AppContent() {
   };
 
   const handleWelcomeAuth = () => {
+    // Welcome is done - go to onboarding for new users
+    // Skip onboarding only if they already completed it (returning user)
+    const alreadyOnboarded = localStorage.getItem('plato_onboarded') === 'true' || !!userProfile?.name;
     localStorage.setItem('plato_welcome_done', 'true');
-    localStorage.setItem('plato_onboarded', 'true');
     setWelcomeDone(true);
-    setHasOnboarded(true);
+    if (alreadyOnboarded) {
+      setHasOnboarded(true);
+    }
+    // else: falls through to onboarding screen
   };
 
   // Show welcome screen first time
@@ -154,6 +159,11 @@ function AppContent() {
         <Onboarding onComplete={completeOnboarding} />
       </div>
     );
+  }
+
+  // Safety guard - if somehow we reach here with no profile, show onboarding
+  if (!userProfile) {
+    return <Onboarding onComplete={completeOnboarding} />;
   }
 
   const renderTab = () => {
