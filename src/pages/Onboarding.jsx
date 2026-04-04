@@ -146,7 +146,7 @@ export function Onboarding({ onComplete }) {
                   className="w-full py-3.5 rounded-xl text-white font-bold text-base" style={{ background: "linear-gradient(135deg,#10b981,#059669)", boxShadow: "0 6px 20px rgba(16,185,129,0.35)" }}>
                   Get Started
                 </motion.button>
-                <p className="text-xs text-slate-400 mt-3">Free \u00B7 No account needed</p>
+                <p className="text-xs text-slate-400 mt-3">Free · No account needed</p>
               </motion.div>
             </motion.div>
           )}
@@ -192,11 +192,11 @@ export function Onboarding({ onComplete }) {
                         form.activity === a.v ? 'border-emerald-300' : 'bg-white border-slate-200'
                       }`}>
                       <div>
-                        <p className={`text-sm font-semibold ${form.activity === a.v ? 'text-green-700' : 'text-slate-800'}`}>{a.l}</p>
+                        <p className={`text-sm font-semibold ${form.activity === a.v ? 'text-emerald-700' : 'text-slate-800'}`}>{a.l}</p>
                         <p className="text-xs text-slate-400">{a.d}</p>
                       </div>
                       {form.activity === a.v && (
-                        <div className="w-5 h-5 rounded-full flex items-center" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }} className2=" justify-center shrink-0">
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
                         </div>
                       )}
@@ -314,7 +314,7 @@ export function Onboarding({ onComplete }) {
           {step === 4 && (
             <motion.div key="gen" {...page} transition={trans}
               className="flex-1 flex flex-col items-center justify-center text-center py-16">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-green-200">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8" style={{ background: "linear-gradient(135deg,#10b981,#6366f1)", boxShadow: "0 8px 24px rgba(16,185,129,0.3)" }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" className="animate-pulse">
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                 </svg>
