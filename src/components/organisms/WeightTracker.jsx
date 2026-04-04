@@ -129,6 +129,7 @@ export function WeightTracker({ entries = [], onLog, dark = true, onClose }) {
           )}
 
           {/* Chart */}
+          {bmiCard}
           {chartEntries.length > 1 && (
             <Card variant="glass" padding="md" dark={dark} className="mb-4">
               <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-3">
