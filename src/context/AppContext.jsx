@@ -112,6 +112,7 @@ export function AppProvider({ children }) {
 
   // === COLLECTIONS ===
   const [savedPlans, setSavedPlans] = useState(() => loadState('savedPlans', []));
+  const [favoriteFoods, setFavoriteFoods] = useState(() => loadState('favoriteFoods', []));
   const [recipes, setRecipes] = useState(() => loadState('recipes', []));
   const [favorites, setFavorites] = useState(() => loadState('favorites', []));
   const [groceryList, setGroceryList] = useState(() => loadState('groceryList', []));
@@ -168,6 +169,7 @@ export function AppProvider({ children }) {
   useEffect(() => { saveState('dailyLog', dailyLog); }, [dailyLog]);
   useEffect(() => { saveState('logHistory', logHistory); }, [logHistory]);
   useEffect(() => { saveState('savedPlans', savedPlans); }, [savedPlans]);
+  useEffect(() => { saveState('favoriteFoods', favoriteFoods); }, [favoriteFoods]);
   useEffect(() => { saveState('recipes', recipes); }, [recipes]);
   useEffect(() => { saveState('favorites', favorites); }, [favorites]);
   useEffect(() => { saveState('groceryList', groceryList); }, [groceryList]);
@@ -264,6 +266,18 @@ export function AppProvider({ children }) {
 
     saveLogEntry(normalizedMeal).catch(() => {});
   }, [setDailyLog]);
+
+  const toggleFavorite = useCallback((food) => {
+    setFavoriteFoods(prev => {
+      const exists = prev.find(f => f.name === food.name);
+      if (exists) return prev.filter(f => f.name !== food.name);
+      return [{ ...food, savedAt: Date.now() }, ...prev].slice(0, 50);
+    });
+  }, []);
+
+  const isFavorite = useCallback((name) => {
+    return favoriteFoods.some(f => f.name === name);
+  }, [favoriteFoods]);
 
   const removeMeal = useCallback((index) => {
     setDailyLog(prev => {
@@ -415,6 +429,7 @@ export function AppProvider({ children }) {
     premiumModalOpen,
     setPremiumModalOpen,
     removeMeal,
+    favoriteFoods, toggleFavorite, isFavorite,
     openPremiumModal,
     // auth
     isLoggedIn,
