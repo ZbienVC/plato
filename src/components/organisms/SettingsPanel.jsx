@@ -95,7 +95,7 @@ export function SettingsPanel() {
           <div className="flex gap-2">
             <button
               onClick={() => setUnits('imperial')}
-              className={lex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'imperial' ? 'text-white btn-primary' : 'text-slate-500 app-card-soft'}`}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'imperial' ? 'text-white btn-primary' : 'text-slate-500 app-card-soft'}`}
         <div className="px-4 py-3 border-b border-slate-50">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">About</p>
         </div>
