@@ -12,7 +12,7 @@ function debounce(fn, ms) {
 }
 
 export function FoodSearch({ onSelect, placeholder = 'Search food (e.g. chicken breast)...' }) {
-  const { toggleFavorite, isFavorite } = useApp();
+  const { toggleFoodFavorite, isFoodFavorite } = useApp();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
