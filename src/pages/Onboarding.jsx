@@ -18,7 +18,7 @@ const trans = { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] };
 const Chip = ({ label, active, onClick }) => (
   <motion.button whileTap={{ scale: 0.95 }} onClick={onClick}
     className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
-      active ? 'bg-green-500 text-white border-green-500 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-green-300'
+      active ? 'text-white border-transparent shadow-md'  : 'border-slate-200 text-slate-600 hover:border-emerald-300'
     }`}>{label}</motion.button>
 );
 
@@ -28,7 +28,7 @@ const Field = ({ label, ...props }) => (
   <div>
     {label && <Label>{label}</Label>}
     <input {...props}
-      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all" />
+      className="w-full premium-input text-sm" />
   </div>
 );
 
@@ -96,7 +96,7 @@ export function Onboarding({ onComplete }) {
     <div className="min-h-screen relative max-w-[430px] mx-auto overflow-hidden" style={{ background: "linear-gradient(160deg, #f0fdf4 0%, #eff6ff 60%, #faf5ff 100%)" }}>
       {/* Progress bar */}
       {step >= 1 && step <= TOTAL_STEPS && (
-        <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-20 px-5 pt-4 bg-slate-50">
+        <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-20 px-5 pt-4" style={{ background: "rgba(240,253,244,0.92)", backdropFilter: "blur(16px)" }}>
           <div className="flex gap-1.5">
             {Array.from({ length: TOTAL_STEPS }).map((_, s) => (
               <div key={s} className="h-1.5 rounded-full flex-1 overflow-hidden" style={{ background: "rgba(99,102,241,0.15)" }}>
@@ -247,10 +247,10 @@ export function Onboarding({ onComplete }) {
                   <Label>Days / Week</Label>
                   <div className="flex items-center gap-4">
                     <motion.button whileTap={{ scale: 0.9 }} onClick={() => set('trainingDays', Math.max(0, form.trainingDays - 1))}
-                      className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-lg shadow-sm flex items-center justify-center">−</motion.button>
+                      className="w-10 h-10 rounded-xl app-card-soft text-slate-700 font-bold text-lg flex items-center justify-center">−</motion.button>
                     <span className="text-3xl font-black text-slate-900 w-8 text-center tabular-nums">{form.trainingDays}</span>
                     <motion.button whileTap={{ scale: 0.9 }} onClick={() => set('trainingDays', Math.min(7, form.trainingDays + 1))}
-                      className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-lg shadow-sm flex items-center justify-center">+</motion.button>
+                      className="w-10 h-10 rounded-xl app-card-soft text-slate-700 font-bold text-lg flex items-center justify-center">+</motion.button>
                   </div>
                 </div>
                 <div>
@@ -263,7 +263,7 @@ export function Onboarding({ onComplete }) {
 
               <div className="flex gap-3">
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(1)}
-                  className="flex-1 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-s shadow-smm">Back</motion.button>
+                  className="flex-1 py-3 rounded-xl app-card-soft text-slate-700 font-semibold text-sm">Back</motion.button>
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(3)}
                   className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold text-sm">Continue</motion.button>
               </div>
@@ -303,7 +303,7 @@ export function Onboarding({ onComplete }) {
 
               <div className="flex gap-3">
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(2)}
-                  className="flex-1 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-s shadow-smm">Back</motion.button>
+                  className="flex-1 py-3 rounded-xl app-card-soft text-slate-700 font-semibold text-sm">Back</motion.button>
                 <motion.button whileTap={{ scale: 0.97 }} onClick={generate}
                   className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold text-sm">Build Plan ✨</motion.button>
               </div>
