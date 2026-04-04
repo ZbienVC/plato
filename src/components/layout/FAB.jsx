@@ -8,12 +8,10 @@ export function FAB({ onClick, pulse = false }) {
       whileTap={{ scale: 0.9 }}
       whileHover={{ scale: 1.05 }}
       className={`fixed z-50 w-14 h-14 rounded-2xl
-        bg-green-500
         flex items-center justify-center
-        shadow-lg shadow-green-300/50
         ${pulse ? 'animate-pulse' : ''}
       `}
-      style={{ bottom: '96px', right: 'max(20px, calc((100vw - 430px) / 2 + 20px))' }}
+      style={{ bottom: '96px', right: 'max(20px, calc((100vw - 430px) / 2 + 20px))', background: 'linear-gradient(135deg,#10b981,#6366f1)', boxShadow: '0 8px 24px rgba(16,185,129,0.4)' }}
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"
         strokeLinecap="round" strokeLinejoin="round">
