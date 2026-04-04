@@ -3,12 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User, Loader2 } from 'lucide-react';
 import { auth } from '../../lib/api';
 
-export function AuthModal({ open, onClose, onSuccess }) {
-  const [mode, setMode] = useState('login'); // 'login' | 'signup'
+export function AuthModal({ open, onClose, onSuccess, initialMode = 'login' }) {
+  const [mode, setMode] = useState(initialMode); // 'login' | 'signup'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Sync mode when initialMode prop changes (e.g. opened from 'signup' button)
+  React.useEffect(() => { setMode(initialMode); }, [initialMode]);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
