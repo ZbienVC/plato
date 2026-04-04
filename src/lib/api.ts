@@ -3,7 +3,8 @@
  * Replaces the stub api.ts â€” wires to the real backend
  */
 
-const BASE = '/api';
+// Use VITE_API_URL for Railway backend, fall back to relative path for local dev
+const BASE = ((import.meta as any).env?.VITE_API_URL || '').replace(/\/$/, '') + '/api';
 
 function getToken(): string | null {
   return localStorage.getItem('plato_token');
