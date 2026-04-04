@@ -174,7 +174,7 @@ export function LogMeal() {
     setTab(nextTab);
   };
 
-  const TABS = ['search', 'manual', 'voice', 'scan', 'quick'];
+  const TABS = ['search', 'quick', 'voice'];
 
   return (
     <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-4 pb-4">
@@ -183,11 +183,11 @@ export function LogMeal() {
         <p className="text-sm text-slate-400 mt-0.5">Search, snap, or describe what you ate.</p>
       </motion.div>
 
-      <motion.div variants={item} className="flex rounded-xl p-1 gap-1" style={{ background: "rgba(99,102,241,0.07)" }}>
+      <motion.div variants={item} className="flex rounded-xl p-1 gap-1" style={{ background: "rgba(16,185,129,0.06)", borderRadius: 16, padding: 3 }}>
         {TABS.map(t => (
           <button key={t} onClick={() => handleTabChange(t)}
-            className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all relative ${activeTab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>
-            {t === 'quick' ? 'Quick Add' : t === 'scan' ? 'Photo' : t === 'search' ? 'Search' : t.charAt(0).toUpperCase() + t.slice(1)}
+            className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all relative ${activeTab === t ? 'text-white shadow-md' : 'text-slate-500'}`}>
+            {t === 'quick' ? 'Quick Log' : t === 'voice' ? 'Voice' : 'Search'}
             {t === 'voice' && !premiumUnlocked && (
               <span className="absolute -top-1 -right-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-600">Lock</span>
             )}
@@ -227,6 +227,9 @@ export function LogMeal() {
               placeholder="Search food (e.g. chicken breast, Greek yogurt)..."
             />
           </div>
+
+          {/* Manual entry toggle in search tab */}
+          <ManualEntryCard onLog={handleLog} />
 
           <div className="app-card">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Recent Logs</p>
