@@ -59,6 +59,14 @@ export type FoodResult = {
   fat: number;
   fiber?: number;
   sugar?: number;
+  sodium?: number;       // mg
+  potassium?: number;    // mg
+  calcium?: number;      // mg
+  iron?: number;         // mg
+  vitaminC?: number;     // mg
+  vitaminD?: number;     // mcg
+  cholesterol?: number;  // mg
+  saturatedFat?: number; // g
 };
 
 export type DayLog = {
