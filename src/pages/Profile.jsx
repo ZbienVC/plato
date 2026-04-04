@@ -16,6 +16,7 @@ export function Profile() {
     dark, setDark, userProfile, setUserProfile, planConfig, plan, streak,
     weightEntries, logWeight, advancedMode, setAdvancedMode,
     showMealImages, setShowMealImages, resetAll, logHistory,
+    isLoggedIn, setAuthModalOpen, logout,
   } = useApp();
   const { targets } = useMacros();
 
@@ -30,6 +31,25 @@ export function Profile() {
       <motion.div variants={item}>
         <h1 className="text-2xl font-bold text-slate-900">Profile</h1>
       </motion.div>
+
+      <motion.div variants={item} className={`rounded-2xl border p-4 flex items-center justify-between gap-3 ${isLoggedIn ? "bg-green-50 border-green-200" : "bg-slate-50 border-slate-200"}`}>
+        <div className="flex items-center gap-3">
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base ${isLoggedIn ? "bg-green-100" : "bg-slate-200"}`}>
+            {isLoggedIn ? "âœ“" : "â˜"}
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-900">{isLoggedIn ? "Syncing across devices" : "Sync your data"}</p>
+            <p className="text-xs text-slate-500">{isLoggedIn ? "Logs backed up to cloud" : "Sign in to save logs everywhere"}</p>
+          </div>
+        </div>
+        {isLoggedIn ? (
+          <button onClick={logout} className="text-xs text-slate-400 hover:text-red-500 font-medium transition-colors px-2 py-1">Sign out</button>
+        ) : (
+          <button onClick={() => setAuthModalOpen(true)} className="px-3 py-1.5 rounded-xl bg-green-500 text-white text-xs font-semibold">Sign in</button>
+        )}
+      </motion.div>
+
+
 
       {/* User card */}
       <motion.div variants={item} className="app-card">
