@@ -4,33 +4,23 @@
     "private":  true,
     "type":  "module",
     "scripts":  {
-                    "dev":  "vite",
                     "build":  "vite build",
-                    "lint":  "eslint .",
-                    "preview":  "vite preview",
-                    "start":  "NODE_ENV=production node --experimental-vm-modules server.ts",
                     "server":  "tsx server.ts",
-                    "dev:full":  "tsx server.ts"
+                    "preview":  "vite preview",
+                    "lint":  "eslint .",
+                    "dev:full":  "tsx server.ts",
+                    "dev":  "vite"
                 },
     "dependencies":  {
-                         "clsx":  "^2.1.1",
-                         "react-dom":  "^19.2.0",
-                         "@tailwindcss/vite":  "^4.2.1",
+                         "lucide-react":  "^0.577.0",
+                         "tailwind-merge":  "^3.5.0",
                          "react":  "^19.2.0",
                          "tailwindcss":  "^4.2.1",
-                         "tailwind-merge":  "^3.5.0",
-                         "lucide-react":  "^0.577.0",
+                         "clsx":  "^2.1.1",
+                         "@tailwindcss/vite":  "^4.2.1",
+                         "react-dom":  "^19.2.0",
                          "framer-motion":  "^12.38.0"
                      },
-    "optionalDependencies":  {
-                                 "bcryptjs":  "^3.0.3",
-                                 "tsx":  "^4.21.0",
-                                 "express":  "^5.2.1",
-                                 "dotenv":  "^17.3.1",
-                                 "better-sqlite3":  "^9.4.3",
-                                 "cors":  "^2.8.6",
-                                 "jsonwebtoken":  "^9.0.3"
-                             },
     "devDependencies":  {
                             "@vitejs/plugin-react":  "^5.1.1",
                             "eslint-plugin-react-hooks":  "^7.0.1",
