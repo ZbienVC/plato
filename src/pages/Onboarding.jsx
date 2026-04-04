@@ -101,7 +101,7 @@ export function Onboarding({ onComplete }) {
             {Array.from({ length: TOTAL_STEPS }).map((_, s) => (
               <div key={s} className="h-1.5 rounded-full flex-1 overflow-hidden" style={{ background: "rgba(99,102,241,0.15)" }}>
                 <motion.div
-                  className="h-full bg-green-500 rounded-full"
+                  className="h-full rounded-full" style={{ background: "linear-gradient(90deg,#10b981,#6366f1)" }}
                   initial={{ width: '0%' }}
                   animate={{ width: s < step ? '100%' : s === step - 1 ? '100%' : '0%' }}
                   transition={{ duration: 0.4 }}
@@ -122,7 +122,7 @@ export function Onboarding({ onComplete }) {
               className="flex-1 flex flex-col items-center justify-center text-center py-16">
               <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.6 }}
-                className="w-20 h-20 rounded-2xl bg-green-500 flex items-center justify-center mb-8 shadow-xl shadow-green-200">
+                className="w-20 h-20 rounded-2xl flex items-center justify-center mb-8" style={{ background: "linear-gradient(135deg,#10b981,#6366f1)", boxShadow: "0 8px 32px rgba(16,185,129,0.3)" }}>
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 8h1a4 4 0 0 1 0 8h-1" stroke="white" strokeWidth="1.5"/>
                   <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" stroke="white" strokeWidth="1.5"/>
@@ -133,8 +133,8 @@ export function Onboarding({ onComplete }) {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                <h1 className="text-5xl font-black tracking-tight text-slate-900 mb-2">PLATO</h1>
-                <p className="text-green-500 text-base font-semibold mb-3">AI-Powered Nutrition</p>
+                <h1 className="text-5xl font-black tracking-tight mb-2" style={{ background: "linear-gradient(135deg,#10b981,#6366f1)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Plato</h1>
+                <p className="text-base font-semibold mb-3" style={{ color: "#10b981" }}>AI-Powered Nutrition</p>
                 <p className="text-slate-400 text-sm leading-relaxed max-w-[260px] mx-auto">
                   Personalized meal plans, intelligent logging, and insights that adapt to you.
                 </p>
@@ -143,10 +143,10 @@ export function Onboarding({ onComplete }) {
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
                 className="mt-12 w-full max-w-[280px]">
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(1)}
-                  className="w-full py-3.5 rounded-xl bg-green-500 text-white font-bold text-base shadow-lg shadow-green-200">
-                  Let's Go!
+                  className="w-full py-3.5 rounded-xl text-white font-bold text-base" style={{ background: "linear-gradient(135deg,#10b981,#059669)", boxShadow: "0 6px 20px rgba(16,185,129,0.35)" }}>
+                  Get Started
                 </motion.button>
-                <p className="text-xs text-slate-400 mt-3">Free · No account needed</p>
+                <p className="text-xs text-slate-400 mt-3">Free \u00B7 No account needed</p>
               </motion.div>
             </motion.div>
           )}
@@ -189,7 +189,7 @@ export function Onboarding({ onComplete }) {
                   ].map(a => (
                     <motion.button key={a.v} whileTap={{ scale: 0.98 }} onClick={() => set('activity', a.v)}
                       className={`w-full p-3 rounded-xl text-left flex items-center justify-between border transition-all ${
-                        form.activity === a.v ? 'bg-green-50 border-green-300' : 'bg-white border-slate-200'
+                        form.activity === a.v ? 'border-emerald-300' : 'bg-white border-slate-200'
                       }`}>
                       <div>
                         <p className={`text-sm font-semibold ${form.activity === a.v ? 'text-green-700' : 'text-slate-800'}`}>{a.l}</p>
@@ -206,7 +206,7 @@ export function Onboarding({ onComplete }) {
               </div>
 
               <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(2)}
-                className="w-full py-3.5 rounded-xl bg-green-500 text-white font-bold text-base">
+                className="py-3.5 rounded-xl text-white font-bold text-base" style={{ background: "linear-gradient(135deg,#10b981,#059669)", boxShadow: "0 4px 16px rgba(16,185,129,0.3)" }}>
                 Continue
               </motion.button>
               <button onClick={onComplete} className="block mx-auto text-sm text-slate-400">Skip for now</button>
@@ -265,7 +265,7 @@ export function Onboarding({ onComplete }) {
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(1)}
                   className="flex-1 py-3 rounded-xl app-card-soft text-slate-700 font-semibold text-sm">Back</motion.button>
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(3)}
-                  className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold text-sm">Continue</motion.button>
+                  className="py-3 rounded-xl text-white font-bold text-sm" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}>Continue</motion.button>
               </div>
               <button onClick={onComplete} className="block mx-auto text-sm text-slate-400">Skip for now</button>
             </motion.div>
@@ -305,7 +305,7 @@ export function Onboarding({ onComplete }) {
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(2)}
                   className="flex-1 py-3 rounded-xl app-card-soft text-slate-700 font-semibold text-sm">Back</motion.button>
                 <motion.button whileTap={{ scale: 0.97 }} onClick={generate}
-                  className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold text-sm">Build Plan ✨</motion.button>
+                  className="py-3 rounded-xl text-white font-bold text-sm" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}>Build Plan ✨</motion.button>
               </div>
             </motion.div>
           )}
