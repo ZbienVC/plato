@@ -32,7 +32,7 @@ export function Profile() {
         <h1 className="text-2xl font-bold text-slate-900">Profile</h1>
       </motion.div>
 
-      <motion.div variants={item} className={`rounded-2xl border p-4 flex items-center justify-between gap-3 ${isLoggedIn ? "rounded-xl" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }} : "bg-slate-50 border-slate-200"}`}>
+      <motion.div variants={item} className="rounded-2xl p-4 flex items-center justify-between gap-3 app-card">
         <div className="flex items-center gap-3">
           <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base ${isLoggedIn ? "bg-green-100" : "bg-slate-200"}`}>
             {isLoggedIn ? "âœ“" : "â˜"}
