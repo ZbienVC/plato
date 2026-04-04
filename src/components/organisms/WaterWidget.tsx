@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Droplets } from 'lucide-react';
-import { auth } from '../lib/api';
+import { auth } from '../../lib/api';
 
 const GOAL_ML = 2500; // 10 glasses default
 const GLASS_ML = 250;
