@@ -399,6 +399,45 @@ async function startServer() {
     res.json({ streak, longestStreak, lastLogDate: dates[0]?.date });
   });
 
+
+  // Water Log
+  app.post('/api/water', authMiddleware, (req: any, res) => {
+    const { amount_ml, date } = req.body
+    if (!amount_ml || amount_ml <= 0) return res.status(400).json({ error: 'amount_ml required' })
+    const d = date || new Date().toISOString().split('T')[0]
+    db.prepare('INSERT INTO water_log (id, user_id, amount_ml, date) VALUES (?, ?, ?, ?)').run(randomUUID(), req.userId, amount_ml, d)
+    const row = db.prepare('SELECT SUM(amount_ml) as t FROM water_log WHERE user_id = ? AND date = ?').get(req.userId, d) as any
+    res.json({ ok: true, total_ml: row.t || 0 })
+  })
+
+  app.get('/api/water', authMiddleware, (req: any, res) => {
+    const date = String(req.query.date || new Date().toISOString().split('T')[0])
+    const entries = db.prepare('SELECT * FROM water_log WHERE user_id = ? AND date = ? ORDER BY logged_at ASC').all(req.userId, date)
+    const total = entries.reduce((s: number, e: any) => s + (e.amount_ml || 0), 0)
+    res.json({ date, entries, total_ml: total, glasses: Math.round(total / 250) })
+  })
+
+  app.delete('/api/water/:id', authMiddleware, (req: any, res) => {
+    db.prepare('DELETE FROM water_log WHERE id = ? AND user_id = ?').run(req.params.id, req.userId)
+    res.json({ ok: true })
+  })
+
+  // Weight Log
+  app.post('/api/weight', authMiddleware, (req: any, res) => {
+    const { weight_kg, date, note } = req.body
+    if (!weight_kg) return res.status(400).json({ error: 'weight_kg required' })
+    const d = date || new Date().toISOString().split('T')[0]
+    const id = randomUUID()
+    db.prepare('INSERT INTO weight_log (id, user_id, weight_kg, date, note) VALUES (?, ?, ?, ?, ?)').run(id, req.userId, weight_kg, d, note || null)
+    res.json({ ok: true, id })
+  })
+
+  app.get('/api/weight', authMiddleware, (req: any, res) => {
+    const days = Math.min(parseInt(String(req.query.days || '90')), 365)
+    const entries = db.prepare("SELECT * FROM weight_log WHERE user_id = ? AND date >= date('now', ?) ORDER BY date DESC").all(req.userId, '-' + days + ' days')
+    res.json({ entries })
+  })
+
   // â”€â”€ Vite SPA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
