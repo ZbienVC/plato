@@ -13,6 +13,74 @@ function Toggle({ value, onChange }) {
   );
 }
 
+function MacroGoalsEditor() {
+  const { planConfig, setPlanConfig } = useApp();
+  const [editing, setEditing] = React.useState(false);
+  const [vals, setVals] = React.useState({
+    calories: planConfig?.calories || 2000,
+    protein: planConfig?.protein || 150,
+    carbs: planConfig?.carbs || 200,
+    fat: planConfig?.fat || 65,
+  });
+
+  const save = () => {
+    setPlanConfig(p => ({ ...(p || {}), ...vals }));
+    setEditing(false);
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <p className="text-sm font-bold text-slate-900">My Macro Goals</p>
+          <p className="text-xs text-slate-400 mt-0.5">Your daily nutrition targets</p>
+        </div>
+        <button onClick={() => setEditing(e => !e)}
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg"
+          style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>
+          {editing ? 'Cancel' : 'Edit'}
+        </button>
+      </div>
+      {editing ? (
+        <div className="space-y-3">
+          {[
+            { key: 'calories', label: 'Calories', unit: 'kcal', color: '#10b981' },
+            { key: 'protein',  label: 'Protein',  unit: 'g',    color: '#6366f1' },
+            { key: 'carbs',    label: 'Carbs',    unit: 'g',    color: '#f59e0b' },
+            { key: 'fat',      label: 'Fat',      unit: 'g',    color: '#f43f5e' },
+          ].map(({ key, label, unit, color }) => (
+            <div key={key} className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
+              <span className="text-sm text-slate-600 w-16">{label}</span>
+              <input type="number" value={vals[key]}
+                onChange={e => setVals(v => ({ ...v, [key]: parseInt(e.target.value) || 0 }))}
+                className="premium-input text-sm py-2 flex-1" />
+              <span className="text-xs text-slate-400">{unit}</span>
+            </div>
+          ))}
+          <button onClick={save} className="w-full py-2.5 rounded-xl text-white text-sm font-bold"
+            style={{ background: 'linear-gradient(135deg,#10b981,#059669)' }}>
+            Save Goals
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { l: 'Cal', v: planConfig?.calories || 2000, c: '#10b981' },
+            { l: 'Pro', v: `${planConfig?.protein || 150}g`, c: '#6366f1' },
+            { l: 'Carb', v: `${planConfig?.carbs || 200}g`, c: '#f59e0b' },
+            { l: 'Fat', v: `${planConfig?.fat || 65}g`, c: '#f43f5e' },
+          ].map(({ l, v, c }) => (
+            <div key={l} className="text-center app-card-soft py-2">
+              <p className="text-base font-black tabular-nums" style={{ color: c }}>{v}</p>
+              <p className="text-[10px] text-slate-400 font-semibold uppercase mt-0.5">{l}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 export function SettingsPanel() {
   const { dark, setDark, setActiveTab } = useApp();
   const [mealReminders, setMealReminders] = useState(true);
@@ -144,6 +212,11 @@ export function SettingsPanel() {
             </div>
           </div>
         )}
+
+      {/* Custom Macro Goals */}
+      <div className="app-card">
+        <MacroGoalsEditor />
+      </div>
       </div>
     </div>
   );
