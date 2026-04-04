@@ -6,10 +6,10 @@ import { generateMealPlan } from '../services/mealGenerator';
 import { updateProfile, auth } from '../lib/api';
 
 const GOAL_OPTIONS = [
-  { v: 'lose-fat', l: 'Lose Fat', d: 'Caloric deficit', Icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-50 border-rose-200' },
-  { v: 'maintain', l: 'Maintain', d: 'Stay balanced', Icon: Scale, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
-  { v: 'build-muscle', l: 'Build Muscle', d: 'Surplus for growth', Icon: Dumbbell, color: 'text-violet-600', bg: 'bg-violet-50 border-violet-200' },
-  { v: 'athletic', l: 'Athletic', d: 'Performance focus', Icon: Zap, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
+  { v: 'lose-fat', l: 'Lose Fat', d: 'Caloric deficit', Icon: TrendingDown, color: 'text-rose-600', bg: 'border-rose-200', gradBg: 'linear-gradient(135deg,#fff5f5,#fff)' },
+  { v: 'maintain', l: 'Maintain', d: 'Stay balanced', Icon: Scale, color: 'text-blue-600', bg: 'border-blue-200', gradBg: 'linear-gradient(135deg,#eff6ff,#fff)' },
+  { v: 'build-muscle', l: 'Build Muscle', d: 'Surplus for growth', Icon: Dumbbell, color: 'text-violet-600', bg: 'border-violet-200', gradBg: 'linear-gradient(135deg,#f5f3ff,#fff)' },
+  { v: 'athletic', l: 'Athletic', d: 'Performance focus', Icon: Zap, color: 'text-amber-600', bg: 'border-amber-200', gradBg: 'linear-gradient(135deg,#fffbeb,#fff)' },
 ];
 
 const page = { initial: { opacity: 0, x: 40 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -40 } };
@@ -93,13 +93,13 @@ export function Onboarding({ onComplete }) {
   const TOTAL_STEPS = 3;
 
   return (
-    <div className="min-h-screen bg-slate-50 relative max-w-[430px] mx-auto overflow-hidden">
+    <div className="min-h-screen relative max-w-[430px] mx-auto overflow-hidden" style={{ background: "linear-gradient(160deg, #f0fdf4 0%, #eff6ff 60%, #faf5ff 100%)" }}>
       {/* Progress bar */}
       {step >= 1 && step <= TOTAL_STEPS && (
         <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-20 px-5 pt-4 bg-slate-50">
           <div className="flex gap-1.5">
             {Array.from({ length: TOTAL_STEPS }).map((_, s) => (
-              <div key={s} className="h-1 rounded-full flex-1 overflow-hidden bg-slate-200">
+              <div key={s} className="h-1.5 rounded-full flex-1 overflow-hidden" style={{ background: "rgba(99,102,241,0.15)" }}>
                 <motion.div
                   className="h-full bg-green-500 rounded-full"
                   initial={{ width: '0%' }}
@@ -247,10 +247,10 @@ export function Onboarding({ onComplete }) {
                   <Label>Days / Week</Label>
                   <div className="flex items-center gap-4">
                     <motion.button whileTap={{ scale: 0.9 }} onClick={() => set('trainingDays', Math.max(0, form.trainingDays - 1))}
-                      className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold text-lg flex items-center justify-center">−</motion.button>
+                      className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-lg shadow-sm flex items-center justify-center">−</motion.button>
                     <span className="text-3xl font-black text-slate-900 w-8 text-center tabular-nums">{form.trainingDays}</span>
                     <motion.button whileTap={{ scale: 0.9 }} onClick={() => set('trainingDays', Math.min(7, form.trainingDays + 1))}
-                      className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold text-lg flex items-center justify-center">+</motion.button>
+                      className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-lg shadow-sm flex items-center justify-center">+</motion.button>
                   </div>
                 </div>
                 <div>
@@ -263,7 +263,7 @@ export function Onboarding({ onComplete }) {
 
               <div className="flex gap-3">
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(1)}
-                  className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold text-sm">Back</motion.button>
+                  className="flex-1 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-s shadow-smm">Back</motion.button>
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(3)}
                   className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold text-sm">Continue</motion.button>
               </div>
@@ -303,7 +303,7 @@ export function Onboarding({ onComplete }) {
 
               <div className="flex gap-3">
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep(2)}
-                  className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold text-sm">Back</motion.button>
+                  className="flex-1 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-s shadow-smm">Back</motion.button>
                 <motion.button whileTap={{ scale: 0.97 }} onClick={generate}
                   className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold text-sm">Build Plan ✨</motion.button>
               </div>
