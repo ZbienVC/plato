@@ -4,6 +4,7 @@ import { Camera, ImagePlus, Mic, MicOff, Search, Sparkles, Upload, Wand2, Lock }
 import { useApp } from '../context/AppContext';
 import { MEAL_DATABASE } from '../services/mealGenerator';
 import { FoodImage } from '../components/molecules/FoodImage';
+import { FoodSearch } from '../components/organisms/FoodSearch';
 
 const stagger = { animate: { transition: { staggerChildren: 0.06 } } };
 const item = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
@@ -173,7 +174,7 @@ export function LogMeal() {
     setTab(nextTab);
   };
 
-  const TABS = ['manual', 'voice', 'scan', 'quick'];
+  const TABS = ['search', 'manual', 'voice', 'scan', 'quick'];
 
   return (
     <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-4 pb-4">
@@ -186,7 +187,7 @@ export function LogMeal() {
         {TABS.map(t => (
           <button key={t} onClick={() => handleTabChange(t)}
             className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all relative ${activeTab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>
-            {t === 'quick' ? 'Quick Add' : t === 'scan' ? 'Photo' : t.charAt(0).toUpperCase() + t.slice(1)}
+            {t === 'quick' ? 'Quick Add' : t === 'scan' ? 'Photo' : t === 'search' ? 'Search' : t.charAt(0).toUpperCase() + t.slice(1)}
             {t === 'voice' && !premiumUnlocked && (
               <span className="absolute -top-1 -right-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-600">Lock</span>
             )}
@@ -205,6 +206,52 @@ export function LogMeal() {
         )}
       </AnimatePresence>
 
+
+      {activeTab === 'search' && (
+        <motion.div variants={item} className="space-y-4">
+          <div className="app-card p-4 space-y-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-800 mb-1">Search real food database</p>
+              <p className="text-xs text-slate-400">Powered by USDA FoodData Central — millions of foods with accurate macros</p>
+            </div>
+            <FoodSearch
+              onSelect={(food) => handleLog({
+                name: food.name + (food.brand ? ` (${food.brand})` : ''),
+                calories: food.calories,
+                protein: food.protein,
+                carbs: food.carbs,
+                fat: food.fat,
+                source: 'usda',
+                type: 'lunch',
+              })}
+              placeholder="Search food (e.g. chicken breast, Greek yogurt)..."
+            />
+          </div>
+
+          <div className="app-card">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Recent Logs</p>
+            {recentMeals.length > 0 ? (
+              <div className="space-y-2">
+                {recentMeals.map((m, i) => (
+                  <motion.button key={i} whileTap={{ scale: 0.98 }} onClick={() => handleLog(m)}
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 hover:border-green-200 transition-colors">
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-slate-800">{m.name}</p>
+                      <p className="text-xs text-slate-400">{m.protein}P · {m.carbs}C · {m.fat}F</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-slate-900">{m.calories} <span className="text-xs font-normal text-slate-400">cal</span></p>
+                      <p className="text-xs text-slate-400">{new Date(m.loggedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400 text-center py-4">No meals logged today yet</p>
+            )}
+          </div>
+        </motion.div>
+      )}
       {activeTab === 'manual' && (
         <motion.div variants={item} className="space-y-4">
           <div className="relative">
