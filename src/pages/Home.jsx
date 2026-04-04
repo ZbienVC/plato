@@ -227,7 +227,7 @@ export function Home() {
             ) : todayMeals.length === 0 && (
               <button onClick={() => {
                 const count = copyYesterdayMeals();
-                if (count) setCopyMsg(`Copied  meals`);
+                if (count) setCopyMsg(`Copied ${count} meal${count !== 1 ? "s" : ""}`);
                 else setCopyMsg('No meals yesterday');
                 setTimeout(() => setCopyMsg(''), 3000);
               }} className="text-xs font-semibold text-indigo-500 hover:text-indigo-700">
