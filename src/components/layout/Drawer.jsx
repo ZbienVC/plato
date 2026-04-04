@@ -38,7 +38,7 @@ export function Drawer() {
 
           {/* Drawer panel */}
           <motion.div
-            className="fixed top-0 left-0 h-full w-[280px] bg-white z-[60] shadow-2xl flex flex-col"
+            className="fixed top-0 left-0 h-full w-[280px] z-[60] flex flex-col" style={{ background: "rgba(255,255,255,0.96)", backdropFilter: "blur(20px)", boxShadow: "4px 0 40px rgba(99,102,241,0.12)" }}
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
@@ -56,14 +56,18 @@ export function Drawer() {
 
             {/* User section */}
             <div className="px-5 pb-5 border-b border-slate-100">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white text-xl font-bold mb-3 shadow-md">
+              <div className="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold mb-3" style={{ background: "linear-gradient(135deg,#10b981,#6366f1)", boxShadow: "0 4px 16px rgba(16,185,129,0.3)" }}>
                 {initials}
               </div>
               <p className="font-bold text-slate-900 text-base">{userProfile?.name || 'Set your name'}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <Flame className="w-4 h-4 text-orange-500" />
-                <span className="text-sm text-slate-500">{streak || 0} day streak</span>
+              <div className="flex items-center gap-2 mt-2">
+                <Flame className="w-4 h-4 text-orange-400" />
+                <span className="text-sm font-semibold text-slate-600">{streak || 0} day streak</span>
+                {streak >= 7 && <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(16,185,129,0.1)", color: "#10b981" }}>On Fire</span>}
               </div>
+              {userProfile?.calorieTarget && (
+                <p className="text-xs text-slate-400 mt-1">{userProfile.calorieTarget || 2000} cal target</p>
+              )}
             </div>
 
             {/* Nav items */}
@@ -72,7 +76,7 @@ export function Drawer() {
                 <button
                   key={view}
                   onClick={() => handleItem(view)}
-                  className="w-full flex items-center gap-4 px-5 py-3.5 hover:app-card-soft transition-colors text-left"
+                  className="w-full flex items-center gap-4 px-5 py-3.5 transition-colors text-left rounded-xl mx-1 hover:bg-emerald-50 hover:text-emerald-700"
                 >
                   <Icon className="w-5 h-5 text-slate-500 flex-shrink-0" />
                   <span className="text-base font-medium text-slate-800">{label}</span>
@@ -88,7 +92,7 @@ export function Drawer() {
               >
                 {dark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-slate-500" />}
                 <span className="text-base font-medium text-slate-800">{dark ? 'Light Mode' : 'Dark Mode'}</span>
-                <div className={`ml-auto w-11 h-6 rounded-full transition-colors ${dark ? 'bg-green-500' : 'bg-slate-200'} relative flex-shrink-0`}>
+                <div className={`ml-auto w-11 h-6 rounded-full transition-colors ${dark ? '' : 'bg-slate-200'} relative flex-shrink-0`}>
                   <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${dark ? 'translate-x-6' : 'translate-x-1'}`} />
                 </div>
               </button>
