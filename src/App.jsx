@@ -14,6 +14,7 @@ import { VoiceLogOverlay } from './components/organisms/VoiceLogOverlay';
 import { PremiumPaywallModal } from './components/organisms/PremiumPaywallModal';
 import { useToast } from './components/organisms/Toast';
 import { AuthModal } from './components/organisms/AuthModal';
+import { WelcomeScreen } from './pages/WelcomeScreen';
 import './styles/index.css';
 
 // Simple Explore page
@@ -116,27 +117,41 @@ function AppContent() {
   } = useApp();
   const { showToast, ToastContainer } = useToast();
 
-  // Onboarding gate: persisted in localStorage so refresh doesn't reset it
+  // Welcome → Onboarding → Dashboard flow
+  const [welcomeDone, setWelcomeDone] = useState(
+    () => localStorage.getItem('plato_welcome_done') === 'true' || !!userProfile?.name
+  );
   const [hasOnboarded, setHasOnboarded] = useState(
     () => localStorage.getItem('plato_onboarded') === 'true' || !!userProfile?.name
   );
-  const needsOnboarding = !hasOnboarded;
 
   const completeOnboarding = () => {
     localStorage.setItem('plato_onboarded', 'true');
     setHasOnboarded(true);
   };
 
-  if (needsOnboarding) {
+  const handleWelcomeGuest = () => {
+    localStorage.setItem('plato_welcome_done', 'true');
+    setWelcomeDone(true);
+  };
+
+  const handleWelcomeAuth = () => {
+    localStorage.setItem('plato_welcome_done', 'true');
+    localStorage.setItem('plato_onboarded', 'true');
+    setWelcomeDone(true);
+    setHasOnboarded(true);
+  };
+
+  // Show welcome screen first time
+  if (!welcomeDone) {
+    return <WelcomeScreen onContinueAsGuest={handleWelcomeGuest} onAuthSuccess={handleWelcomeAuth} />;
+  }
+
+  // Then onboarding for new users
+  if (!hasOnboarded) {
     return (
       <div>
         <Onboarding onComplete={completeOnboarding} />
-        <button
-          onClick={() => setAuthModalOpen(true)}
-          style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 200, background: 'rgba(34,197,94,0.9)', color: '#fff', border: 'none', borderRadius: 12, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}
-        >
-          Already have an account? Sign in
-        </button>
       </div>
     );
   }
