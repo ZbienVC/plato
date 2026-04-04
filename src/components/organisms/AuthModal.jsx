@@ -124,7 +124,7 @@ export function AuthModal({ open, onClose, onSuccess, initialMode = 'login' }) {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-green-500 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60"
+                className="w-full py-3 rounded-xl text-white font-semibold" style={{ background: "linear-gradient(135deg,#10b981,#059669)", boxShadow: "0 4px 16px rgba(16,185,129,0.3)" }} // text-sm flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
