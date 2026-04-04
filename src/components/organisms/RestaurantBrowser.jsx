@@ -68,7 +68,7 @@ export function RestaurantBrowser({ onLog, onClose, dark = false }) {
           {filters.map(f => (
             <button key={f.id} onClick={() => setActiveFilter(f.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                activeFilter === f.id ? 'bg-green-500 text-white' : 'bg-white border border-slate-200 text-slate-600'
+                activeFilter === f.id ? 'text-white btn-primary' : 'bg-white border border-slate-200 text-slate-600'
               }`}>
               {f.label}
             </button>
@@ -88,7 +88,7 @@ export function RestaurantBrowser({ onLog, onClose, dark = false }) {
                 </div>
               </div>
               <motion.button whileTap={{ scale: 0.9 }} onClick={() => doLog(item)}
-                className="shrink-0 px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-semibold">
+                className="shrink-0 px-3 py-1.5 rounded-lg text-white text-xs font-semibold" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}>
                 Log
               </motion.button>
             </div>
@@ -114,6 +114,17 @@ export function RestaurantBrowser({ onLog, onClose, dark = false }) {
         </svg>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search restaurants..."
           className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100" />
+      </div>
+
+      {/* Category filter */}
+      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar mb-4">
+        {['all','fast-casual','fast-food','cafe','grocery','snacks'].map(cat => (
+          <button key={cat} onClick={() => setSearch(cat === 'all' ? '' : cat)}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all capitalize"
+            style={{ background: search === cat ? 'linear-gradient(135deg,#10b981,#059669)' : 'rgba(255,255,255,0.8)', color: search === cat ? '#fff' : '#64748b', border: '1px solid rgba(99,102,241,0.15)' }}>
+            {cat === 'all' ? 'All' : cat.replace('-',' ')}
+          </button>
+        ))}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
