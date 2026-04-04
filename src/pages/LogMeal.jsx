@@ -183,7 +183,7 @@ export function LogMeal() {
         <p className="text-sm text-slate-400 mt-0.5">Search, snap, or describe what you ate.</p>
       </motion.div>
 
-      <motion.div variants={item} className="flex bg-slate-100 rounded-xl p-1 gap-1">
+      <motion.div variants={item} className="flex rounded-xl p-1 gap-1" style={{ background: "rgba(99,102,241,0.07)" }}>
         {TABS.map(t => (
           <button key={t} onClick={() => handleTabChange(t)}
             className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all relative ${activeTab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>
@@ -257,7 +257,7 @@ export function LogMeal() {
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search food database..."
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all" />
+              className="w-full pl-10 pr-4 premium-input text-sm" />
           </div>
 
           {searchResults.length > 0 && (
@@ -298,7 +298,7 @@ export function LogMeal() {
           <div className="app-card">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Custom Entry</p>
             <div className="space-y-2">
-              <input value={customName} onChange={e => setCustomName(e.target.value)} placeholder="Food name" className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100" />
+              <input value={customName} onChange={e => setCustomName(e.target.value)} placeholder="Food name" className="w-full px-3 py-2.5 premium-input text-sm" />
               <div className="grid grid-cols-4 gap-2">
                 {[['Cal', customCals, setCustomCals], ['Pro', customProtein, setCustomProtein], ['Carb', customCarbs, setCustomCarbs], ['Fat', customFat, setCustomFat]].map(([label, val, setter]) => (
                   <div key={label}>
