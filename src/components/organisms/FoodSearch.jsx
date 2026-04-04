@@ -68,7 +68,7 @@ export function FoodSearch({ onSelect, placeholder = 'Search food (e.g. chicken 
             onClick={() => { setQuery(''); setResults([]); setOpen(false); }}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
           >
-            âœ•
+            ✕
           </button>
         )}
       </div>
@@ -77,30 +77,38 @@ export function FoodSearch({ onSelect, placeholder = 'Search food (e.g. chicken 
         <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl">
           <div className="max-h-80 overflow-y-auto">
             {results.map((food) => (
-              <div className="flex items-center border-b border-slate-50 last:border-0">
-                
-                onClick={() => handleSelect(food)}
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-900">{food.name}</p>
-                  {food.brand && (
-                    <p className="truncate text-xs text-slate-400">{food.brand}</p>
-                  )}
-                  <p className="text-xs text-slate-400 mt-0.5">{food.serving}</p>
-                </div>
-                <div className="flex-shrink-0 text-right">
-                  <p className="text-sm font-bold text-slate-900">{food.calories} <span className="text-xs font-normal text-slate-400">kcal</span></p>
-                  <div className="flex gap-2 mt-0.5 justify-end">
-                    <span className="text-xs text-blue-500">{food.protein}P</span>
-                    <span className="text-xs text-amber-500">{food.carbs}C</span>
-                    <span className="text-xs text-rose-500">{food.fat}F</span>
+              <div key={food.fdcId} className="flex items-center border-b border-slate-50 last:border-0">
+                <button
+                  onClick={() => handleSelect(food)}
+                  className="flex flex-1 items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-slate-900">{food.name}</p>
+                    {food.brand && (
+                      <p className="truncate text-xs text-slate-400">{food.brand}</p>
+                    )}
+                    <p className="text-xs text-slate-400 mt-0.5">{food.serving}</p>
                   </div>
-                </div>
-              </button>
-              <button onClick={(e) => { e.stopPropagation(); toggleFoodFavorite(food); }} style={{ padding: '8px', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
-                <Star size={14} color={isFoodFavorite(food.name) ? '#f59e0b' : '#94a3b8'} fill={isFoodFavorite(food.name) ? '#f59e0b' : 'none'} />
-              </button>
+                  <div className="flex-shrink-0 text-right">
+                    <p className="text-sm font-bold text-slate-900">{food.calories} <span className="text-xs font-normal text-slate-400">kcal</span></p>
+                    <div className="flex gap-2 mt-0.5 justify-end">
+                      <span className="text-xs text-blue-500">{food.protein}P</span>
+                      <span className="text-xs text-amber-500">{food.carbs}C</span>
+                      <span className="text-xs text-rose-500">{food.fat}F</span>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleFoodFavorite(food); }}
+                  className="flex-shrink-0 px-3 py-3"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  <Star
+                    size={14}
+                    color={isFoodFavorite(food.name) ? '#f59e0b' : '#94a3b8'}
+                    fill={isFoodFavorite(food.name) ? '#f59e0b' : 'none'}
+                  />
+                </button>
               </div>
             ))}
           </div>
