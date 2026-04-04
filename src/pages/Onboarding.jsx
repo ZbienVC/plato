@@ -368,6 +368,9 @@ export function Onboarding({ onComplete }) {
               </motion.button>
             </motion.div>
           )}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 }
 
