@@ -4,6 +4,7 @@ import { Flame, Coffee, Salad, Utensils, Apple, Plus, CheckCircle2, Mic, Lock, T
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
 import { FoodImage } from '../components/molecules/FoodImage';
+import { WaterWidget } from '../components/organisms/WaterWidget';
 import { Skeleton } from '../components/atoms/Skeleton';
 
 const stagger = { animate: { transition: { staggerChildren: 0.07 } } };
@@ -342,6 +343,11 @@ export function Home() {
           <svg className="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
         </motion.button>
       )}
+
+      {/* Water Widget */}
+      <motion.div variants={item}>
+        <WaterWidget />
+      </motion.div>
 
       {/* Quick stats */}
       <motion.div variants={item} className="grid grid-cols-3 gap-3">
