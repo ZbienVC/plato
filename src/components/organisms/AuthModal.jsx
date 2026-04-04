@@ -84,7 +84,7 @@ export function AuthModal({ open, onClose, onSuccess, initialMode = 'login' }) {
                     value={username}
                     onChange={e => setUsername(e.target.value)}
                     placeholder="Username (optional)"
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                   />
                 </div>
               )}
@@ -98,7 +98,7 @@ export function AuthModal({ open, onClose, onSuccess, initialMode = 'login' }) {
                   placeholder="Email address"
                   required
                   autoComplete="email"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                 />
               </div>
 
@@ -112,7 +112,7 @@ export function AuthModal({ open, onClose, onSuccess, initialMode = 'login' }) {
                   required
                   minLength={6}
                   autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                 />
               </div>
 
@@ -135,7 +135,7 @@ export function AuthModal({ open, onClose, onSuccess, initialMode = 'login' }) {
                 <button
                   type="button"
                   onClick={toggle}
-                  className="text-green-600 font-semibold hover:text-green-700"
+                  style={{ color: "#10b981", fontWeight: 700, textDecoration: "none", cursor: "pointer" }}
                 >
                   {mode === 'login' ? 'Sign up free' : 'Sign in'}
                 </button>
