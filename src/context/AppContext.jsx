@@ -265,6 +265,24 @@ export function AppProvider({ children }) {
     saveLogEntry(normalizedMeal).catch(() => {});
   }, [setDailyLog]);
 
+  const removeMeal = useCallback((index) => {
+    setDailyLog(prev => {
+      if (!prev) return prev
+      const meals = [...(prev.meals || [])]
+      meals.splice(index, 1)
+      const updated = {
+        ...prev,
+        meals,
+        totalCalories: meals.reduce((s, m) => s + (m.calories || 0), 0),
+        totalProtein:  meals.reduce((s, m) => s + (m.protein || 0), 0),
+        totalCarbs:    meals.reduce((s, m) => s + (m.carbs || 0), 0),
+        totalFat:      meals.reduce((s, m) => s + (m.fat || 0), 0),
+      }
+      saveState('dailyLog', updated)
+      return updated
+    })
+  }, [])
+
   const logWeight = useCallback((weight) => {
     const date = new Date().toISOString().split('T')[0];
     setWeightEntries(prev => {
@@ -396,6 +414,7 @@ export function AppProvider({ children }) {
     isPremiumActive,
     premiumModalOpen,
     setPremiumModalOpen,
+    removeMeal,
     openPremiumModal,
     // auth
     isLoggedIn,
