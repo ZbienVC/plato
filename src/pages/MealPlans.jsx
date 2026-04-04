@@ -84,8 +84,13 @@ export function MealPlans() {
       {/* Header */}
       <motion.div variants={item}>
         <h1 className="text-2xl font-bold text-slate-900">Meal Plans</h1>
-        <p className="text-sm text-slate-400 mt-0.5">
-          {hasPlan ? `${plan.calories} cal/day · ${plan.protein}g protein` : 'Generate a plan to get started'}
+        {hasPlan && (
+          <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            {plan.calories} cal/day · {plan.protein}g protein · {days} day plan
+          </p>
+        )}
+        {!hasPlan && <p className="text-sm text-slate-400 mt-0.5">'Generate a plan to get started</p>}
         </p>
       </motion.div>
 
@@ -94,7 +99,7 @@ export function MealPlans() {
         {TABS.map(t => (
           <button key={t} onClick={() => handleSubTabChange(t)}
             className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all relative ${
-              activeTab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+              activeTab === t ? 'text-white shadow-md' : 'text-slate-500'
             }`}>
             {t === 'plan' ? 'My Plan' : t.charAt(0).toUpperCase() + t.slice(1)}
             {t === 'restaurant' && !premiumUnlocked && (
