@@ -92,7 +92,8 @@ const PlanSkeletonCard = () => (
 );
 
 export function Home() {
-  const { plan, planLoading, dailyLog, logMeal, removeMeal, userProfile, setActiveTab, setShowVoiceLog, streak, isPremiumActive, openPremiumModal, isLoggedIn, setAuthModalOpen } = useApp();
+  const { plan, planLoading, dailyLog, logMeal, removeMeal, copyYesterdayMeals, userProfile, setActiveTab, setShowVoiceLog, streak, isPremiumActive, openPremiumModal, isLoggedIn, setAuthModalOpen } = useApp();
+  const [copyMsg, setCopyMsg] = React.useState('');
   const { targets, current } = useMacros();
   const hasPlan = plan?.meals?.length > 0;
   const todayMeals = dailyLog?.meals || [];
@@ -221,6 +222,18 @@ export function Home() {
         <motion.div variants={item} className="app-card">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold text-slate-900">Today's Log</h2>
+            {copyMsg ? (
+              <span className="text-xs font-semibold text-emerald-600">{copyMsg}</span>
+            ) : todayMeals.length === 0 && (
+              <button onClick={() => {
+                const count = copyYesterdayMeals();
+                if (count) setCopyMsg(Copied  meals);
+                else setCopyMsg('No meals yesterday');
+                setTimeout(() => setCopyMsg(''), 3000);
+              }} className="text-xs font-semibold text-indigo-500 hover:text-indigo-700">
+                Copy yesterday
+              </button>
+            )}
           </div>
           <div className="space-y-2">
             {todayMeals.map((m, i) => (
