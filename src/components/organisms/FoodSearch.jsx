@@ -77,8 +77,8 @@ export function FoodSearch({ onSelect, placeholder = 'Search food (e.g. chicken 
         <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl">
           <div className="max-h-80 overflow-y-auto">
             {results.map((food) => (
-              <button
-                key={food.fdcId}
+              <div className="flex items-center border-b border-slate-50 last:border-0">
+                
                 onClick={() => handleSelect(food)}
                 className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
               >
@@ -101,6 +101,7 @@ export function FoodSearch({ onSelect, placeholder = 'Search food (e.g. chicken 
               <button onClick={(e) => { e.stopPropagation(); toggleFoodFavorite(food); }} style={{ padding: '8px', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
                 <Star size={14} color={isFoodFavorite(food.name) ? '#f59e0b' : '#94a3b8'} fill={isFoodFavorite(food.name) ? '#f59e0b' : 'none'} />
               </button>
+              </div>
             ))}
           </div>
           <div className="px-4 py-2 border-t border-slate-100 bg-slate-50">
