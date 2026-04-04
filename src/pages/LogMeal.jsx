@@ -73,6 +73,52 @@ function parseMealFromText(text) {
   };
 }
 
+// Collapsible manual entry card
+function ManualEntryCard({ onLog }) {
+  const [open, setOpen] = React.useState(false);
+  const [name, setName] = React.useState('');
+  const [cals, setCals] = React.useState('');
+  const [pro, setPro] = React.useState('');
+  const [carbs, setCarbs] = React.useState('');
+  const [fat, setFat] = React.useState('');
+
+  const submit = () => {
+    if (!name) return;
+    onLog({ name, calories: parseInt(cals)||0, protein: parseInt(pro)||0, carbs: parseInt(carbs)||0, fat: parseInt(fat)||0, type: 'lunch' });
+    setName(''); setCals(''); setPro(''); setCarbs(''); setFat('');
+    setOpen(false);
+  };
+
+  return (
+    <div className="app-card">
+      <button onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between text-left">
+        <p className="text-sm font-semibold text-slate-800">Manual Entry</p>
+        <span className="text-xs text-slate-400 font-medium">{open ? 'Hide' : 'Add custom food'}</span>
+      </button>
+      {open && (
+        <div className="mt-3 space-y-2.5">
+          <input value={name} onChange={e => setName(e.target.value)} placeholder="Food name"
+            className="w-full premium-input text-sm" />
+          <div className="grid grid-cols-4 gap-2">
+            {[['Cal', cals, setCals], ['Pro', pro, setPro], ['Carb', carbs, setCarbs], ['Fat', fat, setFat]].map(([l, v, s]) => (
+              <div key={l}>
+                <p className="text-[10px] text-slate-400 font-semibold text-center mb-1">{l}</p>
+                <input type="number" value={v} onChange={e => s(e.target.value)} placeholder="0"
+                  className="w-full px-2 py-2 rounded-xl border border-slate-200 bg-white/80 text-sm text-center outline-none focus:border-emerald-400" />
+              </div>
+            ))}
+          </div>
+          <button onClick={submit}
+            className="w-full py-2.5 rounded-xl text-white text-sm font-bold"
+            style={{ background: 'linear-gradient(135deg,#10b981,#059669)' }}>
+            Add Food
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 export function LogMeal() {
   const { logMeal, dailyLog, isPremiumActive, openPremiumModal } = useApp();
   const [activeTab, setTab] = useState('manual');
