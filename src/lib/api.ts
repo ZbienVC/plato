@@ -62,10 +62,36 @@ export type DayLog = {
 
 // â”€â”€â”€ Auth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+// Local auth fallback — works without a backend
+// Stores hashed credentials in localStorage when VITE_API_URL not set
+const HAS_BACKEND = !!(import.meta as any).env?.VITE_API_URL;
+
+function localSignup(email: string, password: string, username?: string) {
+  const users = JSON.parse(localStorage.getItem('plato_users') || '{}');
+  const key = email.toLowerCase();
+  if (users[key]) throw new Error('Email already in use');
+  const id = Math.random().toString(36).slice(2);
+  users[key] = { id, email: key, username: username || key.split('@')[0], password };
+  localStorage.setItem('plato_users', JSON.stringify(users));
+  const token = btoa(JSON.stringify({ userId: id, email: key }));
+  setToken(token);
+  return { token, userId: id };
+}
+
+function localLogin(email: string, password: string) {
+  const users = JSON.parse(localStorage.getItem('plato_users') || '{}');
+  const user = users[email.toLowerCase()];
+  if (!user || user.password !== password) throw new Error('Invalid email or password');
+  const token = btoa(JSON.stringify({ userId: user.id, email: user.email }));
+  setToken(token);
+  return { token, userId: user.id };
+}
+
 export const auth = {
   isLoggedIn: () => !!getToken(),
 
   async signup(email: string, password: string, username?: string) {
+    if (!HAS_BACKEND) return localSignup(email, password, username);
     const res = await fetch(`${BASE}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -78,6 +104,7 @@ export const auth = {
   },
 
   async login(email: string, password: string) {
+    if (!HAS_BACKEND) return localLogin(email, password);
     const res = await fetch(`${BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
