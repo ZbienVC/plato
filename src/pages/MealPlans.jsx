@@ -90,7 +90,7 @@ export function MealPlans() {
       </motion.div>
 
       {/* Sub-tab bar */}
-      <motion.div variants={item} className="flex bg-slate-100 rounded-xl p-1 gap-1">
+      <motion.div variants={item} className="flex app-card-soft rounded-xl p-1 gap-1">
         {TABS.map(t => (
           <button key={t} onClick={() => handleSubTabChange(t)}
             className={`flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all relative ${
@@ -116,7 +116,7 @@ export function MealPlans() {
             <motion.div variants={item} className="app-card">
               <div className="grid grid-cols-4 gap-2 text-center">
                 {[
-                  { l: 'Cal', v: plan.calories, c: '#22C55E' },
+                  { l: 'Cal', v: plan.calories, c: '#10b981' },
                   { l: 'Protein', v: `${plan.protein}g`, c: '#3B82F6' },
                   { l: 'Carbs', v: `${plan.carbs}g`, c: '#F59E0B' },
                   { l: 'Fat', v: `${plan.fat}g`, c: '#F43F5E' },
@@ -136,7 +136,7 @@ export function MealPlans() {
               {Array.from({ length: days }).map((_, i) => (
                 <motion.button key={i} whileTap={{ scale: 0.95 }} onClick={() => setSelDay(i)}
                   className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                    selDay === i ? 'bg-green-500 text-white shadow-sm shadow-green-200' : 'bg-white text-slate-500 border border-slate-200'
+                    selDay === i ? 'text-white shadow-sm shadow-green-200' : 'bg-white text-slate-500 border border-slate-200'
                   }`}>{DAY_NAMES[i] || `Day ${i+1}`}</motion.button>
               ))}
             </motion.div>
@@ -148,7 +148,7 @@ export function MealPlans() {
               <PlanRowsSkeleton />
             </motion.div>
           ) : hasPlan && dayMeals.length > 0 && (
-            <motion.div variants={item} className="space-y-3">
+            <motion.div variants={item} className=" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}space-y-3">
               {dayMeals.map((meal, i) => (
                 <div key={i} className="app-card overflow-hidden">
                   {showMealImages && (
@@ -177,14 +177,14 @@ export function MealPlans() {
                       <motion.button
                         whileTap={{ scale: 0.92 }}
                         onClick={() => logMeal({ name: meal.name, calories: meal.calories, protein: meal.protein, carbs: meal.carbs, fat: meal.fat, type: meal.type })}
-                        className="px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-semibold"
+                        className="px-3 py-1.5 rounded-lg text-white text-xs font-semibold" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}
                       >
                         Log
                       </motion.button>
                       <motion.button
                         whileTap={{ scale: 0.92 }}
                         onClick={() => swapMeal(i, meal)}
-                        className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1"
+                        className="px-3 py-1.5 rounded-lg app-card-soft text-slate-700 text-xs font-semibold flex items-center justify-center gap-1"
                       >
                         <RefreshCw className="w-3 h-3" />
                         Swap
@@ -229,7 +229,7 @@ export function MealPlans() {
           {!hasPlan && (
             <motion.div variants={item} className="app-card text-center py-8">
               <div className="w-12 h-12 rounded-2xl mx-auto mb-4 bg-green-50 flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round">
                   <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
                   <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
                 </svg>
@@ -237,7 +237,7 @@ export function MealPlans() {
               <h3 className="text-base font-bold text-slate-900 mb-1">No plan yet</h3>
               <p className="text-sm text-slate-400 mb-4">Complete onboarding to generate a personalized plan.</p>
               <motion.button whileTap={{ scale: 0.97 }} onClick={() => setActiveTab('you')}
-                className="px-6 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold">
+                className="px-6 py-2.5 rounded-xl text-white text-sm font-semibold" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}>
                 Get Started
               </motion.button>
             </motion.div>
@@ -252,7 +252,7 @@ export function MealPlans() {
             <div className="app-card text-center py-10">
               <p className="text-slate-400 text-sm">No recipes yet. Import from YouTube or generate a plan!</p>
               <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowYT(true)}
-                className="mt-4 px-5 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold">
+                className="mt-4 px-5 py-2.5 rounded-xl text-white text-sm font-semibold" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}>
                 Import Recipe
               </motion.button>
             </div>
