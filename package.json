@@ -1,7 +1,8 @@
 {
     "name":  "plato",
-    "private":  true,
     "version":  "0.0.0",
+    "private":  true,
+    "type":  "module",
     "scripts":  {
                     "dev":  "vite",
                     "build":  "vite build",
@@ -12,39 +13,35 @@
                     "dev:full":  "tsx server.ts"
                 },
     "dependencies":  {
-                         "@tailwindcss/vite":  "^4.2.1",
                          "clsx":  "^2.1.1",
-                         "framer-motion":  "^12.38.0",
-                         "lucide-react":  "^0.577.0",
-                         "react":  "^19.2.0",
                          "react-dom":  "^19.2.0",
-                         "tailwind-merge":  "^3.5.0",
+                         "@tailwindcss/vite":  "^4.2.1",
+                         "react":  "^19.2.0",
                          "tailwindcss":  "^4.2.1",
-                         "tsx":  "^4.21.0",
-                         "cors":  "^2.8.6",
-                         "dotenv":  "^17.3.1",
-                         "better-sqlite3":  "^9.4.3",
-                         "jsonwebtoken":  "^9.0.3",
-                         "express":  "^5.2.1",
-                         "bcryptjs":  "^3.0.3"
+                         "tailwind-merge":  "^3.5.0",
+                         "lucide-react":  "^0.577.0",
+                         "framer-motion":  "^12.38.0"
                      },
+    "optionalDependencies":  {
+                                 "bcryptjs":  "^3.0.3",
+                                 "tsx":  "^4.21.0",
+                                 "express":  "^5.2.1",
+                                 "dotenv":  "^17.3.1",
+                                 "better-sqlite3":  "^9.4.3",
+                                 "cors":  "^2.8.6",
+                                 "jsonwebtoken":  "^9.0.3"
+                             },
     "devDependencies":  {
-                            "@eslint/js":  "^9.39.1",
-                            "@types/react":  "^19.2.7",
-                            "@types/react-dom":  "^19.2.3",
                             "@vitejs/plugin-react":  "^5.1.1",
-                            "eslint":  "^9.39.1",
                             "eslint-plugin-react-hooks":  "^7.0.1",
+                            "@eslint/js":  "^9.39.1",
+                            "@types/react-dom":  "^19.2.3",
                             "eslint-plugin-react-refresh":  "^0.4.24",
+                            "eslint":  "^9.39.1",
                             "globals":  "^16.5.0",
-                            "vite":  "^7.3.1",
-                            "@types/better-sqlite3":  "^7.6.8",
-                            "@types/bcryptjs":  "^2.4.6",
-                            "@types/cors":  "^2.8.17",
-                            "@types/express":  "^5.0.3",
-                            "@types/jsonwebtoken":  "^9.0.7"
+                            "@types/react":  "^19.2.7",
+                            "vite":  "^7.3.1"
                         },
-    "type":  "module",
     "engines":  {
                     "node":  "\u003e=20.0.0"
                 }
