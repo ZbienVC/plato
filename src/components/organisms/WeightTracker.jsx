@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useApp } from '../../context/AppContext';
 import { Card } from '../atoms/Card';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
@@ -17,6 +18,17 @@ export function WeightTracker({ entries = [], onLog, dark = true, onClose }) {
     setNewWeight('');
     setShowInput(false);
   };
+
+  const { userProfile } = useApp();
+
+  // BMI calculation from user profile
+  const currentWeight = entries.length > 0 ? entries[entries.length - 1].weight : (userProfile?.weight || 0);
+  const heightInches = userProfile?.height ? ((userProfile.height.feet || 5) * 12 + (userProfile.height.inches || 8)) : 68;
+  const bmi = heightInches > 0 && currentWeight > 0 ? Math.round(((currentWeight * 703) / (heightInches * heightInches)) * 10) / 10 : null;
+  const bmiCategory = !bmi ? '' : bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Healthy' : bmi < 30 ? 'Overweight' : 'Obese';
+  const bmiColor = !bmi ? '#94a3b8' : bmi < 18.5 ? '#0ea5e9' : bmi < 25 ? '#10b981' : bmi < 30 ? '#f59e0b' : '#ef4444';
+  const idealWeightMin = heightInches > 0 ? Math.round((18.5 * heightInches * heightInches) / 703) : 0;
+  const idealWeightMax = heightInches > 0 ? Math.round((24.9 * heightInches * heightInches) / 703) : 0;
 
   const latest = entries.length > 0 ? entries[entries.length - 1] : null;
   const oldest = entries.length > 1 ? entries[0] : null;
