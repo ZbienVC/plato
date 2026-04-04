@@ -151,7 +151,7 @@ export function VoiceLogOverlay({ onClose, onSave, onSuccess }) {
                 onClick={() => (isListening ? stopListening() : startListening())}
                 className={`w-14 h-14 rounded-2xl flex items-center justify-center ${isListening ? 'bg-rose-500 text-white' : 'text-white'}`}
               >
-                {isListening ? <MicOff className=" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}w-6 h-6" /> : <Mic className="w-6 h-6" />}
+                {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
               </button>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-slate-900">{isListening ? 'Listening…' : 'Tap to start recording'}</p>
@@ -180,7 +180,7 @@ export function VoiceLogOverlay({ onClose, onSave, onSuccess }) {
                   className={`flex-1 py-2.5 rounded-xl text-sm font-semibold ${manualText.trim() ? 'text-white' : 'app-card-soft text-slate-400'}`}>
                   {parsing ? 'Parsing…' : 'Parse text'}
                 </button>
-                <button onClick={() => setMode('review')} className=" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}flex-1 py-2.5 rounded-xl app-card-soft text-slate-600 text-sm font-semibold">
+                <button onClick={() => setMode('review')} className="flex-1 py-2.5 rounded-xl app-card-soft text-slate-600 text-sm font-semibold">
                   Edit Manually
                 </button>
               </div>
@@ -239,7 +239,7 @@ export function VoiceLogOverlay({ onClose, onSave, onSuccess }) {
               disabled={disableSave}
               className={`w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 ${disableSave ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'text-white'}`}
             >
-              <Check className=" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}w-4 h-4" /> Log Meal
+              <Check className="w-4 h-4" /> Log Meal
             </button>
             {error && (
               <p className="text-xs text-rose-500 text-center">{error === 'not-allowed' ? 'Microphone permission blocked in browser settings.' : `Voice error: ${error}`}</p>
