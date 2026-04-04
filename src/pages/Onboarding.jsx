@@ -350,7 +350,7 @@ export function Onboarding({ onComplete }) {
               <p className="text-sm text-slate-400 mb-8 capitalize">Optimized for {form.goal.replace("-", " ")}</p>
               <div className="w-full app-card mb-8">
                 <div className="grid grid-cols-4 gap-2 text-center">
-                  {[{l:"Cal",v:genPlan.calories,c:"#10b981"},{l:"Protein",v:${genPlan.protein}g,c:"#6366f1"},{l:"Carbs",v:${genPlan.carbs}g,c:"#f59e0b"},{l:"Fat",v:${genPlan.fat}g,c:"#f43f5e"}].map(m => (
+                  {[{l:"Cal",v:genPlan.calories,c:"#10b981"},{l:"Protein",v:`${genPlan.protein}g`,c:"#6366f1"},{l:"Carbs",v:`${genPlan.carbs}g`,c:"#f59e0b"},{l:"Fat",v:`${genPlan.fat}g`,c:"#f43f5e"}].map(m => (
                     <div key={m.l}>
                       <p className="text-xl font-black tabular-nums" style={{ color: m.c }}>{m.v}</p>
                       <p className="text-[9px] font-bold uppercase tracking-wider mt-1" style={{ color: "#94a3b8" }}>{m.l}</p>
