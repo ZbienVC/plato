@@ -249,3 +249,50 @@ export async function getStreak(): Promise<{ streak: number; longestStreak: numb
     return { streak: 0, longestStreak: 0 };
   }
 }
+
+// ─── Water ────────────────────────────────────────────────────────────────────
+
+export async function logWater(amount_ml: number, date?: string) {
+  if (!auth.isLoggedIn()) return null;
+  try {
+    const res = await fetch(`${BASE}/water`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ amount_ml, date }),
+    });
+    return res.ok ? res.json() : null;
+  } catch { return null; }
+}
+
+export async function getWater(date?: string) {
+  if (!auth.isLoggedIn()) return null;
+  const d = date || new Date().toISOString().split('T')[0];
+  try {
+    const res = await fetch(`${BASE}/water?date=${d}`, { headers: authHeaders() });
+    return res.ok ? res.json() : null;
+  } catch { return null; }
+}
+
+// ─── Weight ───────────────────────────────────────────────────────────────────
+
+export async function logWeight(weight_kg: number, date?: string, note?: string) {
+  if (!auth.isLoggedIn()) return null;
+  try {
+    const res = await fetch(`${BASE}/weight`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ weight_kg, date, note }),
+    });
+    return res.ok ? res.json() : null;
+  } catch { return null; }
+}
+
+export async function getWeightHistory(days = 90) {
+  if (!auth.isLoggedIn()) return [];
+  try {
+    const res = await fetch(`${BASE}/weight?days=${days}`, { headers: authHeaders() });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.entries || [];
+  } catch { return []; }
+}
