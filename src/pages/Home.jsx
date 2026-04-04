@@ -100,6 +100,7 @@ export function Home() {
   const streakEmoji = { legendary: '🔥', 'on-fire': '🔥', hot: '🔥', building: '🔥', start: '✨' }[streakTier];
   const streakColor = streak >= 7 ? '#f97316' : streak >= 3 ? '#fb923c' : '#22c55e';
   const streakBg = streak >= 7 ? 'from-orange-50 to-amber-50 border-orange-100' : streak >= 3 ? 'from-amber-50 to-yellow-50 border-amber-100' : 'from-green-50 to-emerald-50 border-green-100';
+  const StreakIcon = streak >= 30 ? Award : streak >= 7 ? Flame : streak >= 3 ? TrendingUp : Zap;
 
   const dayIndex = Math.floor((Date.now() - new Date(plan?.createdAt || Date.now()).getTime()) / 86400000) % 7;
   const todaysPlanned = hasPlan ? plan.meals.slice(dayIndex * (plan.mealsPerDay || 3), (dayIndex + 1) * (plan.mealsPerDay || 3)) : [];
