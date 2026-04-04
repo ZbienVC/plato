@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { searchFood } from '../lib/api';
+import { searchFood } from '../../lib/api';
 
 function debounce(fn, ms) {
   let timer;
