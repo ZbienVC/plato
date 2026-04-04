@@ -314,7 +314,7 @@ export function Onboarding({ onComplete }) {
           {step === 4 && (
             <motion.div key="gen" {...page} transition={trans}
               className="flex-1 flex flex-col items-center justify-center text-center py-16">
-              <div className="w-16 h-16 rounded-2xl bg-green-500 flex items-center justify-center mb-8 shadow-xl shadow-green-200">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-green-200">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" className="animate-pulse">
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                 </svg>
@@ -325,7 +325,7 @@ export function Onboarding({ onComplete }) {
                   <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
                     className="flex items-center gap-3">
                     <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                      i < genStep ? 'bg-green-500' : i === genStep ? 'border-2 border-green-500' : 'border border-slate-200'
+                      i < genStep ? 'bg-emerald-500' : i === genStep ? 'border-2 border-emerald-500' : 'border border-slate-200'
                     }`}>
                       {i < genStep && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
                       {i === genStep && <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1.5 h-1.5 bg-green-500 rounded-full" />}
