@@ -196,7 +196,7 @@ export function Onboarding({ onComplete }) {
                         <p className="text-xs text-slate-400">{a.d}</p>
                       </div>
                       {form.activity === a.v && (
-                        <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+                        <div className="w-5 h-5 rounded-full flex items-center" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }} className2=" justify-center shrink-0">
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
                         </div>
                       )}
@@ -225,7 +225,7 @@ export function Onboarding({ onComplete }) {
                 {GOAL_OPTIONS.map(g => (
                   <motion.button key={g.v} whileTap={{ scale: 0.97 }} onClick={() => set('goal', g.v)}
                     className={`p-4 rounded-2xl text-left border-2 transition-all ${
-                      form.goal === g.v ? 'bg-green-50 border-green-400 shadow-sm' : 'bg-white border-slate-200'
+                      form.goal === g.v ? 'border-emerald-400 shadow-sm' : 'bg-white border-slate-200'
                     }`}>
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 border ${g.bg}`}>
                       <g.Icon className={`w-5 h-5 ${form.goal === g.v ? 'text-green-600' : g.color}`} />
