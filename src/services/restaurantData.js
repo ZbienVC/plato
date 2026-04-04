@@ -208,7 +208,7 @@ export const RESTAURANT_MENUS = {
     { name: 'Perfect Bar - Chocolate Almond', calories: 350, protein: 17, carbs: 29, fat: 18 },
     { name: 'Premier Protein Shake (11.5oz)', calories: 160, protein: 30, carbs: 5, fat: 3 },
     { name: 'Muscle Milk Zero (11oz, vanilla)', calories: 100, protein: 20, carbs: 2, fat: 2 },
-    { name: 'Siggi's Plain Skyr (5.3oz)', calories: 100, protein: 16, carbs: 8, fat: 0 },
+    { name: 'Siggis Plain Skyr (5.3oz)', calories: 100, protein: 16, carbs: 8, fat: 0 },
     { name: 'Oikos Pro Vanilla (5.3oz)', calories: 120, protein: 20, carbs: 7, fat: 0 },
     { name: 'Chomps Beef Stick', calories: 90, protein: 9, carbs: 1, fat: 6 },
     { name: 'Epic Chicken Sriracha Bar', calories: 80, protein: 11, carbs: 4, fat: 2 },
@@ -221,7 +221,7 @@ export const RESTAURANT_MENUS = {
  */
 export const RESTAURANT_NAMES = {
   chipotle: 'Chipotle',
-  mcdonalds: "McDonald's",
+  mcdonalds: "McDonalds",
   subway: 'Subway',
   chickfila: 'Chick-fil-A',
   sweetgreen: 'Sweetgreen',
@@ -230,9 +230,9 @@ export const RESTAURANT_NAMES = {
   starbucks: 'Starbucks',
   cava: 'Cava',
   pandaexpress: 'Panda Express',
-  jerseymikes: "Jersey Mike's",
+  jerseymikes: "Jersey Mikes",
   wholefoods: 'Whole Foods',
-  traderjoes: "Trader Joe's",
+  traderjoes: "Trader Joes",
   snacksbars: 'Protein Bars & Snacks',
 };
 
