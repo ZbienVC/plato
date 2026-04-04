@@ -1,3 +1,64 @@
+// 7-day macro trend SVG chart
+function TrendChart({ logHistory, targets }) {
+  const days = 7;
+  const today = new Date().toISOString().split('T')[0];
+  const entries = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const log = (logHistory || []).find(l => l.date === key);
+    entries.push({
+      date: key,
+      label: i === 0 ? 'Today' : d.toLocaleDateString('en-US', { weekday: 'short' }),
+      calories: log?.meals?.reduce((s, m) => s + (m.calories || 0), 0) || 0,
+      protein: log?.meals?.reduce((s, m) => s + (m.protein || 0), 0) || 0,
+    });
+  }
+  const maxCal = Math.max(targets.calories * 1.2, ...entries.map(e => e.calories), 100);
+  const W = 280, H = 80, barW = 28, gap = 12;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm font-bold text-slate-800">7-Day Trend</p>
+        <div className="flex items-center gap-3 text-xs text-slate-400">
+          <span><span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1" />Calories</span>
+          <span><span className="inline-block w-2 h-2 rounded-full bg-indigo-400 mr-1" />Protein</span>
+        </div>
+      </div>
+      <svg width="100%" viewBox={`0 0 ${W} ${H + 24}`} style={{ overflow: 'visible' }}>
+        {entries.map((e, i) => {
+          const x = i * (barW + gap);
+          const calH = Math.max(4, (e.calories / maxCal) * H);
+          const protH = Math.max(2, (e.protein / (targets.protein * 1.2 || 150)) * H * 0.7);
+          const atTarget = e.calories >= targets.calories * 0.85 && e.calories <= targets.calories * 1.15;
+          return (
+            <g key={e.date}>
+              <rect x={x} y={H - calH} width={barW} height={calH} rx="4"
+                fill={atTarget ? '#10b981' : e.calories === 0 ? 'rgba(99,102,241,0.1)' : '#f59e0b'}
+                fillOpacity={e.date === today ? 1 : 0.6} />
+              {e.protein > 0 && (
+                <rect x={x + 4} y={H - protH} width={barW - 8} height={protH} rx="2"
+                  fill="#6366f1" fillOpacity={0.7} />
+              )}
+              <text x={x + barW / 2} y={H + 16} textAnchor="middle"
+                fontSize="9" fill="#94a3b8" fontWeight={e.date === today ? '700' : '400'}>
+                {e.label}
+              </text>
+            </g>
+          );
+        })}
+        {/* Target line */}
+        {targets.calories > 0 && (
+          <line x1="0" y1={H - (targets.calories / maxCal) * H}
+            x2={(7 * (barW + gap)) - gap} y2={H - (targets.calories / maxCal) * H}
+            stroke="#10b981" strokeWidth="1" strokeDasharray="4,3" opacity="0.4" />
+        )}
+      </svg>
+    </div>
+  );
+}
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
