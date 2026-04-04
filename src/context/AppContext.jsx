@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import { auth, saveLogEntry as apiSaveLog } from '../lib/api';
 import { MEAL_DATABASE } from '../services/mealGenerator';
 import { saveLogEntry } from '../lib/api';
 
@@ -123,6 +124,22 @@ export function AppProvider({ children }) {
   const [showMealImages, setShowMealImages] = useState(() => loadState('showMealImages', true));
   const [premium, setPremium] = useState(() => loadPremiumState());
   const [premiumModalOpen, setPremiumModalOpen] = useState(false);
+
+  // === AUTH STATE ===
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem('plato_token') || null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  const isLoggedIn = !!authToken;
+
+  const loginSuccess = useCallback(() => {
+    setAuthToken(localStorage.getItem('plato_token'));
+    setAuthModalOpen(false);
+  }, []);
+
+  const logout = useCallback(() => {
+    auth.logout();
+    setAuthToken(null);
+  }, []);
 
   // === WEIGHT TRACKING ===
   const [weightEntries, setWeightEntries] = useState(() => loadState('weightEntries', []));
@@ -380,6 +397,13 @@ export function AppProvider({ children }) {
     premiumModalOpen,
     setPremiumModalOpen,
     openPremiumModal,
+    // auth
+    isLoggedIn,
+    authToken,
+    authModalOpen,
+    setAuthModalOpen,
+    loginSuccess,
+    logout,
     closePremiumModal,
     premiumCheckoutUrl: PREMIUM_CHECKOUT_URL,
     premiumContactEmail: PREMIUM_CONTACT_EMAIL,
