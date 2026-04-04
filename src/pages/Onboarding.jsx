@@ -17,7 +17,7 @@ const trans = { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] };
 
 const Chip = ({ label, active, onClick }) => (
   <motion.button whileTap={{ scale: 0.95 }} onClick={onClick}
-    className={px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ${active ? 'text-white border-transparent' : 'border-slate-200 text-slate-600 hover:border-emerald-300'}`}
+    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ${active ? 'text-white border-transparent' : 'border-slate-200 text-slate-600 hover:border-emerald-300'}` }
     style={active ? { background: 'linear-gradient(135deg,#10b981,#059669)' } : {}}
   >{label}</motion.button>
 );
