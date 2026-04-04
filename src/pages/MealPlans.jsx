@@ -90,8 +90,8 @@ export function MealPlans() {
             {plan.calories} cal/day · {plan.protein}g protein · {days} day plan
           </p>
         )}
-        {!hasPlan && <p className="text-sm text-slate-400 mt-0.5">'Generate a plan to get started</p>}
-        </p>
+        {!hasPlan && <p className="text-sm text-slate-400 mt-0.5">Generate a plan to get started</p>}
+
       </motion.div>
 
       {/* Sub-tab bar */}
