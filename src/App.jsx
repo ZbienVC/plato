@@ -110,14 +110,26 @@ function AppContent() {
     logMeal,
     premiumModalOpen,
     closePremiumModal,
+    authModalOpen,
+    setAuthModalOpen,
+    loginSuccess,
   } = useApp();
   const { showToast, ToastContainer } = useToast();
 
-  const [hasOnboarded, setHasOnboarded] = useState(false);
-  const needsOnboarding = !hasOnboarded && !userProfile?.name;
+  const needsOnboarding = !userProfile?.name && !userProfile?.age;
 
   if (needsOnboarding) {
-    return <Onboarding onComplete={() => setHasOnboarded(true)} />;
+    return (
+      <div>
+        <Onboarding onComplete={() => {}} />
+        <button
+          onClick={() => setAuthModalOpen(true)}
+          style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 200, background: 'rgba(34,197,94,0.9)', color: '#fff', border: 'none', borderRadius: 12, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}
+        >
+          Already have an account? Sign in
+        </button>
+      </div>
+    );
   }
 
   const renderTab = () => {
