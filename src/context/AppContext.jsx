@@ -267,7 +267,7 @@ export function AppProvider({ children }) {
     saveLogEntry(normalizedMeal).catch(() => {});
   }, [setDailyLog]);
 
-  const toggleFavorite = useCallback((food) => {
+  const toggleFoodFavorite = useCallback((food) => {
     setFavoriteFoods(prev => {
       const exists = prev.find(f => f.name === food.name);
       if (exists) return prev.filter(f => f.name !== food.name);
@@ -275,7 +275,7 @@ export function AppProvider({ children }) {
     });
   }, []);
 
-  const isFavorite = useCallback((name) => {
+  const isFoodFavorite = useCallback((name) => {
     return favoriteFoods.some(f => f.name === name);
   }, [favoriteFoods]);
 
@@ -429,7 +429,7 @@ export function AppProvider({ children }) {
     premiumModalOpen,
     setPremiumModalOpen,
     removeMeal,
-    favoriteFoods, toggleFavorite, isFavorite,
+    favoriteFoods, toggleFoodFavorite, isFoodFavorite,
     openPremiumModal,
     // auth
     isLoggedIn,
