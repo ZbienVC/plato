@@ -167,14 +167,7 @@ export function SettingsPanel() {
             </button>
             <button
               onClick={() => setUnits('metric')}
-              className={
-`
-flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all 
-${
-units === 'metric' ? 'text-white btn-primary' : 'text-slate-500 app-card-soft'
-}
-`
-}>
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'metric' ? 'text-white btn-primary' : 'text-slate-500 app-card-soft'}`}>
               Metric
             </button>
           </div>
