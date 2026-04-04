@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { searchFood } from '../../lib/api';
+import { Star } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 
 function debounce(fn, ms) {
   let timer;
@@ -10,6 +12,7 @@ function debounce(fn, ms) {
 }
 
 export function FoodSearch({ onSelect, placeholder = 'Search food (e.g. chicken breast)...' }) {
+  const { toggleFavorite, isFavorite } = useApp();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -74,8 +77,9 @@ export function FoodSearch({ onSelect, placeholder = 'Search food (e.g. chicken 
         <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl">
           <div className="max-h-80 overflow-y-auto">
             {results.map((food) => (
+              <div key={food.fdcId} style={{ display: 'flex', alignItems: 'center' }}>
               <button
-                key={food.fdcId}
+                style={{ flex: 1, display: 'flex' }}
                 onClick={() => handleSelect(food)}
                 className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
               >
