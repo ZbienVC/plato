@@ -340,35 +340,34 @@ export function Onboarding({ onComplete }) {
           {/* READY */}
           {step === 5 && genPlan && (
             <motion.div key="ready" {...page} transition={trans}
-              className="flex-1 flex flex-col items-center justify-center text-center py-16">
-              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }}
-                className="w-16 h-16 rounded-2xl bg-green-50 border-2 border-green-300 flex items-center justify-center mb-6">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              className="flex-1 flex flex-col items-center justify-center text-center py-12">
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 250 }}
+                className="w-20 h-20 rounded-3xl flex items-center justify-center mb-6"
+                style={{ background: "linear-gradient(135deg,#10b981,#6366f1)", boxShadow: "0 8px 32px rgba(16,185,129,0.3)" }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
               </motion.div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-1">Plan ready! 🎉</h2>
-              <p className="text-sm text-slate-400 mb-8">Optimized for {form.goal.replace('-', ' ')}</p>
-
+              <h2 className="text-3xl font-black text-slate-900 mb-2" style={{ letterSpacing: "-1px" }}>Plan ready!</h2>
+              <p className="text-sm text-slate-400 mb-8 capitalize">Optimized for {form.goal.replace("-", " ")}</p>
               <div className="w-full app-card mb-8">
                 <div className="grid grid-cols-4 gap-2 text-center">
-                  {[{l:'Cal',v:genPlan.calories,c:'#22C55E'},{l:'Protein',v:`${genPlan.protein}g`,c:'#3B82F6'},{l:'Carbs',v:`${genPlan.carbs}g`,c:'#F59E0B'},{l:'Fat',v:`${genPlan.fat}g`,c:'#F43F5E'}].map(m =>
+                  {[{l:"Cal",v:genPlan.calories,c:"#10b981"},{l:"Protein",v:${genPlan.protein}g,c:"#6366f1"},{l:"Carbs",v:${genPlan.carbs}g,c:"#f59e0b"},{l:"Fat",v:${genPlan.fat}g,c:"#f43f5e"}].map(m => (
                     <div key={m.l}>
                       <p className="text-xl font-black tabular-nums" style={{ color: m.c }}>{m.v}</p>
-                      <p className="text-[9px] text-slate-400 font-semibold uppercase mt-1">{m.l}</p>
+                      <p className="text-[9px] font-bold uppercase tracking-wider mt-1" style={{ color: "#94a3b8" }}>{m.l}</p>
                     </div>
-                  )}
+                  ))}
                 </div>
-                <div className="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-400">{genPlan.meals.length} meals · 7 days</div>
+                <div className="mt-4 pt-3 text-xs text-center" style={{ borderTop: "1px solid rgba(99,102,241,0.1)", color: "#94a3b8" }}>
+                  {genPlan.meals.length} meals &middot; 7 day plan
+                </div>
               </div>
-
               <motion.button whileTap={{ scale: 0.97 }} onClick={onComplete}
-                className="w-full max-w-[280px] py-3.5 rounded-xl bg-green-500 text-white font-bold text-base shadow-lg shadow-green-200">
-                Start Tracking 🚀
+                className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-base"
+                style={{ background: "linear-gradient(135deg,#10b981,#059669)", boxShadow: "0 6px 24px rgba(16,185,129,0.35)" }}>
+                Start Tracking
               </motion.button>
             </motion.div>
           )}
-        </AnimatePresence>
-      </div>
-    </div>
   );
 }
 
