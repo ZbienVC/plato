@@ -176,6 +176,11 @@ export function Profile() {
         )}
       </motion.div>
 
+      {/* 7-Day Trend Chart */}
+      <motion.div variants={item} className="app-card">
+        <TrendChart logHistory={logHistory} targets={targets} />
+      </motion.div>
+
       {/* Daily Targets */}
       {plan && (
         <motion.div variants={item} className="app-card">
