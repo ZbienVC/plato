@@ -31,7 +31,7 @@ export function SettingsPanel() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => setActiveTab('home')}
-          className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors"
+          className="w-9 h-9 rounded-full app-card-soft flex items-center justify-center hover:bg-slate-200 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-slate-600" />
         </button>
@@ -39,7 +39,7 @@ export function SettingsPanel() {
       </div>
 
       {/* Appearance */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="app-card">
         <div className="px-4 py-3 border-b border-slate-50">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Appearance</p>
         </div>
@@ -58,7 +58,7 @@ export function SettingsPanel() {
       </div>
 
       {/* Notifications */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="app-card">
         <div className="px-4 py-3 border-b border-slate-50">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Notifications</p>
         </div>
@@ -87,7 +87,7 @@ export function SettingsPanel() {
       </div>
 
       {/* Units */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="app-card">
         <div className="px-4 py-3 border-b border-slate-50">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Units</p>
         </div>
@@ -95,22 +95,7 @@ export function SettingsPanel() {
           <div className="flex gap-2">
             <button
               onClick={() => setUnits('imperial')}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'imperial' ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600'}`}
-            >
-              Imperial (lbs/ft)
-            </button>
-            <button
-              onClick={() => setUnits('metric')}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'metric' ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600'}`}
-            >
-              Metric (kg/cm)
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* About */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${units === 'imperial' ? 'text-white" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}app-card">
         <div className="px-4 py-3 border-b border-slate-50">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">About</p>
         </div>
@@ -135,7 +120,7 @@ export function SettingsPanel() {
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-white rounded-2xl border border-red-100 shadow-sm overflow-hidden">
+      <div className="app-card">
         <div className="px-4 py-3 border-b border-red-50">
           <p className="text-xs font-semibold text-red-400 uppercase tracking-widest">Danger Zone</p>
         </div>
@@ -154,7 +139,7 @@ export function SettingsPanel() {
           <div className="p-4 space-y-3">
             <p className="text-sm text-slate-700 font-medium">Are you sure? This cannot be undone.</p>
             <div className="flex gap-2">
-              <button onClick={() => setShowResetConfirm(false)} className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">Cancel</button>
+              <button onClick={() => setShowResetConfirm(false)} className="flex-1 py-2.5 rounded-xl app-card-soft text-slate-700 text-sm font-semibold">Cancel</button>
               <button onClick={handleReset} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold">Reset</button>
             </div>
           </div>
