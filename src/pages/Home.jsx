@@ -225,9 +225,15 @@ export function Home() {
                     <p className="text-xs text-slate-400">{new Date(m.loggedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-slate-900 tabular-nums">{m.calories} cal</p>
-                  <p className="text-xs text-slate-400 tabular-nums">{m.protein}P · {m.carbs}C · {m.fat}F</p>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-slate-900 tabular-nums">{m.calories} cal</p>
+                    <p className="text-xs text-slate-400 tabular-nums">{m.protein}P {m.carbs}C {m.fat}F</p>
+                  </div>
+                  <motion.button whileTap={{ scale: 0.85 }} onClick={() => removeMeal && removeMeal(i)}
+                    className="opacity-0 group-hover:opacity-100 focus:opacity-100 w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center text-red-400 hover:bg-red-100 transition-all">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </motion.button>
                 </div>
               </div>
             ))}
