@@ -27,11 +27,11 @@ function CalorieRing({ current, target }) {
 
   return (
     <svg width="180" height="180" viewBox="0 0 180 180" className="rotate-[-90deg]">
-      <circle cx="90" cy="90" r={r} fill="none" stroke="#E2E8F0" strokeWidth="12" />
+      <circle cx="90" cy="90" r={r} fill="none" stroke="rgba(99,102,241,0.1)" strokeWidth="12" />
       <motion.circle
         cx="90" cy="90" r={r}
         fill="none"
-        stroke="#22C55E"
+        stroke="#10b981"
         strokeWidth="12"
         strokeLinecap="round"
         strokeDasharray={`${circ}`}
@@ -99,7 +99,7 @@ export function Home() {
   const streakTier = streak >= 30 ? 'legendary' : streak >= 14 ? 'on-fire' : streak >= 7 ? 'hot' : streak >= 3 ? 'building' : 'start';
   const streakEmoji = { legendary: '🔥', 'on-fire': '🔥', hot: '🔥', building: '🔥', start: '✨' }[streakTier];
   const streakColor = streak >= 7 ? '#f97316' : streak >= 3 ? '#fb923c' : '#22c55e';
-  const streakBg = streak >= 7 ? 'from-orange-50 to-amber-50 border-orange-100' : streak >= 3 ? 'from-amber-50 to-yellow-50 border-amber-100' : 'from-green-50 to-emerald-50 border-green-100';
+  const streakBg = "";  // using inline style instead
   const StreakIcon = streak >= 30 ? Award : streak >= 7 ? Flame : streak >= 3 ? TrendingUp : Zap;
 
   const dayIndex = Math.floor((Date.now() - new Date(plan?.createdAt || Date.now()).getTime()) / 86400000) % 7;
@@ -118,7 +118,7 @@ export function Home() {
       {/* Streak Banner — always visible */}
       <motion.div
         variants={item}
-        className={`bg-gradient-to-r ${streakBg} border rounded-2xl p-4 flex items-center gap-3`}
+        className="rounded-2xl p-4 flex items-center gap-3 app-card" style={{ borderLeft: `3px solid ${streakColor}` }}
       >
         <motion.div
           animate={streak > 0 ? { scale: [1, 1.15, 1], rotate: [-3, 3, -3, 0] } : {}}
@@ -167,7 +167,7 @@ export function Home() {
             <p className="text-3xl font-black text-slate-900 tabular-nums">{current.calories.toLocaleString()}</p>
             <p className="text-xs text-slate-400 font-medium">of {targets.calories.toLocaleString()} kcal</p>
             {targets.calories > 0 && (
-              <p className="text-xs font-semibold text-green-500 mt-1">
+              <p className="text-xs font-semibold mt-1 gradient-text">
                 {Math.max(0, targets.calories - current.calories)} remaining
               </p>
             )}
@@ -180,7 +180,7 @@ export function Home() {
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-base font-bold text-slate-900">Macros Today</h2>
         </div>
-        <MacroBar label="Protein" current={current.protein} target={targets.protein} color="#3B82F6" />
+        <MacroBar label="Protein" current={current.protein} target={targets.protein} color="#6366f1" />
         <MacroBar label="Carbs" current={current.carbs} target={targets.carbs} color="#F59E0B" />
         <MacroBar label="Fat" current={current.fat} target={targets.fat} color="#F43F5E" />
       </motion.div>
@@ -307,7 +307,7 @@ export function Home() {
       {!hasPlan && todayMeals.length === 0 && (
         <motion.div variants={item} className="app-card text-center py-8">
           <div className="w-14 h-14 rounded-2xl mx-auto mb-4 bg-green-50 flex items-center justify-center">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round">
               <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
               <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
             </svg>
@@ -332,7 +332,7 @@ export function Home() {
         <motion.button variants={item} whileTap={{ scale: 0.98 }} onClick={() => setActiveTab('log')}
           className="w-full app-card flex items-center gap-3 text-left">
           <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2" strokeLinecap="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round">
               <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
               <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
             </svg>
@@ -353,7 +353,7 @@ export function Home() {
       {/* Quick stats */}
       <motion.div variants={item} className="grid grid-cols-3 gap-3">
         {[
-          { l: 'Meals', v: todayMeals.length, color: '#22C55E', bg: '#F0FDF4' },
+          { l: 'Meals', v: todayMeals.length, color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
           { l: 'Protein', v: `${current.protein}g`, color: '#3B82F6', bg: '#EFF6FF' },
           { l: 'Progress', v: `${targets.calories > 0 ? Math.round(current.calories / targets.calories * 100) : 0}%`, color: '#F59E0B', bg: '#FFFBEB' },
         ].map(s => (
