@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingDown, Scale, Dumbbell, Zap, Flame, BarChart3, ChefHat, Clock, Beef, Leaf, Globe, Ban, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { generateMealPlan } from '../services/mealGenerator';
+import { updateProfile, auth } from '../lib/api';
 
 const GOAL_OPTIONS = [
   { v: 'lose-fat', l: 'Lose Fat', d: 'Caloric deficit', Icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-50 border-rose-200' },
@@ -65,7 +66,23 @@ export function Onboarding({ onComplete }) {
       const macros = calcMacros();
       const meals = generateMealPlan(macros.calories, macros, form.mealsPerDay, form);
       const plan = { ...macros, name: form.name || 'My Plan', meals, mealsPerDay: form.mealsPerDay, createdAt: new Date().toISOString() };
-      setUserProfile({ name: form.name, age: form.age, gender: form.gender, height: { feet: form.heightFeet, inches: form.heightInches }, weight: form.weight, activityLevel: form.activity });
+      // Sync to backend if logged in
+    if (auth.isLoggedIn()) {
+      updateProfile({
+        name: form.name,
+        age: form.age,
+        gender: form.gender,
+        goal: form.goal,
+        activity_level: form.activity,
+        calorie_target: macros.calories,
+        protein_target: macros.protein,
+        carb_target: macros.carbs,
+        fat_target: macros.fat,
+        weight_kg: Math.round(form.weight * 0.4536),
+        height_cm: Math.round(form.heightFeet * 30.48 + form.heightInches * 2.54),
+      }).catch(() => { /* non-fatal if offline */ })
+    }
+    setUserProfile({ name: form.name, age: form.age, gender: form.gender, height: { feet: form.heightFeet, inches: form.heightInches }, weight: form.weight, activityLevel: form.activity });
       setPlanConfig({ goal: form.goal, trainingType: form.trainingType, trainingDays: form.trainingDays, dietStyle: form.dietStyle, mealsPerDay: form.mealsPerDay, cookTime: form.cookTime, cuisines: form.cuisines, restrictions: form.restrictions, activity: form.activity });
       setPlan(plan); setGenPlan(plan); setStep(5);
     } finally {
