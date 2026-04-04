@@ -105,6 +105,27 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS meal_logs_user_date ON meal_logs(user_id, date);
   CREATE INDEX IF NOT EXISTS meal_logs_user_logged ON meal_logs(user_id, logged_at);
+
+  CREATE TABLE IF NOT EXISTS water_log (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    amount_ml INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    logged_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS water_log_user_date ON water_log(user_id, date);
+
+  CREATE TABLE IF NOT EXISTS weight_log (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    weight_kg REAL NOT NULL,
+    date TEXT NOT NULL,
+    note TEXT,
+    logged_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS weight_log_user_date ON weight_log(user_id, date);
 `);
 
 // â”€â”€â”€ Auth helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
