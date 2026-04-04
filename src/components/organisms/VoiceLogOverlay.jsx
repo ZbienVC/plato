@@ -141,7 +141,7 @@ export function VoiceLogOverlay({ onClose, onSave, onSuccess }) {
                 <p className="text-xs font-semibold text-green-500 uppercase tracking-wider">Voice Logger</p>
                 <h2 className="text-xl font-bold text-slate-900">Speak your meal</h2>
               </div>
-              <button onClick={closeOverlay} className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center">
+              <button onClick={closeOverlay} className="w-10 h-10 rounded-2xl app-card-soft text-slate-500 flex items-center justify-center">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -149,9 +149,9 @@ export function VoiceLogOverlay({ onClose, onSave, onSuccess }) {
             <div className="app-card flex items-center gap-4">
               <button
                 onClick={() => (isListening ? stopListening() : startListening())}
-                className={`w-14 h-14 rounded-2xl flex items-center justify-center ${isListening ? 'bg-rose-500 text-white' : 'bg-green-500 text-white'}`}
+                className={`w-14 h-14 rounded-2xl flex items-center justify-center ${isListening ? 'bg-rose-500 text-white' : 'text-white'}`}
               >
-                {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+                {isListening ? <MicOff className=" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}w-6 h-6" /> : <Mic className="w-6 h-6" />}
               </button>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-slate-900">{isListening ? 'Listening…' : 'Tap to start recording'}</p>
@@ -173,14 +173,14 @@ export function VoiceLogOverlay({ onClose, onSave, onSuccess }) {
                 onChange={(e) => setManualText(e.target.value)}
                 rows={3}
                 placeholder={speechSupported ? '"Grilled chicken with rice and broccoli, about 520 calories"' : 'Type your meal, e.g. "Avocado toast with 2 eggs, 420 calories, 20g protein"'}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
+                className="w-full rounded-2xl border border-slate-200 app-card-soft px-3 py-3 text-sm text-slate-900 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
               />
               <div className="flex gap-2 mt-2">
                 <button onClick={() => handleParse(manualText)} disabled={!manualText.trim() || parsing}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-semibold ${manualText.trim() ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-semibold ${manualText.trim() ? 'text-white' : 'app-card-soft text-slate-400'}`}>
                   {parsing ? 'Parsing…' : 'Parse text'}
                 </button>
-                <button onClick={() => setMode('review')} className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-600 text-sm font-semibold">
+                <button onClick={() => setMode('review')} className=" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}flex-1 py-2.5 rounded-xl app-card-soft text-slate-600 text-sm font-semibold">
                   Edit Manually
                 </button>
               </div>
@@ -237,9 +237,9 @@ export function VoiceLogOverlay({ onClose, onSave, onSuccess }) {
             <button
               onClick={handleSave}
               disabled={disableSave}
-              className={`w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 ${disableSave ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'bg-green-500 text-white'}`}
+              className={`w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 ${disableSave ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'text-white'}`}
             >
-              <Check className="w-4 h-4" /> Log Meal
+              <Check className=" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}w-4 h-4" /> Log Meal
             </button>
             {error && (
               <p className="text-xs text-rose-500 text-center">{error === 'not-allowed' ? 'Microphone permission blocked in browser settings.' : `Voice error: ${error}`}</p>
