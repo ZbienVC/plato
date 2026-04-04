@@ -148,7 +148,7 @@ export function MealPlans() {
               <PlanRowsSkeleton />
             </motion.div>
           ) : hasPlan && dayMeals.length > 0 && (
-            <motion.div variants={item} className=" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}space-y-3">
+            <motion.div variants={item} className=space-y-3">
               {dayMeals.map((meal, i) => (
                 <div key={i} className="app-card overflow-hidden">
                   {showMealImages && (
