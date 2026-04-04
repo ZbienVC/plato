@@ -364,8 +364,7 @@ export function Home() {
           { l: 'Protein', v: `${current.protein}g`, color: '#3B82F6', bg: '#EFF6FF' },
           { l: 'Progress', v: `${targets.calories > 0 ? Math.round(current.calories / targets.calories * 100) : 0}%`, color: '#F59E0B', bg: '#FFFBEB' },
         ].map(s => (
-          <div key={s.l} className="text-center py-3 rounded-xl border border-slate-100"
-            className="app-card-soft" style={{}}>
+          <div key={s.l} className="app-card-soft text-center">
             <p className="text-xl font-black tabular-nums" style={{ color: s.color }}>{s.v}</p>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{s.l}</p>
           </div>
