@@ -69,11 +69,7 @@ export function TopBar({ activeTab }) {
     : premiumStatus === 'trial'
       ? '48h full access'
       : 'Voice + Restaurant locked';
-  const premiumPillClasses = premiumActive
-    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-    : premiumStatus === 'trial'
-      ? 'border-amber-200 bg-amber-50 text-amber-700'
-      : 'border-slate-200 bg-slate-100 text-slate-500';
+  const premiumPillClasses = '';
 
   const handlePremiumClick = () => {
     if (premiumActive) return;
@@ -118,7 +114,7 @@ export function TopBar({ activeTab }) {
   };
 
   return (
-    <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100">
+    <div className="sticky top-0 z-40 backdrop-blur-xl border-b" style={{ background: "rgba(240,253,244,0.88)", borderColor: "rgba(16,185,129,0.1)" }}>
       <div className="flex items-center justify-between px-4 h-14">
         {/* Left: Avatar → opens drawer */}
         <button
@@ -137,24 +133,20 @@ export function TopBar({ activeTab }) {
         {renderRight()}
       </div>
 
-      <div className="px-4 pb-2">
-        <button
-          type="button"
-          onClick={handlePremiumClick}
-          className={`w-full rounded-2xl border px-3 py-2 text-left transition-all flex items-center justify-between gap-3 ${premiumActive ? 'cursor-default' : 'cursor-pointer'} ${premiumPillClasses}`}
-        >
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em]">Premium</p>
-            <p className="text-sm font-semibold leading-tight">{premiumCopy}</p>
-            <p className="text-[11px] font-medium opacity-80">{premiumSubtext}</p>
-          </div>
-          {!premiumActive && (
-            <div className="rounded-xl bg-white/60 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">
-              Unlock
+      {!premiumActive && (
+        <div className="px-4 pb-2.5">
+          <button type="button" onClick={handlePremiumClick}
+            className="w-full flex items-center justify-between rounded-xl px-3 py-2 transition-all"
+            style={{ background: "linear-gradient(135deg,rgba(16,185,129,0.07),rgba(99,102,241,0.07))", border: "1px solid rgba(16,185,129,0.15)" }}>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: "0.04em" }}>FREE TIER</span>
+              <span style={{ fontSize: 11, color: "#94a3b8" }}>Voice locked</span>
             </div>
-          )}
-        </button>
-      </div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#10b981" }}>Upgrade</span>
+          </button>
+        </div>
+      )}
 
       {/* Notification panel */}
       {showNotif && activeTab === 'home' && (
