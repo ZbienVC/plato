@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User, Loader2 } from 'lucide-react';
-import { auth } from '../lib/api';
+import { auth } from '../../lib/api';
 
 export function AuthModal({ open, onClose, onSuccess }) {
   const [mode, setMode] = useState('login'); // 'login' | 'signup'
