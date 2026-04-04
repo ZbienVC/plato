@@ -4,7 +4,8 @@
  */
 
 // Use VITE_API_URL for Railway backend, fall back to relative path for local dev
-const BASE = ((import.meta as any).env?.VITE_API_URL || '').replace(/\/$/, '') + '/api';
+const _base = ((import.meta as any).env?.VITE_API_URL || "").trim().replace(/\/$/, "");
+const BASE = _base.startsWith("http") ? _base + "/api" : "";
 
 function getToken(): string | null {
   return localStorage.getItem('plato_token');
@@ -70,7 +71,8 @@ export type DayLog = {
 
 // Local auth fallback — works without a backend
 // Stores hashed credentials in localStorage when VITE_API_URL not set
-const HAS_BACKEND = !!(import.meta as any).env?.VITE_API_URL;
+const _apiUrl = ((import.meta as any).env?.VITE_API_URL || "").trim();
+const HAS_BACKEND = _apiUrl.length > 0 && _apiUrl.startsWith("http");
 
 function localSignup(email: string, password: string, username?: string) {
   const users = JSON.parse(localStorage.getItem('plato_users') || '{}');
