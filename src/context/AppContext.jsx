@@ -279,6 +279,18 @@ export function AppProvider({ children }) {
     return favoriteFoods.some(f => f.name === name);
   }, [favoriteFoods]);
 
+  const copyYesterdayMeals = useCallback(() => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayKey = yesterday.toISOString().split('T')[0];
+    const yesterdayLog = (logHistory || []).find(l => l.date === yesterdayKey);
+    if (!yesterdayLog || !yesterdayLog.meals || yesterdayLog.meals.length === 0) return false;
+    yesterdayLog.meals.forEach(meal => {
+      logMeal({ ...meal, loggedAt: new Date().toISOString() });
+    });
+    return yesterdayLog.meals.length;
+  }, [logHistory, logMeal]);
+
   const removeMeal = useCallback((index) => {
     setDailyLog(prev => {
       if (!prev) return prev
@@ -429,6 +441,7 @@ export function AppProvider({ children }) {
     premiumModalOpen,
     setPremiumModalOpen,
     removeMeal,
+    copyYesterdayMeals,
     favoriteFoods, toggleFoodFavorite, isFoodFavorite,
     openPremiumModal,
     // auth
