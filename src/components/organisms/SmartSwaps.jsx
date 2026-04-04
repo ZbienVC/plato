@@ -184,7 +184,7 @@ export function SmartSwaps({ meal, onSwap, onClose, userPreferences = {} }) {
           { name: 'Legumes' }
         ],
         impact: 'Aligns with vegetarian diet',
-        color: '#22C55E'
+        color: '#10b981'
       });
     }
 
