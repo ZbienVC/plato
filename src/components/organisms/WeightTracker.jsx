@@ -163,7 +163,7 @@ export function WeightTracker({ entries = [], onLog, dark = true, onClose }) {
                   <div
                     key={i}
                     className={`flex items-center justify-between p-3 rounded-xl ${
-                      dark ? 'bg-white/[0.03]' : 'bg-slate-50'
+                      dark ? 'bg-white/[0.03]' : 'app-card-soft'
                     }`}
                   >
                     <span className="text-xs text-slate-500">{entry.date}</span>
