@@ -48,7 +48,7 @@ export function Drawer() {
             <div className="flex justify-end px-4 pt-4 pb-2">
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center"
+                className="w-9 h-9 rounded-full hover:app-card-soft flex items-center justify-center"
               >
                 <X className="w-5 h-5 text-slate-600" />
               </button>
@@ -72,7 +72,7 @@ export function Drawer() {
                 <button
                   key={view}
                   onClick={() => handleItem(view)}
-                  className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 transition-colors text-left"
+                  className="w-full flex items-center gap-4 px-5 py-3.5 hover:app-card-soft transition-colors text-left"
                 >
                   <Icon className="w-5 h-5 text-slate-500 flex-shrink-0" />
                   <span className="text-base font-medium text-slate-800">{label}</span>
