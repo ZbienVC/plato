@@ -158,7 +158,7 @@ export function Home() {
       </motion.div>
 
       {/* Calorie Ring Card */}
-      <motion.div variants={item} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+      <motion.div variants={item} className="app-card p-5">
         <div className="flex items-center justify-center relative">
           <div className="ring-glow">
             <CalorieRing current={current.calories} target={targets.calories} />
@@ -267,7 +267,7 @@ export function Home() {
               const slot = slots[i] || 'snack';
               return (
                 <div key={i} className={`flex items-center justify-between px-3 py-2.5 rounded-xl border ${
-                  logged ? 'bg-green-50 border-green-100' : 'bg-slate-50 border-slate-100'
+                  logged ? 'border-l-2 border-emerald-400' : 'border-l-2 border-transparent'
                 }`}>
                   <div className="flex items-center gap-3">
                     <FoodImage mealName={meal.name} mealType={meal.type || slot} size="sm" />
@@ -320,7 +320,7 @@ export function Home() {
               Get a Plan
             </motion.button>
             <motion.button whileTap={{ scale: 0.97 }} onClick={() => setActiveTab('log')}
-              className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-semibold text-sm">
+              className="flex-1 py-2.5 rounded-xl btn-secondary text-sm">
               Log Meal
             </motion.button>
           </div>
@@ -358,7 +358,7 @@ export function Home() {
           { l: 'Progress', v: `${targets.calories > 0 ? Math.round(current.calories / targets.calories * 100) : 0}%`, color: '#F59E0B', bg: '#FFFBEB' },
         ].map(s => (
           <div key={s.l} className="text-center py-3 rounded-xl border border-slate-100"
-            style={{ background: s.bg }}>
+            className="app-card-soft" style={{}}>
             <p className="text-xl font-black tabular-nums" style={{ color: s.color }}>{s.v}</p>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{s.l}</p>
           </div>
