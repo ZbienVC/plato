@@ -132,6 +132,33 @@ export function AppProvider({ children }) {
 
   const isLoggedIn = !!authToken;
 
+  // On app startup: if already logged in, refresh profile from server
+  useEffect(() => {
+    if (authToken) {
+      getProfile().then(resp => {
+        const p = resp?.profile || resp;
+        const u = resp?.user || {};
+        if (p && (p.name || u.username)) {
+          const heightCm = p.height_cm || 0;
+          const totalInches = heightCm / 2.54;
+          const feet = Math.floor(totalInches / 12);
+          const inches = Math.round(totalInches % 12);
+          const normalized = {
+            name: p.name || u.username || u.email?.split('@')[0] || '',
+            age: p.age || '',
+            gender: p.gender || 'prefer_not_to_say',
+            height: { feet: feet || 5, inches: inches || 7 },
+            weight: p.weight_kg ? Math.round(p.weight_kg * 2.20462) : 150,
+            activityLevel: p.activity_level || 'moderate',
+            goal: p.goal || 'maintain',
+          };
+          setUserProfile(prev => ({ ...prev, ...normalized }));
+          saveState('userProfile', normalized);
+        }
+      }).catch(() => { /* use cached localStorage */ });
+    }
+  }, [authToken]);
+
   const loginSuccess = useCallback(async () => {
     const token = localStorage.getItem('plato_token');
     setAuthToken(token);
