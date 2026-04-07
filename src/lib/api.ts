@@ -213,18 +213,21 @@ async function flushOfflineQueue() {
 
 export async function saveLogEntry(entry: LogEntry): Promise<{ ok: boolean; offline?: boolean }> {
   const payload = { ...entry, loggedAt: entry.loggedAt || new Date().toISOString() };
+  const dateKey = `plato_log_${payload.loggedAt!.split('T')[0]}`;
 
-  // If not logged in, save to localStorage only (legacy behavior)
-  if (!auth.isLoggedIn()) {
-    try {
-      const dateKey = `plato_log_${payload.loggedAt!.split('T')[0]}`;
-      const existing = JSON.parse(localStorage.getItem(dateKey) || '[]');
-      existing.push(payload);
-      localStorage.setItem(dateKey, JSON.stringify(existing));
-    } catch { /* ignore */ }
+  // Always save to localStorage as immediate local backup
+  try {
+    const existing = JSON.parse(localStorage.getItem(dateKey) || '[]');
+    existing.push({ ...payload, _localId: Math.random().toString(36).slice(2) });
+    localStorage.setItem(dateKey, JSON.stringify(existing));
+  } catch { /* ignore */ }
+
+  // If no backend or not logged in, localStorage is the source of truth
+  if (!HAS_BACKEND || !auth.isLoggedIn()) {
     return { ok: true };
   }
 
+  // Try to also sync to backend
   try {
     const res = await fetch(`${BASE}/log`, {
       method: 'POST',
@@ -241,14 +244,34 @@ export async function saveLogEntry(entry: LogEntry): Promise<{ ok: boolean; offl
 }
 
 export async function getDayLog(date?: string): Promise<DayLog | null> {
-  if (!auth.isLoggedIn()) return null;
   const d = date || new Date().toISOString().split('T')[0];
+
+  // If no backend, read from localStorage
+  if (!HAS_BACKEND || !auth.isLoggedIn()) {
+    try {
+      const entries = JSON.parse(localStorage.getItem(`plato_log_${d}`) || '[]');
+      const calories = entries.reduce((s: number, e: LogEntry) => s + (e.calories || 0), 0);
+      const protein = entries.reduce((s: number, e: LogEntry) => s + (e.protein || 0), 0);
+      const carbs = entries.reduce((s: number, e: LogEntry) => s + (e.carbs || 0), 0);
+      const fat = entries.reduce((s: number, e: LogEntry) => s + (e.fat || 0), 0);
+      return { date: d, entries, totals: { calories, protein, carbs, fat, fiber: 0, sugar: 0 } };
+    } catch { return null; }
+  }
+
   try {
     const res = await fetch(`${BASE}/log?date=${d}`, { headers: authHeaders() });
     if (!res.ok) return null;
     return res.json();
   } catch {
-    return null;
+    // Fall back to localStorage if backend fails
+    try {
+      const entries = JSON.parse(localStorage.getItem(`plato_log_${d}`) || '[]');
+      const calories = entries.reduce((s: number, e: LogEntry) => s + (e.calories || 0), 0);
+      const protein = entries.reduce((s: number, e: LogEntry) => s + (e.protein || 0), 0);
+      const carbs = entries.reduce((s: number, e: LogEntry) => s + (e.carbs || 0), 0);
+      const fat = entries.reduce((s: number, e: LogEntry) => s + (e.fat || 0), 0);
+      return { date: d, entries, totals: { calories, protein, carbs, fat, fiber: 0, sugar: 0 } };
+    } catch { return null; }
   }
 }
 
