@@ -139,12 +139,26 @@ export function AppProvider({ children }) {
     // After login, hydrate profile from backend if available
     if (token) {
       try {
-        const serverProfile = await getProfile();
-        if (serverProfile && serverProfile.name) {
-          // Merge server profile into local state (server is source of truth)
-          setUserProfile(prev => ({ ...prev, ...serverProfile }));
-          saveState('userProfile', { ...serverProfile });
-          // Mark as onboarded if they have a name
+        const resp = await getProfile();
+        // Server returns { user, profile } - normalize to app format
+        const p = resp?.profile || resp;
+        const u = resp?.user || {};
+        if (p && (p.name || u.username)) {
+          const heightCm = p.height_cm || 0;
+          const totalInches = heightCm / 2.54;
+          const feet = Math.floor(totalInches / 12);
+          const inches = Math.round(totalInches % 12);
+          const normalized = {
+            name: p.name || u.username || u.email?.split('@')[0] || '',
+            age: p.age || '',
+            gender: p.gender || 'prefer_not_to_say',
+            height: { feet: feet || 5, inches: inches || 7 },
+            weight: p.weight_kg ? Math.round(p.weight_kg * 2.20462) : 150,
+            activityLevel: p.activity_level || 'moderate',
+            goal: p.goal || 'maintain',
+          };
+          setUserProfile(prev => ({ ...prev, ...normalized }));
+          saveState('userProfile', normalized);
           localStorage.setItem('plato_onboarded', 'true');
         }
       } catch { /* server unavailable - use local state */ }
