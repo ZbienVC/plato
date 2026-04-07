@@ -315,16 +315,22 @@ export async function getProfile() {
 
 export async function updateProfile(data: Record<string, unknown>) {
   if (!auth.isLoggedIn()) return null;
+  // If no backend configured, skip silently - don't block
+  if (!HAS_BACKEND) return null;
   try {
-    const res = await fetch(`${BASE}/profile`, {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000); // 4s timeout
+    const res = await fetch(`\/profile`, {
       method: 'PUT',
       headers: authHeaders(),
       body: JSON.stringify(data),
+      signal: controller.signal,
     });
+    clearTimeout(timer);
     if (!res.ok) return null;
     return res.json();
   } catch {
-    return null;
+    return null; // timeout or network error - non-fatal
   }
 }
 
