@@ -82,22 +82,46 @@ export type DayLog = {
 const _apiUrl = ((import.meta as any).env?.VITE_API_URL || "").trim();
 const HAS_BACKEND = _apiUrl.length > 0 && _apiUrl.startsWith("http");
 
+// Simple deterministic hash for local-only storage (no crypto needed in browser)
+function simpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(36);
+}
+
 function localSignup(email: string, password: string, username?: string) {
-  const users = JSON.parse(localStorage.getItem('plato_users') || '{}');
-  const key = email.toLowerCase();
-  if (users[key]) throw new Error('Email already in use');
-  const id = Math.random().toString(36).slice(2);
-  users[key] = { id, email: key, username: username || key.split('@')[0], password };
-  localStorage.setItem('plato_users', JSON.stringify(users));
+  const users = JSON.parse(localStorage.getItem('plato_users_v2') || '{}');
+  const key = email.toLowerCase().trim();
+  if (users[key]) throw new Error('An account with this email already exists. Please sign in.');
+  const id = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const pwHash = simpleHash(password + key); // salted with email
+  users[key] = { id, email: key, username: username || key.split('@')[0], pwHash };
+  localStorage.setItem('plato_users_v2', JSON.stringify(users));
   const token = btoa(JSON.stringify({ userId: id, email: key }));
   setToken(token);
   return { token, userId: id };
 }
 
 function localLogin(email: string, password: string) {
-  const users = JSON.parse(localStorage.getItem('plato_users') || '{}');
-  const user = users[email.toLowerCase()];
-  if (!user || user.password !== password) throw new Error('Invalid email or password');
+  const key = email.toLowerCase().trim();
+  const users = JSON.parse(localStorage.getItem('plato_users_v2') || '{}');
+  const user = users[key];
+  if (!user) throw new Error('No account found with this email. Please sign up first.');
+  const pwHash = simpleHash(password + key);
+  // Also accept old plain-text password for backwards compat, then upgrade
+  const validHash = user.pwHash === pwHash;
+  const validLegacy = user.password === password;
+  if (!validHash && !validLegacy) throw new Error('Incorrect password. Please try again.');
+  // Upgrade legacy plain-text account
+  if (validLegacy && !validHash) {
+    user.pwHash = pwHash;
+    delete user.password;
+    users[key] = user;
+    localStorage.setItem('plato_users_v2', JSON.stringify(users));
+  }
   const token = btoa(JSON.stringify({ userId: user.id, email: user.email }));
   setToken(token);
   return { token, userId: user.id };
