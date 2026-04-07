@@ -98,8 +98,7 @@ export function MealPlans() {
       <motion.div variants={item} className="flex app-card-soft rounded-xl p-1 gap-1">
         {TABS.map(t => (
           <button key={t} onClick={() => handleSubTabChange(t)}
-          <button key={t} onClick={() => handleSubTabChange(t)}
-            className={lex-1 py-2.5 rounded-xl text-xs font-semibold capitalize transition-all relative ${activeTab === t ? "text-white shadow-md" : "text-slate-500"}`}
+            className={`flex-1 py-2.5 rounded-xl text-xs font-semibold capitalize transition-all relative \`}
             style={activeTab === t ? { background: 'linear-gradient(135deg,#10b981,#6366f1)' } : {}}>
             {t === 'plan' ? 'My Plan' : t.charAt(0).toUpperCase() + t.slice(1)}
             {t === 'restaurant' && !premiumUnlocked && (
