@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
-import { auth, saveLogEntry as apiSaveLog } from '../lib/api';
+import { auth, saveLogEntry as apiSaveLog, getProfile } from '../lib/api';
 import { MEAL_DATABASE } from '../services/mealGenerator';
 import { saveLogEntry } from '../lib/api';
 
@@ -132,14 +132,32 @@ export function AppProvider({ children }) {
 
   const isLoggedIn = !!authToken;
 
-  const loginSuccess = useCallback(() => {
-    setAuthToken(localStorage.getItem('plato_token'));
+  const loginSuccess = useCallback(async () => {
+    const token = localStorage.getItem('plato_token');
+    setAuthToken(token);
     setAuthModalOpen(false);
+    // After login, hydrate profile from backend if available
+    if (token) {
+      try {
+        const serverProfile = await getProfile();
+        if (serverProfile && serverProfile.name) {
+          // Merge server profile into local state (server is source of truth)
+          setUserProfile(prev => ({ ...prev, ...serverProfile }));
+          saveState('userProfile', { ...serverProfile });
+          // Mark as onboarded if they have a name
+          localStorage.setItem('plato_onboarded', 'true');
+        }
+      } catch { /* server unavailable - use local state */ }
+    }
   }, []);
 
   const logout = useCallback(() => {
     auth.logout();
     setAuthToken(null);
+    // Clear user-specific cached state on logout
+    // (keep planConfig and preferences but reset profile)
+    setUserProfile({ name: '', age: '', gender: 'prefer_not_to_say', height: { feet: 5, inches: 7 }, weight: 150, activityLevel: 'moderate', goal: 'maintain' });
+    localStorage.removeItem('plato_userProfile');
   }, []);
 
   // === WEIGHT TRACKING ===
