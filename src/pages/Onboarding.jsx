@@ -66,25 +66,27 @@ export function Onboarding({ onComplete }) {
       const macros = calcMacros();
       const meals = generateMealPlan(macros.calories, macros, form.mealsPerDay, form);
       const plan = { ...macros, name: form.name || 'My Plan', meals, mealsPerDay: form.mealsPerDay, createdAt: new Date().toISOString() };
-      // Sync to backend if logged in
-    if (auth.isLoggedIn()) {
-      updateProfile({
-        name: form.name,
-        age: form.age,
-        gender: form.gender,
-        goal: form.goal,
-        activity_level: form.activity,
-        calorie_target: macros.calories,
-        protein_target: macros.protein,
-        carb_target: macros.carbs,
-        fat_target: macros.fat,
-        weight_kg: Math.round(form.weight * 0.4536),
-        height_cm: Math.round(form.heightFeet * 30.48 + form.heightInches * 2.54),
-      }).catch(() => { /* non-fatal if offline */ })
-    }
-    setUserProfile({ name: form.name, age: form.age, gender: form.gender, height: { feet: form.heightFeet, inches: form.heightInches }, weight: form.weight, activityLevel: form.activity });
+      // Update local state immediately - don't block on backend sync
+      setUserProfile({ name: form.name, age: form.age, gender: form.gender, height: { feet: form.heightFeet, inches: form.heightInches }, weight: form.weight, activityLevel: form.activity });
       setPlanConfig({ goal: form.goal, trainingType: form.trainingType, trainingDays: form.trainingDays, dietStyle: form.dietStyle, mealsPerDay: form.mealsPerDay, cookTime: form.cookTime, cuisines: form.cuisines, restrictions: form.restrictions, activity: form.activity });
       setPlan(plan); setGenPlan(plan); setStep(5);
+      // Fire-and-forget backend sync - never blocks the UI
+      if (auth.isLoggedIn()) {
+        Promise.race([
+          updateProfile({
+            name: form.name, age: form.age, gender: form.gender, goal: form.goal,
+            activity_level: form.activity, calorie_target: macros.calories,
+            protein_target: macros.protein, carb_target: macros.carbs, fat_target: macros.fat,
+            weight_kg: Math.round(form.weight * 0.4536),
+            height_cm: Math.round(form.heightFeet * 30.48 + form.heightInches * 2.54),
+          }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+        ]).catch(() => { /* non-fatal - local state already saved */ });
+      }
+    } catch (err) {
+      console.error('Plan generation error:', err);
+      // On error, still allow user to proceed with defaults
+      setStep(5);
     } finally {
       setPlanLoading(false);
     }
