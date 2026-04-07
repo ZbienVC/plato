@@ -1,15 +1,23 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": "vite",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [{ "key": "X-Build-Ref", "value": "f8674b4c" }]
-    }
-  ]
+    "buildCommand":  "npm run build",
+    "outputDirectory":  "dist",
+    "installCommand":  "npm install",
+    "framework":  "vite",
+    "rewrites":  [
+                     {
+                         "source":  "/(.*)",
+                         "destination":  "/index.html"
+                     }
+                 ],
+    "headers":  [
+                    {
+                        "source":  "/(.*)",
+                        "headers":  [
+                                        {
+                                            "key":  "X-Build-Ref",
+                                            "value":  "be4c04b8"
+                                        }
+                                    ]
+                    }
+                ]
 }
