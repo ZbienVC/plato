@@ -5,7 +5,7 @@ import { Drawer } from './Drawer';
 
 export function MainLayout({ children, activeTab, onTabChange }) {
   return (
-    <div className="max-w-[430px] mx-auto bg-slate-50 min-h-screen flex flex-col relative">
+    <div className="max-w-[430px] mx-auto min-h-screen flex flex-col relative" style={{ background: 'radial-gradient(ellipse at top, #0B1120 0%, #060910 60%)' }}>
       <Drawer />
       
       {/* Top bar — sticky */}

@@ -114,7 +114,7 @@ export function TopBar({ activeTab }) {
   };
 
   return (
-    <div className="sticky top-0 z-40 backdrop-blur-xl border-b" style={{ background: "rgba(240,253,244,0.88)", borderColor: "rgba(16,185,129,0.1)" }}>
+    <div className="sticky top-0 z-40 backdrop-blur-xl border-b" style={{ background: "rgba(8,13,26,0.82)", borderColor: "rgba(255,255,255,0.07)" }}>
       <div className="flex items-center justify-between px-4 h-14">
         {/* Left: Avatar → opens drawer */}
         <button

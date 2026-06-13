@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { AuthModal } from '../components/organisms/AuthModal';
 import { Zap, Brain, Database } from 'lucide-react';
+import PlatoMark from '../components/brand/PlatoMark';
 
 interface WelcomeScreenProps {
   onContinueAsGuest: () => void;
@@ -20,7 +21,7 @@ export function WelcomeScreen({ onContinueAsGuest, onAuthSuccess }: WelcomeScree
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(160deg, #f0fdf4 0%, #eff6ff 50%, #faf5ff 100%)',
+      background: 'radial-gradient(ellipse at top, #0d1b3e 0%, #080d1a 60%)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -42,32 +43,25 @@ export function WelcomeScreen({ onContinueAsGuest, onAuthSuccess }: WelcomeScree
         {/* App Icon */}
         <div style={{ marginBottom: 32 }}>
           <div style={{
-            width: 80, height: 80, borderRadius: 24,
-            background: 'linear-gradient(135deg, #10b981, #6366f1)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 88, height: 88,
             margin: '0 auto 20px',
-            boxShadow: '0 8px 32px rgba(16,185,129,0.3)',
+            borderRadius: 24,
+            boxShadow: '0 14px 40px rgba(0,0,0,0.45), 0 4px 14px rgba(60,125,44,0.4)',
           }}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
-              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
-              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-              <line x1="6" y1="1" x2="6" y2="4"/>
-              <line x1="10" y1="1" x2="10" y2="4"/>
-              <line x1="14" y1="1" x2="14" y2="4"/>
-            </svg>
+            <PlatoMark size={88} rounded />
           </div>
 
           <h1 style={{
             fontSize: 40, fontWeight: 900, letterSpacing: '-1.5px',
             margin: '0 0 8px',
-            background: 'linear-gradient(135deg, #10b981, #6366f1)',
+            background: 'linear-gradient(135deg, #6FE6A8, #34E89E 55%, #14B877)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
           }}>
             Plato
           </h1>
-          <p style={{ color: '#64748b', fontSize: 16, margin: 0, fontWeight: 500 }}>
+          <p style={{ color: '#94a3b8', fontSize: 16, margin: 0, fontWeight: 500 }}>
             Your AI nutrition companion
           </p>
         </div>
@@ -77,22 +71,22 @@ export function WelcomeScreen({ onContinueAsGuest, onAuthSuccess }: WelcomeScree
           {features.map(({ Icon, label, color }) => (
             <div key={label} style={{
               display: 'flex', alignItems: 'center', gap: 14,
-              background: 'white',
-              border: '1px solid rgba(15,23,42,0.07)',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: 14, padding: '14px 16px',
               textAlign: 'left',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
             }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 10,
-                background: `${color}15`,
-                border: `1px solid ${color}25`,
+                background: `${color}22`,
+                border: `1px solid ${color}40`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
               }}>
                 <Icon size={18} color={color} />
               </div>
-              <span style={{ color: '#1e293b', fontSize: 15, fontWeight: 600 }}>{label}</span>
+              <span style={{ color: '#E6EAF2', fontSize: 15, fontWeight: 600 }}>{label}</span>
             </div>
           ))}
         </div>
@@ -105,10 +99,10 @@ export function WelcomeScreen({ onContinueAsGuest, onAuthSuccess }: WelcomeScree
             style={{
               width: '100%', padding: '16px',
               borderRadius: 14, border: 'none',
-              background: 'linear-gradient(135deg, #10b981, #059669)',
-              color: '#fff', fontSize: 16, fontWeight: 800,
+              background: 'linear-gradient(135deg, #34E89E, #059669)',
+              color: '#04140C', fontSize: 16, fontWeight: 800,
               cursor: 'pointer',
-              boxShadow: '0 4px 20px rgba(16,185,129,0.3)',
+              boxShadow: '0 6px 24px rgba(52,232,158,0.35)',
               letterSpacing: '-0.01em',
             }}
           >
@@ -121,11 +115,11 @@ export function WelcomeScreen({ onContinueAsGuest, onAuthSuccess }: WelcomeScree
             style={{
               width: '100%', padding: '16px',
               borderRadius: 14,
-              background: 'white',
-              border: '1.5px solid rgba(15,23,42,0.12)',
-              color: '#1e293b', fontSize: 16, fontWeight: 700,
+              background: 'rgba(255,255,255,0.05)',
+              border: '1.5px solid rgba(255,255,255,0.14)',
+              color: '#E6EAF2', fontSize: 16, fontWeight: 700,
               cursor: 'pointer',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
             }}
           >
             Sign in to your account

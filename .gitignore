@@ -28,3 +28,13 @@ dist-ssr
 .env.local
 .env.production
 *.env
+
+# Local visual QA / screenshot harness (not for production)
+_previews/
+_live/
+_shot.cjs
+_shot_ob.cjs
+_livecap.cjs
+_diag.cjs
+_markqa.cjs
+_markqa.html
