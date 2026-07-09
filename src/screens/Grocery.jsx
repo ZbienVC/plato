@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import {
-  ChevronLeft, ShoppingCart, Plus, Check, Trash2, Apple, Beef, Wheat, Package,
+  ChevronLeft, Share, Plus, Check, Apple, Beef, Wheat, Package,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
@@ -27,6 +27,12 @@ function classify(name) {
 const AISLE_META = [...AISLES, PANTRY].reduce((m, a) => { m[a.key] = a; return m; }, {});
 const AISLE_ORDER = ['produce', 'protein', 'grains', 'pantry'];
 
+const SCOPES = [
+  { key: 'week', label: 'this week', days: 7 },
+  { key: 'three', label: 'next 3 days', days: 3 },
+  { key: 'day', label: 'today', days: 1 },
+];
+
 export function Grocery({ onFab }) {
   const {
     plan, groceryList, setGroceryList, groceryChecked, setGroceryChecked, setActiveTab,
@@ -36,9 +42,32 @@ export function Grocery({ onFab }) {
   void onFab;
 
   const [draft, setDraft] = useState('');
+  const [scope, setScope] = useState('week');
+  const [toast, setToast] = useState(null);
+  const [offline, setOffline] = useState(() => (typeof navigator !== 'undefined' ? !navigator.onLine : false));
+  const toastTimer = useRef(null);
+
+  // Toast helper — mirrors the design's transient confirmation banner.
+  const showToast = useCallback((msg) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast(msg);
+    toastTimer.current = setTimeout(() => setToast(null), 1900);
+  }, []);
+
+  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
+
+  // Live offline detection for the offline sync banner.
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const on = () => setOffline(false);
+    const off = () => setOffline(true);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
+  }, []);
 
   // Derive the working item list. Prefer plan ingredients; fall back to groceryList state.
-  // Each item: { name, qty, aisle }.
+  // Each item: { name, qty, aisle }. The active scope trims how many plan days feed the list.
   const items = useMemo(() => {
     const out = [];
     const seen = new Set();
@@ -49,7 +78,13 @@ export function Grocery({ onFab }) {
       out.push({ name: name.trim(), qty: qty || '', aisle: aisle || classify(name) });
     };
 
-    const planIngredients = (plan?.meals || []).flatMap(m => m.ingredients || []);
+    const days = SCOPES.find(s => s.key === scope)?.days ?? 7;
+    const allMeals = plan?.meals || [];
+    // Scope narrows the plan window; when meals carry no day grouping we cap by proportion.
+    const scopedMeals = days >= 7
+      ? allMeals
+      : allMeals.slice(0, Math.max(1, Math.ceil(allMeals.length * (days / 7))));
+    const planIngredients = scopedMeals.flatMap(m => m.ingredients || []);
     if (planIngredients.length) {
       planIngredients.forEach(ing => {
         if (typeof ing === 'string') {
@@ -72,7 +107,7 @@ export function Grocery({ onFab }) {
     });
 
     return out;
-  }, [plan, groceryList]);
+  }, [plan, groceryList, scope]);
 
   const total = items.length;
   const isChecked = (name) => !!groceryChecked[name.toLowerCase()];
@@ -91,17 +126,34 @@ export function Grocery({ onFab }) {
       items.forEach(it => { delete next[it.name.toLowerCase()]; });
       return next;
     });
+    showToast('cleared checked items');
   };
 
   const addItem = () => {
     const name = draft.trim();
-    if (!name) return;
+    if (!name) { showToast('type an item first'); return; }
     setGroceryList(prev => {
       const list = prev || [];
       if (list.some(g => ((typeof g === 'string' ? g : g?.name) || '').trim().toLowerCase() === name.toLowerCase())) return list;
       return [...list, { name, quantity: '', category: classify(name), checked: false }];
     });
     setDraft('');
+    showToast('added ' + name);
+  };
+
+  const share = async () => {
+    const lines = items.map(it => `• ${it.name}${it.qty ? ' — ' + it.qty : ''}`).join('\n');
+    const text = `Plato grocery list\n${lines}`;
+    try {
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        await navigator.share({ title: 'Grocery list', text });
+        return;
+      }
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+      }
+    } catch { /* user dismissed / unsupported — still confirm */ }
+    showToast('share link copied');
   };
 
   // Group into aisle sections, preserving canonical order.
@@ -118,39 +170,38 @@ export function Grocery({ onFab }) {
 
   const empty = total === 0;
 
+  const iconBtn = {
+    width: 38, height: 38, flex: 'none', borderRadius: 999, border: '1px solid var(--glass-border)',
+    background: 'var(--glass-fill)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+    color: 'var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+  };
+
   return (
     <>
+      <style>{`@keyframes g-toast{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@keyframes g-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`}</style>
+
       <div style={{ height: 12 }} />
 
       {/* Top bar */}
       <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 20px 12px', position: 'relative', zIndex: 2 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button
-            onClick={() => setActiveTab('meals')}
-            aria-label="Back to plans"
-            style={{ width: 38, height: 38, flex: 'none', borderRadius: 999, border: '1px solid var(--glass-border)', background: 'var(--glass-fill)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', color: 'var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-          >
+          <button onClick={() => setActiveTab('meals')} aria-label="Back to plans" style={iconBtn}>
             <ChevronLeft size={18} />
           </button>
           <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 24, letterSpacing: '-.02em', color: 'var(--ink)' }}>grocery</div>
         </div>
-        <button
-          onClick={clearChecked}
-          disabled={checkedCount === 0}
-          aria-label="Clear checked items"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 38, padding: '0 13px', borderRadius: 999, border: '1px solid var(--glass-border)', background: 'var(--glass-fill)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', color: checkedCount === 0 ? 'var(--muted)' : 'var(--sage)', font: '600 12px var(--font-ui)', cursor: checkedCount === 0 ? 'default' : 'pointer', opacity: checkedCount === 0 ? 0.6 : 1 }}
-        >
-          <Trash2 size={15} />clear
+        <button onClick={share} aria-label="Share list" style={iconBtn}>
+          <Share size={17} />
         </button>
       </div>
 
       {/* Scroll region */}
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 18px var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 20px var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
 
         {empty ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '60px 24px', gap: 6, minHeight: 460 }}>
             <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%, rgba(231,182,124,.3), rgba(15,148,130,.1) 60%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--warning)' }}>
-              <ShoppingCart size={42} strokeWidth={1.5} />
+              <ShoppingCartIcon />
             </div>
             <div style={{ marginTop: 14, fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 21, letterSpacing: '-.01em', color: 'var(--ink)' }}>your list is empty</div>
             <div style={{ font: '400 14px var(--font-ui)', color: 'var(--sage)', maxWidth: 250, lineHeight: 1.5 }}>
@@ -179,6 +230,30 @@ export function Grocery({ onFab }) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
+            {/* Offline sync banner */}
+            {offline && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '10px 13px', borderRadius: 14, background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderLeft: '3px solid var(--info)' }}>
+                <span style={{ width: 7, height: 7, borderRadius: 999, background: 'var(--info)', flex: 'none', boxShadow: '0 0 8px var(--info)' }} />
+                <span style={{ font: '500 12px var(--font-ui)', color: 'var(--sage)' }}>offline — check items off, we&apos;ll sync your list later</span>
+              </div>
+            )}
+
+            {/* Scope segmented control */}
+            <div style={{ display: 'flex', gap: 6, background: 'var(--surface-2)', borderRadius: 13, padding: 4 }}>
+              {SCOPES.map(s => {
+                const active = scope === s.key;
+                return (
+                  <button
+                    key={s.key}
+                    onClick={() => setScope(s.key)}
+                    style={{ flex: 1, padding: '9px 0', borderRadius: 10, border: 'none', cursor: 'pointer', font: '600 12px var(--font-ui)', transition: 'all .16s var(--ease-out)', color: active ? 'var(--on-accent)' : 'var(--sage)', background: active ? 'var(--primary)' : 'transparent' }}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Progress */}
             <div style={{ ...cardStyle, borderRadius: 'var(--r-tile)', padding: '15px 16px' }}>
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
@@ -202,7 +277,7 @@ export function Grocery({ onFab }) {
                     <span style={microLabel}>{sec.key}</span>
                     <span style={{ flex: 1, height: 1, background: 'var(--hairline)' }} />
                   </div>
-                  <div style={{ ...cardStyle, borderRadius: 'var(--r-tile)', overflow: 'hidden' }}>
+                  <div style={{ ...cardStyle, borderRadius: 18, overflow: 'hidden' }}>
                     {sec.items.map((it, i) => {
                       const ck = isChecked(it.name);
                       const last = i === sec.items.length - 1;
@@ -231,8 +306,8 @@ export function Grocery({ onFab }) {
               );
             })}
 
-            {/* Sticky add-item input */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--surface-2)', border: '1px dashed var(--divider-strong)', borderRadius: 'var(--r-control)', padding: '6px 6px 6px 15px', position: 'sticky', bottom: 8, zIndex: 3, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
+            {/* Add-item input */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--surface-2)', border: '1px dashed var(--divider-strong)', borderRadius: 'var(--r-control)', padding: '6px 6px 6px 15px' }}>
               <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><Plus size={18} /></span>
               <input
                 value={draft}
@@ -244,17 +319,45 @@ export function Grocery({ onFab }) {
               <button onClick={addItem} style={{ height: 36, padding: '0 15px', borderRadius: 11, border: 'none', background: 'var(--primary)', color: 'var(--on-accent)', font: '600 13px var(--font-ui)', cursor: 'pointer' }}>add</button>
             </div>
 
-            {/* Clear checked action */}
-            <button
-              onClick={clearChecked}
-              disabled={checkedCount === 0}
-              style={{ width: '100%', height: 48, borderRadius: 'var(--r-control)', border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--sage)', font: '600 14px var(--font-ui)', cursor: checkedCount === 0 ? 'default' : 'pointer', opacity: checkedCount === 0 ? 0.55 : 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-            >
-              <Trash2 size={16} />clear checked
-            </button>
+            {/* Action row — clear checked + share list */}
+            <div style={{ display: 'flex', gap: 10, marginTop: 2 }}>
+              <button
+                onClick={clearChecked}
+                disabled={checkedCount === 0}
+                style={{ flex: 1, height: 48, borderRadius: 14, border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--sage)', font: '600 14px var(--font-ui)', cursor: checkedCount === 0 ? 'default' : 'pointer', opacity: checkedCount === 0 ? 0.55 : 1 }}
+              >
+                clear checked
+              </button>
+              <button
+                onClick={share}
+                style={{ flex: 1, height: 48, borderRadius: 14, border: 'none', background: 'var(--surface-3)', color: 'var(--ink)', font: '600 14px var(--font-ui)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              >
+                <Share size={16} />share list
+              </button>
+            </div>
           </div>
         )}
       </div>
+
+      {/* Transient toast */}
+      {toast && (
+        <div style={{ position: 'absolute', left: 20, right: 20, bottom: 88, zIndex: 6, display: 'flex', justifyContent: 'center', animation: 'g-toast .24s var(--ease-out)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '11px 16px', borderRadius: 14, background: 'var(--glass-fill)', border: '1px solid var(--divider-strong)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', boxShadow: '0 18px 40px -18px rgba(0,0,0,.9)' }}>
+            <span style={{ font: '600 13px var(--font-ui)', color: 'var(--ink)' }}>{toast}</span>
+          </div>
+        </div>
+      )}
     </>
+  );
+}
+
+// Cart glyph for the empty state — matches the design's inline SVG (open cart outline).
+function ShoppingCartIcon() {
+  return (
+    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="21" r="1" />
+      <circle cx="18" cy="21" r="1" />
+      <path d="M2 3h3l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L23 6H6" />
+    </svg>
   );
 }

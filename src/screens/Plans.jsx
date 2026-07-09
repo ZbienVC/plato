@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import {
-  RefreshCw, Upload, Lock, Utensils, CalendarDays, ShoppingCart,
-  Plus, Check, ArrowRightLeft, Heart, Sparkles, ChevronRight,
+  RefreshCw, Upload, Lock, CalendarDays, ShoppingCart,
+  Plus, Check, ArrowRightLeft, Heart, Sparkles,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
@@ -20,8 +20,29 @@ const MACRO_GRADS = {
   fat: 'var(--macro-fat-grad, linear-gradient(90deg,#ECBFC6,#E1A0AB))',
 };
 const CAL_GRAD = 'linear-gradient(90deg,#8CE0CE,#43C6AC)';
-const DAY_LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+// Design day rail runs Mon→Sun (M T W T F S S).
+const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const TINTS = ['#5FD4C4', '#43C6AC', '#E1A0AB', '#E7B67C', '#AEA6EA'];
+
+const SHIMMER = 'linear-gradient(100deg,var(--surface-2) 30%,var(--surface-3) 50%,var(--surface-2) 70%)';
+
+/* Keyframes for the loading skeleton — match the design's pshimmer / pspin. */
+const PlansKeyframes = () => (
+  <style>{`
+    @keyframes plans-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @keyframes plans-spin { to { transform: rotate(360deg); } }
+  `}</style>
+);
+
+// Bowl / dish glyph used on meal + recipe thumbnails (matches the design SVG).
+function BowlIcon({ size = 22, stroke = 'rgba(255,255,255,.9)', strokeWidth = 1.6 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 11h16a8 8 0 0 1-16 0z" />
+      <path d="M12 4v3M9 6v1M15 6v1" />
+    </svg>
+  );
+}
 
 function tabStyle(active) {
   return {
@@ -41,7 +62,7 @@ function iconBtnStyle() {
 
 export function Plans({ onFab }) {
   const {
-    plan, dailyLog, logMeal, setActiveTab,
+    plan, planLoading, dailyLog, logMeal, setActiveTab,
     recipes, savedRecipes, saveRecipe,
     isPremiumActive, openPremiumModal,
   } = useApp();
@@ -89,6 +110,7 @@ export function Plans({ onFab }) {
 
   return (
     <>
+      <PlansKeyframes />
       <div style={{ height: 12 }} />
 
       {/* Top bar */}
@@ -118,7 +140,9 @@ export function Plans({ onFab }) {
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 18px var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
 
         {tab === 'week' && (
-          plan?.meals?.length ? (
+          planLoading ? (
+            <LoadingWeek />
+          ) : plan?.meals?.length ? (
             <WeekView
               plan={plan}
               per={per}
@@ -218,7 +242,7 @@ function WeekView({ plan, per, todayIndex, selectedDay, setSelectedDay, dayMeals
                   color: sel ? 'var(--on-accent)' : 'var(--ink)',
                 }}>{DAY_LETTERS[i % 7]}</div>
               </div>
-              <span style={{ font: '600 11px var(--font-ui)', color: isToday ? 'var(--ink)' : 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ font: '600 11px var(--font-ui)', color: (sel || isToday) ? 'var(--ink)' : 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>
                 {isToday ? 'today' : `d${i + 1}`}
               </span>
             </button>
@@ -263,8 +287,8 @@ function WeekView({ plan, per, todayIndex, selectedDay, setSelectedDay, dayMeals
           const logged = isLogged(m.name);
           return (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, ...cardStyle, borderRadius: 'var(--r-tile)', padding: '11px 12px', opacity: logged ? 0.62 : 1, transition: 'opacity .3s var(--ease-out)' }}>
-              <div style={{ width: 48, height: 48, flex: 'none', borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(150deg,${TINTS[i % TINTS.length]},var(--brand-forest))`, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.14)', color: 'rgba(255,255,255,.9)' }}>
-                <Utensils size={22} />
+              <div style={{ width: 48, height: 48, flex: 'none', borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(150deg,${TINTS[i % TINTS.length]},var(--brand-forest))`, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.14)' }}>
+                <BowlIcon size={22} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={microLabel}>{(m.type || m.slot || 'meal')}</div>
@@ -308,6 +332,35 @@ function WeekView({ plan, per, todayIndex, selectedDay, setSelectedDay, dayMeals
       <button onClick={onRegenerate} style={{ width: '100%', height: 50, borderRadius: 'var(--r-control)', border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--ink)', font: '600 14px var(--font-ui)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
         <RefreshCw size={16} />regenerate plan
       </button>
+    </div>
+  );
+}
+
+/* ---------- Loading skeleton ---------- */
+
+function LoadingWeek() {
+  const block = (h, radius) => ({
+    width: '100%', height: h, borderRadius: radius,
+    background: SHIMMER, backgroundSize: '200% 100%',
+    animation: 'plans-shimmer 1.4s linear infinite',
+  });
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* Day pills */}
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'space-between' }}>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} style={{ width: 42, height: 60, borderRadius: 14, background: SHIMMER, backgroundSize: '200% 100%', animation: 'plans-shimmer 1.4s linear infinite' }} />
+        ))}
+      </div>
+      {/* Summary + meal card skeletons */}
+      <div style={block(132, 22)} />
+      <div style={block(86, 22)} />
+      <div style={block(86, 22)} />
+      {/* Spinner + status */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginTop: 8 }}>
+        <div style={{ width: 30, height: 30, borderRadius: 999, border: '2.5px solid var(--divider-strong)', borderTopColor: 'var(--primary)', animation: 'plans-spin .8s linear infinite' }} />
+        <div style={{ font: '500 13px var(--font-ui)', color: 'var(--sage)' }}>building your week…</div>
+      </div>
     </div>
   );
 }
@@ -365,7 +418,7 @@ function RecipesView({ recipes, savedRecipes, saveRecipe }) {
           return (
             <div key={i} style={{ ...cardStyle, borderRadius: 'var(--r-tile)', overflow: 'hidden' }}>
               <div style={{ height: 82, position: 'relative', background: `linear-gradient(150deg,${TINTS[i % TINTS.length]},var(--brand-forest))`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Utensils size={26} color="rgba(255,255,255,.85)" strokeWidth={1.5} />
+                <BowlIcon size={26} stroke="rgba(255,255,255,.85)" strokeWidth={1.5} />
                 <button onClick={() => saveRecipe(r)} aria-label="Save recipe" style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 999, border: 'none', background: 'rgba(7,13,12,.4)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: saved ? 'var(--macro-fat)' : '#EAF1EF' }}>
                   <Heart size={15} fill={saved ? 'var(--macro-fat)' : 'none'} strokeWidth={1.9} />
                 </button>

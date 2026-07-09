@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, Loader2, ArrowLeft, KeyRound } from 'lucide-react';
+import { Mail, MailCheck, Lock, User, Eye, EyeOff, Loader2, ChevronLeft, KeyRound } from 'lucide-react';
 import { auth, requestPasswordReset, confirmPasswordReset } from '../lib/api';
 
 // Shared glass/token styles matching the Elevated Verdant system.
@@ -9,7 +9,7 @@ const microLabel = {
 };
 const fieldWrap = {
   display: 'flex', alignItems: 'center', gap: 10, height: 50, padding: '0 14px',
-  borderRadius: 'var(--r-control, 16px)', background: 'var(--surface-2)',
+  borderRadius: 14, background: 'var(--surface-2)',
   border: '1px solid var(--glass-border)',
 };
 const fieldInput = {
@@ -149,13 +149,53 @@ export function AuthSheet({ open, onClose, onSuccess, showToast }) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
       style={{
         position: 'fixed', inset: 0, zIndex: 100,
-        background: 'rgba(0,0,0,.55)',
+        background: 'rgba(4,9,8,.66)',
+        backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)',
         display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        animation: 'authFade .35s ease both',
       }}
     >
+      {/* animation keyframes for the sheet + floating brand mark */}
+      <style>{`
+        @keyframes authSheet { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes authFade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes authMark { from { opacity: 0; } to { opacity: .4; } }
+        @keyframes authMarkPop { from { transform: scale(.9); } to { transform: scale(1); } }
+        @media (prefers-reduced-motion: reduce) { .auth-anim, .auth-anim * { animation-duration: .001ms !important; } }
+      `}</style>
+
+      {/* floating brand mark behind the dim, above the sheet */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute', top: 20, left: '50%', transform: 'translateX(-50%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 11,
+          opacity: 0.4, pointerEvents: 'none',
+          animation: 'authMark .5s var(--ease-out) .05s both',
+        }}
+      >
+        <div style={{ position: 'relative', animation: 'authMarkPop .55s var(--ease-out) .05s both' }}>
+          <div style={{
+            position: 'absolute', inset: -16, borderRadius: '50%',
+            background: 'radial-gradient(circle,rgba(67,198,172,.5),transparent 68%)',
+            filter: 'blur(7px)',
+          }} />
+          <img
+            src="/plato-logo.png"
+            alt="Plato"
+            width={60}
+            height={60}
+            style={{ position: 'relative', display: 'block', width: 60, height: 60, borderRadius: 16 }}
+          />
+        </div>
+        <div style={{ font: '800 26px var(--font-display)', color: 'var(--ink)' }}>Plato</div>
+      </div>
+
       <form
+        className="auth-anim"
         onSubmit={isReset ? (resetToken ? handleConfirmReset : handleRequestReset) : handleSubmit}
         style={{
+          position: 'relative', zIndex: 1,
           width: '100%', maxWidth: 430, margin: '0 auto',
           borderRadius: '28px 28px 0 0',
           background: 'var(--sheet-fill, var(--glass-fill))',
@@ -163,6 +203,7 @@ export function AuthSheet({ open, onClose, onSuccess, showToast }) {
           backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
           boxShadow: '0 -20px 50px -20px rgba(0,0,0,.8)',
           padding: '12px 22px 30px',
+          animation: 'authSheet .3s var(--ease-out)',
         }}
       >
         {/* grab handle */}
@@ -170,78 +211,31 @@ export function AuthSheet({ open, onClose, onSuccess, showToast }) {
           <div style={{ width: 40, height: 4, borderRadius: 999, background: 'var(--divider-strong)' }} />
         </div>
 
-        {/* logo mark + wordmark with soft radial glow */}
-        <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-          marginBottom: 18,
-        }}>
-          <div style={{ position: 'relative' }}>
-            <div style={{
-              position: 'absolute', inset: -16, borderRadius: '50%',
-              background: 'radial-gradient(circle,rgba(67,198,172,.5),transparent 68%)',
-              filter: 'blur(7px)',
-            }} />
-            <img
-              src="/plato-logo.png"
-              alt="Plato"
-              width={60}
-              height={60}
-              style={{ position: 'relative', display: 'block', width: 60, height: 60, borderRadius: 16 }}
-            />
-          </div>
-          <div style={{ font: '800 26px var(--font-display)', color: 'var(--ink)' }}>Plato</div>
-        </div>
-
         {isReset ? (
-          <>
-            {/* reset header */}
-            <div style={{ marginBottom: 18 }}>
-              <button
-                type="button"
-                onClick={backToSignIn}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: 'var(--sage)', font: '600 13px var(--font-ui)', padding: 0, marginBottom: 12,
-                }}
-              ><ArrowLeft size={16} /> back to sign in</button>
-              <div style={{ font: '700 20px var(--font-ui)', color: 'var(--ink)', marginBottom: 4 }}>reset password</div>
-              <div style={{ font: '400 13px var(--font-ui)', color: 'var(--muted)', lineHeight: 1.5 }}>
-                enter your email and we'll send you a reset link.
-              </div>
-            </div>
-
-            {/* reset email */}
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ ...microLabel, marginBottom: 7 }}>email</div>
-              <div style={fieldWrap}>
-                <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><Mail size={18} /></span>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@email.com"
-                  required
-                  autoComplete="email"
-                  disabled={resetSent}
-                  style={{ ...fieldInput, opacity: resetSent ? 0.6 : 1 }}
-                />
-              </div>
-            </div>
-
-            {/* confirmation once a request has been sent */}
-            {resetSent && (
+          resetSent ? (
+            /* enumeration-safe "check your inbox" success state */
+            <div style={{ textAlign: 'center', padding: '8px 0 4px' }}>
               <div style={{
-                marginTop: 4, padding: '11px 14px', borderRadius: 'var(--r-control, 16px)',
-                background: 'rgba(67,198,172,.12)', border: '1px solid rgba(67,198,172,.28)',
-                color: 'var(--ink)', font: '500 13px var(--font-ui)', textAlign: 'center', lineHeight: 1.4,
-              }}>if that email exists, we sent a reset link.</div>
-            )}
+                width: 70, height: 70, margin: '0 auto', borderRadius: 20,
+                background: 'rgba(67,198,172,.14)', color: 'var(--brand-jade)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <MailCheck size={34} strokeWidth={1.7} />
+              </div>
+              <div style={{
+                marginTop: 16, font: '700 21px var(--font-display)',
+                letterSpacing: '-.01em', color: 'var(--ink)',
+              }}>check your inbox</div>
+              <div style={{
+                marginTop: 6, font: '400 14px var(--font-ui)', color: 'var(--sage)',
+                lineHeight: 1.5, maxWidth: 280, marginLeft: 'auto', marginRight: 'auto',
+              }}>
+                if an account exists for that address, we've sent a link to reset your password.
+              </div>
 
-            {/* dev-mode: token + new password to test the flow end-to-end */}
-            {resetSent && resetToken && (
-              <>
-                <div style={{ marginTop: 16 }}>
+              {/* dev-mode: token + new password to test the flow end-to-end */}
+              {resetToken && (
+                <div style={{ marginTop: 18, textAlign: 'left' }}>
                   <div style={{ ...microLabel, marginBottom: 7 }}>reset token</div>
                   <div style={fieldWrap}>
                     <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><KeyRound size={18} /></span>
@@ -255,32 +249,72 @@ export function AuthSheet({ open, onClose, onSuccess, showToast }) {
                       style={fieldInput}
                     />
                   </div>
-                </div>
-                <div style={{ marginTop: 12 }}>
-                  <div style={{ ...microLabel, marginBottom: 7 }}>new password</div>
-                  <div style={fieldWrap}>
-                    <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><Lock size={18} /></span>
-                    <input
-                      type={showNewPw ? 'text' : 'password'}
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="at least 6 characters"
-                      required
-                      minLength={6}
-                      autoComplete="new-password"
-                      style={fieldInput}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowNewPw((s) => !s)}
-                      aria-label={showNewPw ? 'hide password' : 'show password'}
-                      style={{ background: 'none', border: 'none', color: 'var(--sage)', cursor: 'pointer', display: 'inline-flex' }}
-                    >{showNewPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ ...microLabel, marginBottom: 7 }}>new password</div>
+                    <div style={fieldWrap}>
+                      <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><Lock size={18} /></span>
+                      <input
+                        type={showNewPw ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="at least 6 characters"
+                        required
+                        minLength={6}
+                        autoComplete="new-password"
+                        style={fieldInput}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPw((s) => !s)}
+                        aria-label={showNewPw ? 'hide password' : 'show password'}
+                        style={{ background: 'none', border: 'none', color: 'var(--sage)', cursor: 'pointer', display: 'inline-flex' }}
+                      >{showNewPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                    </div>
                   </div>
                 </div>
-              </>
-            )}
-          </>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* reset header */}
+              <button
+                type="button"
+                onClick={backToSignIn}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: 'var(--sage)', font: '600 13px var(--font-ui)', padding: 0, marginBottom: 14,
+                }}
+              ><ChevronLeft size={16} /> back</button>
+              <div style={{
+                font: '700 22px var(--font-display)', letterSpacing: '-.01em', color: 'var(--ink)',
+              }}>reset your password</div>
+              <div style={{
+                marginTop: 6, font: '400 13px var(--font-ui)', color: 'var(--sage)', lineHeight: 1.5,
+              }}>
+                enter your email and we'll send a secure reset link.
+              </div>
+
+              {/* reset email */}
+              <div style={{ marginTop: 18 }}>
+                <div style={{ ...microLabel, marginBottom: 7 }}>email</div>
+                <div style={fieldWrapStyle(focusedField === 'remail')}>
+                  <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><Mail size={18} /></span>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onFocus={() => setFocusedField('remail')}
+                    onBlur={() => setFocusedField(null)}
+                    placeholder="you@email.com"
+                    required
+                    autoComplete="email"
+                    style={fieldInput}
+                  />
+                </div>
+              </div>
+            </>
+          )
         ) : (
         <>
         {/* segmented tabs with animated sliding indicator */}
@@ -348,7 +382,7 @@ export function AuthSheet({ open, onClose, onSuccess, showToast }) {
                 type="button"
                 onClick={handleForgot}
                 style={{ background: 'none', border: 'none', color: 'var(--primary)', font: '600 11px var(--font-ui)', cursor: 'pointer' }}
-              >forgot password?</button>
+              >forgot?</button>
             )}
           </div>
           <div style={fieldWrapStyle(focusedField === 'password')}>
@@ -422,37 +456,43 @@ export function AuthSheet({ open, onClose, onSuccess, showToast }) {
           }}>{error}</div>
         )}
 
-        {/* primary */}
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            marginTop: 20, width: '100%', height: 54, border: 'none',
-            borderRadius: 'var(--r-control, 16px)',
-            background: 'linear-gradient(135deg,#43C6AC,#0F9482)',
-            color: 'var(--on-accent, #04231C)', font: '700 16px var(--font-ui)',
-            cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.7 : 1,
-            boxShadow: '0 14px 34px -16px rgba(67,198,172,.7)',
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          }}
-        >
-          {loading && <Loader2 size={18} className="animate-spin" />}
-          {loading
-            ? 'just a sec…'
-            : isReset
-              ? (resetToken ? 'set new password' : 'send reset link')
-              : isSignup ? 'create account' : 'log in'}
-        </button>
+        {/* primary gradient submit — hidden in the enumeration-safe "sent" state
+            unless a dev token is present (then it confirms the new password) */}
+        {(!isReset || !resetSent || resetToken) && (
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              marginTop: 20, width: '100%', height: 54, border: 'none',
+              borderRadius: 16,
+              background: 'linear-gradient(135deg,#43C6AC,#0F9482)',
+              color: 'var(--on-accent, #04231C)', font: '700 16px var(--font-ui)',
+              cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.7 : 1,
+              boxShadow: '0 14px 34px -16px rgba(67,198,172,.7)',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}
+          >
+            {loading && <Loader2 size={18} className="animate-spin" />}
+            {loading
+              ? 'just a sec…'
+              : isReset
+                ? (resetToken ? 'set new password' : 'send reset link')
+                : isSignup ? 'create account' : 'log in'}
+          </button>
+        )}
 
         {isReset ? (
-          /* back to sign in (secondary link in reset flow) */
-          <div style={{ marginTop: 16, textAlign: 'center' }}>
-            <button
-              type="button"
-              onClick={backToSignIn}
-              style={{ background: 'none', border: 'none', color: 'var(--sage)', font: '600 13px var(--font-ui)', cursor: 'pointer' }}
-            >back to sign in</button>
-          </div>
+          /* outlined "back to log in" — the sent state's primary action */
+          <button
+            type="button"
+            onClick={backToSignIn}
+            style={{
+              marginTop: resetSent && !resetToken ? 20 : 16, width: '100%', height: 52,
+              borderRadius: 16, border: '1px solid var(--glass-border)',
+              background: 'var(--surface-2)', color: 'var(--ink)',
+              font: '600 15px var(--font-ui)', cursor: 'pointer',
+            }}
+          >back to log in</button>
         ) : (
           <>
             {/* continue without account */}

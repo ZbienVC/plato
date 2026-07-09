@@ -32,12 +32,18 @@ const microLabel = { font: '600 10px/1.2 var(--font-ui)', letterSpacing: '.16em'
 export function Home({ onFab }) {
   const {
     userProfile, premium, dark, setTheme,
-    streak, plan, dailyLog, logMeal,
+    streak, plan, dailyLog, logMeal, logHistory,
     waterCups, waterGoalCups, addWater, setActiveTab,
   } = useApp();
   const { current, targets } = useMacros();
   const [armed, setArmed] = useState(false);
+  const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
   useEffect(() => { const id = requestAnimationFrame(() => setArmed(true)); return () => cancelAnimationFrame(id); }, []);
+  useEffect(() => {
+    const up = () => setOnline(true), down = () => setOnline(false);
+    window.addEventListener('online', up); window.addEventListener('offline', down);
+    return () => { window.removeEventListener('online', up); window.removeEventListener('offline', down); };
+  }, []);
 
   const cals = current.calories || 0;
   const calTarget = targets.calories || 2000;
@@ -64,6 +70,46 @@ export function Home({ onFab }) {
   }, [plan]);
   const isLogged = (name) => (dailyLog?.meals || []).some(m => (m.name || '').toLowerCase() === (name || '').toLowerCase());
 
+  const loggedMealCount = (dailyLog?.meals || []).length;
+  const isEmptyDay = loggedMealCount === 0 && cals === 0;
+
+  // --- Insights: real protein-hit streak + calorie sparkline from log history ---
+  const { insightText, spark, sparkColor, lowData } = useMemo(() => {
+    const history = (logHistory || []).filter(l => l?.date).slice(-7);
+    const proteinTarget = targets.protein || 0;
+    let proteinRun = 0;
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (proteinTarget > 0 && (history[i].totalProtein || 0) >= proteinTarget) proteinRun++;
+      else break;
+    }
+    if (proteinTarget > 0 && (current.protein || 0) >= proteinTarget) proteinRun++;
+
+    const cals7 = [...history.map(l => l.totalCalories || l.calories || 0), cals];
+    const recent = cals7.slice(-7);
+    const enough = history.length >= 2;
+    const max = Math.max(...recent, 1);
+    const bars = recent.length
+      ? recent.map(c => Math.max(6, Math.round((c / max) * 24) + 6))
+      : [6, 6, 6, 6, 6, 6, 6];
+    if (!enough) {
+      return {
+        insightText: "log a few more days and we'll spot your patterns.",
+        spark: [6, 6, 6, 6, 6, 6, 6], sparkColor: 'var(--hairline)', lowData: true,
+      };
+    }
+    return {
+      insightText: proteinRun >= 2
+        ? `you hit protein ${proteinRun} days running.`
+        : over
+          ? `you're ${(cals - calTarget).toLocaleString()} over today — heavier than planned.`
+          : `${left.toLocaleString()} calories left to hit your target.`,
+      spark: bars, sparkColor: 'var(--macro-protein)', lowData: false,
+    };
+  }, [logHistory, targets.protein, current.protein, cals, calTarget, over, left]);
+
+  const showCoach = isEmptyDay && !!plan?.meals?.length;
+  const coachText = 'tap + log on your first meal to fill your orb';
+
   const orbFill = over
     ? 'linear-gradient(180deg, #E7B67C, #E1616C 78%)'
     : 'linear-gradient(180deg, rgba(140,224,206,.95), #43C6AC 42%, #0F9482)';
@@ -73,8 +119,15 @@ export function Home({ onFab }) {
 
   return (
     <>
-      {/* status bar spacer + top bar */}
-      <div style={{ height: 12 }} />
+      {/* status bar */}
+      <div style={{ height: 44, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 26px 0', position: 'relative', zIndex: 2 }}>
+        <span style={{ font: '600 14px var(--font-ui)', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>9:41</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--ink)' }}>
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor" /><rect x="5" y="5" width="3" height="7" rx="1" fill="currentColor" /><rect x="10" y="2" width="3" height="10" rx="1" fill="currentColor" /><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor" opacity=".4" /></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><path d="M1 4a11 11 0 0 1 14 0" /><path d="M3.6 6.6a7 7 0 0 1 8.8 0" /><path d="M6.2 9.1a3 3 0 0 1 3.6 0" /></svg>
+          <svg width="25" height="14" viewBox="0 0 25 14" fill="none"><rect x="1" y="2" width="19" height="10" rx="2.6" stroke="currentColor" strokeWidth="1.3" opacity=".5" /><rect x="3" y="4" width="13" height="6" rx="1.2" fill="currentColor" /><rect x="21.5" y="5" width="2" height="4" rx="1" fill="currentColor" /></svg>
+        </span>
+      </div>
       <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 12, padding: '6px 20px 12px', position: 'relative', zIndex: 2 }}>
         <button
           onClick={() => setActiveTab('profile')}
@@ -103,6 +156,14 @@ export function Home({ onFab }) {
 
       {/* scroll region */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 18px var(--nav-safe-pad)', display: 'flex', flexDirection: 'column', gap: 14, position: 'relative', zIndex: 1 }}>
+
+        {/* Offline banner */}
+        {!online && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '10px 13px', borderRadius: 14, background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderLeft: '3px solid var(--info)' }}>
+            <span style={{ width: 7, height: 7, borderRadius: 999, background: 'var(--info)', flex: 'none', boxShadow: '0 0 8px var(--info)' }} />
+            <span style={{ font: '500 12px var(--font-ui)', color: 'var(--sage)' }}>you're offline — changes save on this device and sync later</span>
+          </div>
+        )}
 
         {/* Orb hero */}
         <div style={{ ...cardStyle, borderRadius: 'var(--r-card)', padding: '22px 20px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -146,6 +207,7 @@ export function Home({ onFab }) {
               </div>
               <div style={{ marginTop: 11, position: 'relative', height: 7, borderRadius: 999, background: 'var(--hairline)', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${m.pct}%`, background: m.grad, borderRadius: 999, transition: 'width .9s var(--ease-out)' }} />
+                {m.over && <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '16%', background: 'var(--danger)', borderRadius: 999 }} />}
               </div>
             </div>
           ))}
@@ -167,7 +229,7 @@ export function Home({ onFab }) {
                 return <div key={i} style={{ width: 9, height: 9, borderRadius: 999, flex: 'none', background: on ? 'var(--brand-jade)' : today ? 'transparent' : 'var(--hairline)', border: today && !on ? '1.5px solid var(--brand-jade)' : 'none', boxShadow: today && on ? '0 0 0 3px rgba(67,198,172,.20)' : 'none' }} />;
               })}
             </div>
-            <div style={{ marginTop: 11, font: '500 12px var(--font-ui)', color: 'var(--sage)' }}>{(streak || 0) > 0 ? 'keep it going' : 'log to start a streak'}</div>
+            <div style={{ marginTop: 11, font: '500 12px var(--font-ui)', color: 'var(--sage)' }}>{(streak || 0) > 1 ? `${streak} days · keep it going` : (streak || 0) === 1 ? 'day 1 · welcome' : 'log to start a streak'}</div>
           </div>
 
           <div style={{ ...cardStyle, borderRadius: 'var(--r-tile)', padding: 14 }}>
@@ -196,7 +258,7 @@ export function Home({ onFab }) {
           ].map(c => (
             <button key={c.label} onClick={openLog} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flex: 'none', height: 44, padding: '0 15px', borderRadius: 999, background: 'var(--glass-fill)', border: '1px solid var(--glass-border)', backdropFilter: 'blur(16px)', color: 'var(--ink)', font: '500 13px var(--font-ui)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><c.Icon size={18} /></span>{c.label}
-              {c.lock && <span style={{ color: 'var(--warning)', display: 'inline-flex', marginLeft: 1 }}><Barcode size={0} style={{ display: 'none' }} /><LockGlyph /></span>}
+              {c.lock && <span style={{ color: 'var(--warning)', display: 'inline-flex', marginLeft: 1 }}><LockGlyph /></span>}
             </button>
           ))}
         </div>
@@ -205,8 +267,14 @@ export function Home({ onFab }) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, letterSpacing: '-.01em', color: 'var(--ink)' }}>today's plan</div>
-            <button onClick={() => setActiveTab('meals')} style={{ display: 'inline-flex', alignItems: 'center', gap: 2, color: 'var(--primary)', font: '600 13px var(--font-ui)', background: 'none', border: 'none', cursor: 'pointer' }}>full week <ChevronRight size={15} /></button>
+            <button onClick={() => setActiveTab('meals')} style={{ display: 'inline-flex', alignItems: 'center', gap: 2, color: 'var(--primary)', font: '600 13px var(--font-ui)', background: 'none', border: 'none', cursor: 'pointer' }}>edit <ChevronRight size={15} /></button>
           </div>
+          {showCoach && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9, margin: '10px 0 2px', padding: '10px 12px', borderRadius: 14, background: 'rgba(67,198,172,.08)', border: '1px solid rgba(67,198,172,.16)' }}>
+              <span style={{ width: 9, height: 9, borderRadius: 999, background: 'radial-gradient(circle,#8CE0CE,#43C6AC)', boxShadow: '0 0 10px rgba(67,198,172,.5)', flex: 'none' }} />
+              <span style={{ font: '500 13px var(--font-ui)', color: 'var(--ink)' }}>{coachText}</span>
+            </div>
+          )}
           <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
             {todayMeals.length === 0 && (
               <div style={{ ...cardStyle, borderRadius: 'var(--r-card)', padding: '18px 16px', textAlign: 'center' }}>
@@ -238,6 +306,22 @@ export function Home({ onFab }) {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* Insights */}
+        <div style={{ ...cardStyle, borderRadius: 'var(--r-card)', padding: '15px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11 }}>
+            <div style={microLabel}>insights</div>
+            <button onClick={() => setActiveTab('insights')} style={{ display: 'inline-flex', alignItems: 'center', gap: 2, color: 'var(--primary)', font: '600 13px var(--font-ui)', background: 'none', border: 'none', cursor: 'pointer' }}>see all <ChevronRight size={15} /></button>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ flex: 1, font: '500 15px var(--font-ui)', color: 'var(--ink)', lineHeight: 1.4 }}>{insightText}</div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 30 }}>
+              {spark.map((h, i) => (
+                <div key={i} style={{ width: 5, height: h, borderRadius: 3, background: lowData ? 'var(--hairline)' : sparkColor }} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

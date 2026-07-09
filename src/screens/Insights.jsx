@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { TrendingUp, Lock, Flame, Clock, BarChart3, Sparkles } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { TrendingUp, Lock, Flame, Clock, Dumbbell } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
 
@@ -17,7 +17,7 @@ const PERIODS = [
   { key: 'year', label: 'year', locked: true, days: 365 },
 ];
 
-const DAY_LABELS = ['s', 'm', 't', 'w', 't', 'f', 's'];
+const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 function periodTabStyle(active, locked) {
   return {
@@ -50,6 +50,26 @@ export function Insights({ onFab }) {
   const [period, setPeriod] = useState('week');
   const activePeriod = PERIODS.find(p => p.key === period) || PERIODS[0];
   const days = activePeriod.days;
+
+  // Inline toast — locked-period taps surface a gentle nudge (design micro-interaction).
+  const [toast, setToast] = useState(null);
+  const toastT = useRef(null);
+  const showToast = (msg) => {
+    if (toastT.current) clearTimeout(toastT.current);
+    setToast(msg);
+    toastT.current = setTimeout(() => setToast(null), 2000);
+  };
+  useEffect(() => () => { if (toastT.current) clearTimeout(toastT.current); }, []);
+
+  // Offline awareness — surface the "last synced" banner when the device drops off.
+  const [offline, setOffline] = useState(() => typeof navigator !== 'undefined' && navigator.onLine === false);
+  useEffect(() => {
+    const on = () => setOffline(false);
+    const off = () => setOffline(true);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
+  }, []);
 
   const dayMap = useMemo(() => buildDayMap(logHistory, dailyLog), [logHistory, dailyLog]);
 
@@ -104,6 +124,8 @@ export function Insights({ onFab }) {
     return best;
   }, [series]);
 
+  // Locked periods surface the deep-history nudge; the correlation card's CTA opens the full paywall.
+  const onLockedTap = () => showToast('deep history is Plato Plus');
   const openUpsell = () => openPremiumModal && openPremiumModal();
 
   return (
@@ -111,29 +133,26 @@ export function Insights({ onFab }) {
       <div style={{ height: 12 }} />
 
       {/* Top bar */}
-      <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 20px 10px', position: 'relative', zIndex: 2 }}>
+      <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 22px 12px', position: 'relative', zIndex: 2 }}>
         <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 26, letterSpacing: '-.02em', color: 'var(--ink)' }}>insights</div>
-        <div style={{ font: '600 11px var(--font-ui)', color: 'var(--sage)', textTransform: 'lowercase' }}>this {activePeriod.label}</div>
-      </div>
-
-      {/* Period segmented control */}
-      <div style={{ flex: 'none', padding: '0 20px 12px', position: 'relative', zIndex: 2 }}>
-        <div style={{ display: 'flex', background: 'var(--surface-2)', borderRadius: 13, padding: 4, gap: 3 }}>
-          {PERIODS.map(p => (
-            <button
-              key={p.key}
-              onClick={() => (p.locked ? openUpsell() : setPeriod(p.key))}
-              style={periodTabStyle(period === p.key, p.locked)}
-            >
-              {p.label}
-              {p.locked && <span style={{ display: 'inline-flex', color: 'var(--warning)' }}><Lock size={11} strokeWidth={2.4} /></span>}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Scroll region */}
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 18px var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 20px var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
+
+        {/* Period segmented control — sticks to the top of the scroll region */}
+        <div style={{ display: 'flex', background: 'var(--surface-2)', borderRadius: 13, padding: 4, gap: 3, position: 'sticky', top: 0, zIndex: 3, marginBottom: 16 }}>
+          {PERIODS.map(p => (
+            <button
+              key={p.key}
+              onClick={() => (p.locked ? onLockedTap() : setPeriod(p.key))}
+              style={periodTabStyle(period === p.key, p.locked)}
+            >
+              {p.label}
+              {p.locked && <span style={{ marginLeft: 4, display: 'inline-flex', verticalAlign: -2, color: 'currentColor' }}><Lock size={11} strokeWidth={2.4} /></span>}
+            </button>
+          ))}
+        </div>
 
         {empty ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '56px 24px', gap: 6, minHeight: 440 }}>
@@ -148,6 +167,14 @@ export function Insights({ onFab }) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
+            {/* Offline banner */}
+            {offline && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '10px 13px', borderRadius: 14, background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderLeft: '3px solid var(--info)' }}>
+                <span style={{ width: 7, height: 7, borderRadius: 999, background: 'var(--info)', flex: 'none', boxShadow: '0 0 8px var(--info)' }} />
+                <span style={{ font: '500 12px var(--font-ui)', color: 'var(--sage)' }}>offline — showing your last synced insights</span>
+              </div>
+            )}
+
             {/* Headline summary tile */}
             <div style={{ ...cardStyle, borderRadius: 'var(--r-card)', padding: '16px 18px', borderLeft: '3px solid var(--macro-protein)' }}>
               <div style={microLabel}>this {activePeriod.label}</div>
@@ -161,8 +188,8 @@ export function Insights({ onFab }) {
                 <div style={{ position: 'relative', width: 118, height: 118, flex: 'none' }}>
                   <div style={{ width: 118, height: 118, borderRadius: '50%', background: donutBg, WebkitMask: 'radial-gradient(circle, transparent 55%, #000 56%)', mask: 'radial-gradient(circle, transparent 55%, #000 56%)' }} />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 22, letterSpacing: '-.02em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{Math.round(current.calories || 0).toLocaleString()}</span>
-                    <span style={{ font: '600 9px var(--font-ui)', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--sage)' }}>today kcal</span>
+                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 22, letterSpacing: '-.02em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{avgCal.toLocaleString()}</span>
+                    <span style={{ font: '600 9px var(--font-ui)', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--sage)' }}>avg kcal</span>
                   </div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 11 }}>
@@ -191,29 +218,23 @@ export function Insights({ onFab }) {
               gradId="itrend-cal"
             />
 
-            {/* Protein trend mini-chart */}
-            <TrendCard
-              title="protein trend"
-              rightLabel={`target ${Math.round(targets.protein || 0)}g`}
-              values={series.map(d => d.protein)}
-              target={targets.protein || 0}
-              color="#5FD4C4"
-              gradId="itrend-pro"
-            />
-
             {/* Logging adherence heat-strip */}
             <div style={{ ...cardStyle, borderRadius: 'var(--r-card)', padding: 18 }}>
               <div style={{ ...microLabel, marginBottom: 13 }}>logging adherence</div>
-              <div style={{ display: 'flex', gap: days > 7 ? 6 : 9, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: days > 7 ? 7 : 9, flexWrap: 'wrap' }}>
                 {series.map((d, i) => {
                   const over = d.logged && d.calories > calTarget * 1.1;
+                  // Ramp logged days by how close they landed to target (design uses a jade intensity scale).
+                  const ratio = d.logged ? d.calories / (calTarget || 1) : 0;
                   const bg = !d.logged
                     ? 'var(--hairline)'
                     : over
                       ? 'var(--warning)'
-                      : d.calories >= calTarget * 0.75
+                      : ratio >= 0.9
                         ? 'var(--brand-jade)'
-                        : 'rgba(67,198,172,.4)';
+                        : ratio >= 0.6
+                          ? 'rgba(67,198,172,.55)'
+                          : 'rgba(67,198,172,.28)';
                   const sz = days > 7 ? 20 : 30;
                   return <div key={i} title={d.key} style={{ width: sz, height: sz, borderRadius: 6, background: bg }} />;
                 })}
@@ -259,7 +280,7 @@ export function Insights({ onFab }) {
                   <path d="M0,20 L60,24 L120,18 L180,28 L240,26 L300,34" fill="none" stroke="#43C6AC" strokeWidth="2.5" />
                   <path d="M0,44 L60,40 L120,46 L180,38 L240,42 L300,36" fill="none" stroke="#5FD4C4" strokeWidth="2.5" />
                 </svg>
-                <div style={{ marginTop: 8, font: '500 13px var(--font-ui)', color: 'var(--ink)' }}>see how your intake shapes your weight trend over time.</div>
+                <div style={{ marginTop: 8, font: '500 13px var(--font-ui)', color: 'var(--ink)' }}>as intake averaged {avgCal.toLocaleString()} kcal, weight trended down ~0.4 lb/wk.</div>
               </div>
               <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '0 24px', textAlign: 'center', background: 'linear-gradient(180deg,transparent,var(--glass-scrim) 55%)' }}>
                 <div style={{ font: '600 14px var(--font-ui)', color: 'var(--ink)' }}>see how intake shapes your weight</div>
@@ -275,7 +296,7 @@ export function Insights({ onFab }) {
               <div style={{ ...cardStyle, borderRadius: 'var(--r-tile)', overflow: 'hidden' }}>
                 {[
                   { Icon: TrendingUp, bg: 'rgba(231,182,124,.14)', color: 'var(--warning)', text: avgCal > calTarget ? `you averaged ${avgCal.toLocaleString()} kcal — about ${(avgCal - calTarget).toLocaleString()} over target.` : `you averaged ${avgCal.toLocaleString()} kcal, under your ${calTarget.toLocaleString()} target.` },
-                  { Icon: BarChart3, bg: 'rgba(95,212,196,.14)', color: 'var(--info)', text: `you logged ${loggedCount} of the last ${days} days.` },
+                  { Icon: Dumbbell, bg: 'rgba(95,212,196,.14)', color: 'var(--info)', text: `you logged ${loggedCount} of the last ${days} days.` },
                   { Icon: Clock, bg: 'rgba(67,198,172,.14)', color: 'var(--brand-jade)', text: bestStreak >= 3 ? `your best run was ${bestStreak} days in a row — nice consistency.` : 'log daily to build a longer streak.' },
                 ].map((n, i, all) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 15px', borderBottom: i < all.length - 1 ? '1px solid var(--hairline)' : 'none' }}>
@@ -289,6 +310,15 @@ export function Insights({ onFab }) {
           </div>
         )}
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div style={{ position: 'absolute', left: 20, right: 20, bottom: 'calc(var(--nav-safe-pad, 104px) - 12px)', zIndex: 6, display: 'flex', justifyContent: 'center', pointerEvents: 'none', animation: 'slideUp .24s var(--ease-out)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '11px 16px', borderRadius: 14, background: 'var(--glass-fill)', border: '1px solid var(--divider-strong)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', boxShadow: '0 18px 40px -18px rgba(0,0,0,.9)' }}>
+            <span style={{ font: '600 13px var(--font-ui)', color: 'var(--ink)' }}>{toast}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }

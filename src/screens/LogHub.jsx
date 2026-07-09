@@ -1,17 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Search, Zap, PencilLine, Mic, Barcode, Camera,
-  X, ChevronLeft, Plus, Minus, Check,
+  X, ChevronLeft, Plus, Minus, Check, ChevronDown, Info, Image, Flashlight,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { useMacros } from '../hooks/useMacros';
 import { searchFood, lookupBarcode } from '../lib/api';
 
-const cardStyle = {
-  background: 'var(--glass-fill)', border: '1px solid var(--glass-border)',
-  backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,.05),0 18px 34px -28px rgba(0,0,0,.9)',
-};
+// self-contained keyframes for the capture overlays (mic pulse, waveform, toast)
+const LOGHUB_ANIM = `
+@keyframes lh-mic { 0%,100% { transform: scale(1); box-shadow:0 0 0 0 rgba(67,198,172,.4); } 50% { transform: scale(1.04); box-shadow:0 0 0 16px rgba(67,198,172,0); } }
+@keyframes lh-wave { 0%,100% { transform: scaleY(.4); } 50% { transform: scaleY(1); } }
+@keyframes lh-toast { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .lh-anim, .lh-anim * { animation-duration:.001ms !important; animation-iteration-count:1 !important; } }
+`;
+
 const microLabel = { font: '600 10px/1.2 var(--font-ui)', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--sage)' };
 const fieldLabel = { font: '600 10px var(--font-ui)', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--sage)', marginBottom: 7 };
 
@@ -44,7 +46,7 @@ const QUICK_FOODS = [
 const TILES = [
   { mode: 'search', title: 'search', sub: 'usda database', Icon: Search, iconBg: 'rgba(67,198,172,.14)', iconColor: 'var(--brand-jade)', locked: false },
   { mode: 'quick', title: 'quick log', sub: 'common foods', Icon: Zap, iconBg: 'rgba(231,182,124,.14)', iconColor: 'var(--warning)', locked: false },
-  { mode: 'manual', title: 'manual', sub: 'enter macros', Icon: PencilLine, iconBg: 'rgba(174,166,234,.16)', iconColor: 'var(--info)', locked: false },
+  { mode: 'manual', title: 'manual', sub: 'enter macros', Icon: PencilLine, iconBg: 'rgba(174,166,234,.16)', iconColor: 'var(--accent-violet)', locked: false },
   { mode: 'voice', title: 'voice log', sub: 'just say it', Icon: Mic, iconBg: 'rgba(95,212,196,.14)', iconColor: 'var(--info)', locked: true },
   { mode: 'scan', title: 'scan', sub: 'packaged food', Icon: Barcode, iconBg: 'rgba(67,198,172,.14)', iconColor: 'var(--brand-jade)', locked: false },
   { mode: 'photo', title: 'photo', sub: 'snap your plate', Icon: Camera, iconBg: 'rgba(225,160,171,.16)', iconColor: 'var(--macro-fat)', locked: true },
@@ -66,9 +68,8 @@ function slotBtn(active) {
 
 export function LogHub({ onFab }) {
   const { logMeal, setActiveTab, isPremiumActive, openPremiumModal, setShowVoiceLog, dailyLog } = useApp();
-  const { current, targets } = useMacros();
 
-  const [mode, setMode] = useState('hub'); // hub | search | quick | manual | confirm | scan
+  const [mode, setMode] = useState('hub'); // hub | search | quick | manual | confirm | scan | voice | photo
   const [slot, setSlot] = useState(defaultSlot());
   const [toast, setToast] = useState(null);
 
@@ -91,6 +92,7 @@ export function LogHub({ onFab }) {
   const [scanLoading, setScanLoading] = useState(false);
   const [scanError, setScanError] = useState('');
   const [camActive, setCamActive] = useState(false);
+  const [scanEntry, setScanEntry] = useState(false); // manual-entry panel toggle in scan overlay
   const hasBarcodeDetector = typeof window !== 'undefined' && 'BarcodeDetector' in window
     && typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
   const videoRef = useRef(null);
@@ -158,10 +160,17 @@ export function LogHub({ onFab }) {
     setMode('hub');
   };
 
+  // Voice: hand off to the shared VoiceLogOverlay (real capture pipeline).
+  const startVoiceCapture = () => { setShowVoiceLog(true); };
+  // Photo: Plus feature — surface the upsell / capture entry.
+  const startPhotoCapture = () => { showToast('photo logging coming soon'); };
+
   // ── tile handlers ───────────────────────────────────────────────────────
   const openTile = (m) => {
-    if (m === 'voice') { isPremiumActive() ? setShowVoiceLog(true) : openPremiumModal(); return; }
-    if (m === 'photo') { openPremiumModal(); return; }
+    // Voice & Photo are Plato Plus — gate before showing the capture overlay.
+    if (m === 'voice') { isPremiumActive() ? setMode('voice') : openPremiumModal(); return; }
+    if (m === 'photo') { isPremiumActive() ? setMode('photo') : openPremiumModal(); return; }
+    if (m === 'scan') { setScanEntry(false); setScanError(''); }
     setMode(m);
   };
 
@@ -278,26 +287,40 @@ export function LogHub({ onFab }) {
   }, [mode, stopCamera]);
 
   const isSheet = ['hub', 'search', 'quick', 'manual', 'confirm'].includes(mode);
+  const camReady = hasBarcodeDetector;
 
   return (
     <>
-      <div style={{ height: 12 }} />
+      <style dangerouslySetInnerHTML={{ __html: LOGHUB_ANIM }} />
 
-      {/* Top bar */}
-      <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 20px 12px', position: 'relative', zIndex: 2 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          {mode !== 'hub' && (
-            <button onClick={back} aria-label="Back" style={iconBtn()}><ChevronLeft size={18} /></button>
-          )}
-          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 26, letterSpacing: '-.02em', color: 'var(--ink)' }}>log</div>
-        </div>
-        <button onClick={closeToHome} aria-label="Close" style={iconBtn()}><X size={18} /></button>
-      </div>
+      {/* ── VOICE overlay (Plato Plus) ─────────────────────────── */}
+      {mode === 'voice' && (
+        <VoiceOverlay onClose={() => setMode('hub')} onCapture={startVoiceCapture} />
+      )}
 
-      {/* Sub-title micro-label */}
-      <div style={{ flex: 'none', padding: '0 20px 10px', position: 'relative', zIndex: 2 }}>
-        <div style={microLabel}>{SHEET_TITLES[mode] || 'log a meal'}</div>
-      </div>
+      {/* ── PHOTO overlay (Plato Plus) ─────────────────────────── */}
+      {mode === 'photo' && (
+        <PhotoOverlay onClose={() => setMode('hub')} onCapture={startPhotoCapture} />
+      )}
+
+      {/* Sheet: everything except the full-bleed capture overlays */}
+      {isSheet && (
+        <>
+          {/* grabber handle */}
+          <div style={{ flex: 'none', display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
+            <div style={{ width: 40, height: 4, borderRadius: 999, background: 'var(--divider-strong)' }} />
+          </div>
+
+          {/* Sheet header: back · title · close */}
+          <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 18px 14px', position: 'relative', zIndex: 2 }}>
+            {mode !== 'hub' ? (
+              <button onClick={back} aria-label="Back" style={sheetIconBtn()}><ChevronLeft size={17} strokeWidth={2} /></button>
+            ) : (
+              <div style={{ width: 34 }} />
+            )}
+            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: '-.01em', color: 'var(--ink)' }}>{SHEET_TITLES[mode] || 'log a meal'}</div>
+            <button onClick={closeToHome} aria-label="Close" style={sheetIconBtn()}><X size={17} strokeWidth={2} /></button>
+          </div>
 
       {/* Scroll region */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 18px var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
@@ -310,7 +333,7 @@ export function LogHub({ onFab }) {
                 <button
                   key={t.mode}
                   onClick={() => openTile(t.mode)}
-                  style={{ position: 'relative', textAlign: 'left', ...cardStyle, borderRadius: 'var(--r-tile)', padding: 15, cursor: 'pointer' }}
+                  style={{ position: 'relative', textAlign: 'left', background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-tile)', padding: 15, cursor: 'pointer' }}
                 >
                   <span style={{ width: 40, height: 40, borderRadius: 12, background: t.iconBg, color: t.iconColor, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <t.Icon size={21} strokeWidth={1.9} />
@@ -318,7 +341,7 @@ export function LogHub({ onFab }) {
                   <div style={{ marginTop: 11, font: '700 15px var(--font-ui)', color: 'var(--ink)' }}>{t.title}</div>
                   <div style={{ marginTop: 2, font: '500 12px var(--font-ui)', color: 'var(--sage)' }}>{t.sub}</div>
                   {t.locked && (
-                    <span style={{ position: 'absolute', top: 13, right: 13, display: 'inline-flex', alignItems: 'center', padding: '3px 7px', borderRadius: 999, background: 'rgba(231,182,124,.15)', color: 'var(--warning)', font: '700 9px var(--font-ui)', letterSpacing: '.1em', textTransform: 'uppercase' }}>plus</span>
+                    <span style={{ position: 'absolute', top: 13, right: 13, display: 'inline-flex', alignItems: 'center', gap: 3, padding: '3px 7px', borderRadius: 999, background: 'rgba(231,182,124,.15)', color: 'var(--warning)', font: '700 9px var(--font-ui)', letterSpacing: '.1em', textTransform: 'uppercase' }}>Plus</span>
                   )}
                 </button>
               ))}
@@ -372,7 +395,7 @@ export function LogHub({ onFab }) {
 
             {!searching && !query.trim() && (
               <div style={{ padding: '40px 20px', textAlign: 'center', font: '500 13px var(--font-ui)', color: 'var(--sage)', lineHeight: 1.5 }}>
-                search 300k+ foods from usda fooddata central.
+                search 300k+ foods from USDA FoodData Central.
               </div>
             )}
 
@@ -405,7 +428,7 @@ export function LogHub({ onFab }) {
                     </button>
                   ))}
                 </div>
-                <div style={{ marginTop: 14, textAlign: 'center', font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>data from usda fooddata central</div>
+                <div style={{ marginTop: 14, textAlign: 'center', font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>data from USDA FoodData Central</div>
               </>
             )}
           </div>
@@ -418,7 +441,7 @@ export function LogHub({ onFab }) {
               <button
                 key={q.name}
                 onClick={() => quickLog(q)}
-                style={{ display: 'flex', alignItems: 'center', gap: 11, ...cardStyle, borderRadius: 'var(--r-control)', padding: 12, cursor: 'pointer', textAlign: 'left' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 11, background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-control)', padding: 12, cursor: 'pointer', textAlign: 'left' }}
               >
                 <div style={{ width: 36, height: 36, flex: 'none', borderRadius: 11, background: `linear-gradient(150deg,${q.tint},var(--brand-forest))`, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.14)' }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -474,9 +497,17 @@ export function LogHub({ onFab }) {
               <div style={{ marginTop: 3, font: '500 12px var(--font-ui)', color: 'var(--muted)' }}>from {confirmFood.source.toLowerCase()} · {confirmFood.serving}</div>
             </div>
 
+            {/* serving row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderRadius: 14, padding: '13px 15px' }}>
+              <span style={{ font: '600 13px var(--font-ui)', color: 'var(--sage)' }}>serving</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, font: '600 14px var(--font-ui)', color: 'var(--ink)' }}>
+                {confirmFood.serving}<ChevronDown size={15} color="var(--sage)" />
+              </span>
+            </div>
+
             {/* quantity stepper */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderRadius: 14, padding: '11px 15px' }}>
-              <span style={{ font: '600 13px var(--font-ui)', color: 'var(--sage)' }}>servings</span>
+              <span style={{ font: '600 13px var(--font-ui)', color: 'var(--sage)' }}>quantity</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                 <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease" style={stepBtn()}><Minus size={16} /></button>
                 <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', minWidth: 34, textAlign: 'center' }}>{qty}</span>
@@ -503,12 +534,22 @@ export function LogHub({ onFab }) {
             <button onClick={confirmLog} style={primaryBtn()}>log meal</button>
           </div>
         )}
+          </div>
+        </>
+      )}
 
-        {/* ── SCAN (barcode lookup — FREE) ────────────────────── */}
-        {mode === 'scan' && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, paddingTop: 10 }}>
-            {/* viewfinder — shows live camera feed when active, otherwise a static frame */}
-            <div style={{ position: 'relative', width: '100%', maxWidth: 260, aspectRatio: '250 / 170', borderRadius: 14, background: 'linear-gradient(180deg,#0a1512,#050a09)', overflow: 'hidden' }}>
+      {/* ── SCAN overlay (barcode lookup — FREE) ───────────────── */}
+      {mode === 'scan' && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 8, background: 'linear-gradient(180deg,#0a1512,#050a09)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 22 }}>
+          {/* header: title · close */}
+          <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ font: '600 13px var(--font-ui)', color: '#EAF1EF' }}>scan barcode</span>
+            <button onClick={() => setMode('hub')} aria-label="Close" style={{ width: 36, height: 36, borderRadius: 999, border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,.08)', color: '#EAF1EF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={18} strokeWidth={2} /></button>
+          </div>
+
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, width: '100%' }}>
+            {/* viewfinder — live camera feed when active, otherwise a static frame */}
+            <div style={{ position: 'relative', width: 250, height: 170, maxWidth: '100%', borderRadius: 14, overflow: 'hidden' }}>
               <video
                 ref={videoRef}
                 playsInline
@@ -529,55 +570,53 @@ export function LogHub({ onFab }) {
               )}
             </div>
 
-            <div style={{ font: '600 15px var(--font-ui)', color: 'var(--ink)' }}>
-              {camActive ? 'point at a barcode' : 'look up a barcode'}
-            </div>
-            <div style={{ font: '500 13px var(--font-ui)', color: 'var(--sage)', textAlign: 'center', maxWidth: 260, lineHeight: 1.5, marginTop: -12 }}>
-              barcode lookup is free. {hasBarcodeDetector ? 'scan with your camera, or ' : ''}enter the number by hand.
-            </div>
+            <div style={{ font: '600 15px var(--font-ui)', color: '#EAF1EF' }}>point at a barcode</div>
 
-            {/* barcode entry + lookup */}
-            <div style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <input
-                value={barcode}
-                onChange={(e) => { setBarcode(e.target.value.replace(/[^0-9]/g, '')); if (scanError) setScanError(''); }}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !scanLoading) runBarcodeLookup(); }}
-                placeholder="enter barcode number"
-                inputMode="numeric"
-                disabled={scanLoading}
-                style={{ width: '100%', height: 48, borderRadius: 14, border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--ink)', padding: '0 14px', outline: 'none', font: '500 15px var(--font-ui)', textAlign: 'center', letterSpacing: '.05em', fontVariantNumeric: 'tabular-nums' }}
-              />
-
-              {scanError && (
-                <div style={{ font: '500 12px var(--font-ui)', color: 'var(--macro-fat, #E1A0AB)', textAlign: 'center', lineHeight: 1.4 }}>{scanError}</div>
-              )}
-
-              <button
-                onClick={() => runBarcodeLookup()}
-                disabled={scanLoading || !barcode.trim()}
-                style={{ ...primaryBtn(), marginTop: 0, height: 48, opacity: (scanLoading || !barcode.trim()) ? 0.55 : 1, cursor: (scanLoading || !barcode.trim()) ? 'default' : 'pointer' }}
-              >{scanLoading ? 'looking up…' : 'look up'}</button>
-
-              {hasBarcodeDetector && (
+            {/* action row: camera/torch · enter manually */}
+            <div style={{ display: 'flex', gap: 10 }}>
+              {camReady && (
                 <button
                   onClick={() => (camActive ? stopCamera() : startCamera())}
                   disabled={scanLoading}
-                  style={{ height: 44, borderRadius: 999, border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--ink)', font: '600 13px var(--font-ui)', cursor: scanLoading ? 'default' : 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-                ><Camera size={16} />{camActive ? 'stop camera' : 'scan with camera'}</button>
+                  style={{ height: 44, padding: '0 18px', borderRadius: 999, border: '1px solid rgba(255,255,255,.16)', background: 'rgba(255,255,255,.06)', color: '#EAF1EF', font: '600 13px var(--font-ui)', cursor: scanLoading ? 'default' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: 7 }}
+                ><Flashlight size={16} />{camActive ? 'stop' : 'camera'}</button>
               )}
-
               <button
-                onClick={() => setMode('search')}
-                style={{ height: 40, borderRadius: 999, border: 'none', background: 'none', color: 'var(--sage)', font: '600 12px var(--font-ui)', cursor: 'pointer' }}
-              >or search foods instead</button>
+                onClick={() => setScanEntry(true)}
+                style={{ height: 44, padding: '0 18px', borderRadius: 999, border: 'none', background: 'var(--brand-jade)', color: '#04231C', font: '600 13px var(--font-ui)', cursor: 'pointer' }}
+              >enter manually</button>
             </div>
+
+            {/* manual barcode entry (real lookup) */}
+            {scanEntry && (
+              <div style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <input
+                  autoFocus
+                  value={barcode}
+                  onChange={(e) => { setBarcode(e.target.value.replace(/[^0-9]/g, '')); if (scanError) setScanError(''); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !scanLoading) runBarcodeLookup(); }}
+                  placeholder="enter barcode number"
+                  inputMode="numeric"
+                  disabled={scanLoading}
+                  style={{ width: '100%', height: 48, borderRadius: 14, border: '1px solid rgba(255,255,255,.16)', background: 'rgba(255,255,255,.06)', color: '#EAF1EF', padding: '0 14px', outline: 'none', font: '500 15px var(--font-ui)', textAlign: 'center', letterSpacing: '.05em', fontVariantNumeric: 'tabular-nums' }}
+                />
+                {scanError && (
+                  <div style={{ font: '500 12px var(--font-ui)', color: 'var(--macro-fat, #E1A0AB)', textAlign: 'center', lineHeight: 1.4 }}>{scanError}</div>
+                )}
+                <button
+                  onClick={() => runBarcodeLookup()}
+                  disabled={scanLoading || !barcode.trim()}
+                  style={{ ...primaryBtn(), marginTop: 0, height: 48, opacity: (scanLoading || !barcode.trim()) ? 0.55 : 1, cursor: (scanLoading || !barcode.trim()) ? 'default' : 'pointer' }}
+                >{scanLoading ? 'looking up…' : 'look up'}</button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* toast */}
       {toast && (
-        <div style={{ position: 'absolute', left: 20, right: 20, bottom: 26, zIndex: 9, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
+        <div className="lh-anim" style={{ position: 'absolute', left: 20, right: 20, bottom: 26, zIndex: 9, display: 'flex', justifyContent: 'center', pointerEvents: 'none', animation: 'lh-toast .24s var(--ease-out)' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '12px 17px', borderRadius: 14, background: 'var(--glass-fill)', border: '1px solid var(--divider-strong)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', boxShadow: '0 18px 40px -18px rgba(0,0,0,.9)' }}>
             <span style={{ width: 19, height: 19, borderRadius: 999, background: 'var(--success)', color: 'var(--on-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}><Check size={12} strokeWidth={3} /></span>
             <span style={{ font: '600 13px var(--font-ui)', color: 'var(--ink)' }}>{toast}</span>
@@ -590,12 +629,76 @@ export function LogHub({ onFab }) {
 
 /* ── helpers ──────────────────────────────────────────────────────────── */
 
-function iconBtn() {
+// circular button used in the sheet header (matches the design's surface-2 chips)
+function sheetIconBtn() {
   return {
-    width: 36, height: 36, flex: 'none', borderRadius: 999, border: '1px solid var(--glass-border)',
-    background: 'var(--glass-fill)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-    color: 'var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+    width: 34, height: 34, flex: 'none', borderRadius: 999, border: '1px solid var(--glass-border)',
+    background: 'var(--surface-2)', color: 'var(--sage)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
   };
+}
+
+function plusBadge() {
+  return {
+    display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 11px', borderRadius: 999,
+    background: 'rgba(231,182,124,.15)', color: 'var(--warning)',
+    font: '700 9px var(--font-ui)', letterSpacing: '.12em', textTransform: 'uppercase',
+  };
+}
+
+/* ── VOICE capture overlay (Plato Plus) ───────────────────────────────── */
+function VoiceOverlay({ onClose, onCapture }) {
+  const bars = ['var(--brand-jade)', 'var(--brand-jade)', 'var(--brand-mint)', 'var(--brand-jade)', 'var(--brand-jade)'];
+  return (
+    <div className="lh-anim" style={{ position: 'absolute', inset: 0, zIndex: 8, background: 'radial-gradient(70% 50% at 50% 34%, rgba(67,198,172,.14), transparent 70%), var(--bg-base)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 22 }}>
+      <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={plusBadge()}>Plato Plus</span>
+        <button onClick={onClose} aria-label="Close" style={{ width: 36, height: 36, borderRadius: 999, border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={18} strokeWidth={2} /></button>
+      </div>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 26 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 5, height: 44 }}>
+          {bars.map((c, i) => (
+            <div key={i} style={{ width: 5, height: 44, borderRadius: 3, background: c, transformOrigin: 'bottom', animation: `lh-wave 1s ease-in-out infinite ${i * 0.15}s` }} />
+          ))}
+        </div>
+        <button onClick={onCapture} aria-label="Start recording" style={{ width: 104, height: 104, borderRadius: 999, border: 'none', background: 'linear-gradient(140deg,#43C6AC,#0F9482)', color: '#04231C', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', animation: 'lh-mic 2s ease-in-out infinite', boxShadow: '0 20px 50px -18px rgba(67,198,172,.6)' }}>
+          <Mic size={40} strokeWidth={1.8} />
+        </button>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>tap and describe your meal</div>
+          <div style={{ marginTop: 8, font: '500 13px var(--font-ui)', color: 'var(--sage)', maxWidth: 260, lineHeight: 1.5 }}>“a bowl of oatmeal with blueberries and a scoop of protein”</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── PHOTO capture overlay (Plato Plus) ───────────────────────────────── */
+function PhotoOverlay({ onClose, onCapture }) {
+  return (
+    <div style={{ position: 'absolute', inset: 0, zIndex: 8, background: 'radial-gradient(70% 50% at 50% 30%, rgba(225,160,171,.12), transparent 70%), var(--bg-base)', display: 'flex', flexDirection: 'column', padding: 22 }}>
+      <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={plusBadge()}>Plato Plus</span>
+        <button onClick={onClose} aria-label="Close" style={{ width: 36, height: 36, borderRadius: 999, border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={18} strokeWidth={2} /></button>
+      </div>
+      <div style={{ marginTop: 20, fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 22, letterSpacing: '-.02em', color: 'var(--ink)' }}>snap your plate</div>
+      <div style={{ marginTop: 5, font: '500 13px var(--font-ui)', color: 'var(--sage)', lineHeight: 1.5 }}>our AI reads the foods and estimates macros. you confirm before it logs.</div>
+      <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <button onClick={onCapture} style={{ aspectRatio: '1', border: '1px solid var(--glass-border)', background: 'var(--surface-2)', borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, cursor: 'pointer', color: 'var(--ink)' }}>
+          <span style={{ width: 54, height: 54, borderRadius: 16, background: 'rgba(67,198,172,.14)', color: 'var(--brand-jade)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Camera size={26} strokeWidth={1.7} /></span>
+          <span style={{ font: '600 14px var(--font-ui)' }}>take photo</span>
+        </button>
+        <button onClick={onCapture} style={{ aspectRatio: '1', border: '1px dashed var(--divider-strong)', background: 'var(--surface-1)', borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, cursor: 'pointer', color: 'var(--ink)' }}>
+          <span style={{ width: 54, height: 54, borderRadius: 16, background: 'var(--surface-3)', color: 'var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Image size={26} strokeWidth={1.7} /></span>
+          <span style={{ font: '600 14px var(--font-ui)' }}>upload</span>
+        </button>
+      </div>
+      <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 9, padding: '12px 14px', borderRadius: 14, background: 'rgba(95,212,196,.1)', border: '1px solid rgba(95,212,196,.2)' }}>
+        <span style={{ color: 'var(--info)', display: 'inline-flex', flex: 'none' }}><Info size={18} strokeWidth={1.8} /></span>
+        <span style={{ font: '500 12px var(--font-ui)', color: 'var(--sage)', lineHeight: 1.45 }}>estimates come with a confidence score — low-confidence items are flagged for you to check.</span>
+      </div>
+    </div>
+  );
 }
 
 function stepBtn() {

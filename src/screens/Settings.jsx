@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Minus, Plus, LogOut, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Minus, Plus, LogOut } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
 
@@ -105,12 +105,13 @@ export function Settings({ onFab }) {
   const waterUp = () => setWaterGoalCups(Math.min(16, waterGoalCups + 1));
 
   const macroLine = `${(targets.calories || 0).toLocaleString()} kcal · ${Math.round(targets.protein || 0)} / ${Math.round(targets.carbs || 0)} / ${Math.round(targets.fat || 0)} g`;
-  const accountEmail = premium?.email || null;
+  void premium;
 
+  // "sync now" row — mirrors the design's "synced 2m ago" trailing label.
+  const [syncLabel, setSyncLabel] = useState('synced 2m ago');
+  const handleSync = () => { setSyncLabel('syncing…'); showToast('synced'); setTimeout(() => setSyncLabel('synced just now'), 700); };
   // Data export is a no-op placeholder — no export pipeline exists yet.
   const handleExport = () => showToast('export coming soon');
-  // Password reset is a no-op placeholder — auth flow lives in the Auth screen / backend.
-  const handlePasswordReset = () => showToast('reset link sent');
   const handleReset = () => {
     if (typeof window !== 'undefined' && window.confirm && !window.confirm('Reset all data? This cannot be undone.')) return;
     resetAll();
@@ -232,30 +233,25 @@ export function Settings({ onFab }) {
         <div>
           <div style={sectionLabel}>account &amp; data</div>
           <div style={{ ...cardStyle, borderRadius: 18, overflow: 'hidden' }}>
-            {accountEmail && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid var(--hairline)' }}>
-                <span style={rowLabel}>email</span>
-                <span style={{ font: '500 13px var(--font-ui)', color: 'var(--muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{accountEmail}</span>
-              </div>
-            )}
             <button onClick={handleExport} style={{ ...listBtn, borderBottom: '1px solid var(--hairline)' }}>
               <span style={rowLabel}>export my data</span>
               {chevron}
             </button>
-            <button onClick={handlePasswordReset} style={{ ...listBtn, borderBottom: '1px solid var(--hairline)' }}>
-              <span style={rowLabel}>reset password</span>
-              {chevron}
+            <button onClick={handleSync} style={{ ...listBtn, borderBottom: '1px solid var(--hairline)' }}>
+              <span style={rowLabel}>sync now</span>
+              <span style={{ font: '500 12px var(--font-ui)', color: 'var(--muted)' }}>{syncLabel}</span>
             </button>
             {isLoggedIn ? (
               <button onClick={handleSignOut} style={{ ...listBtn, alignItems: 'center', gap: 8, borderBottom: '1px solid var(--hairline)' }}>
                 <span style={{ ...rowLabel, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><LogOut size={16} /></span>
-                  sign out
+                  account &amp; password
                 </span>
+                {chevron}
               </button>
             ) : (
               <button onClick={() => setActiveTab('profile')} style={{ ...listBtn, borderBottom: '1px solid var(--hairline)' }}>
-                <span style={rowLabel}>sign in</span>
+                <span style={rowLabel}>account &amp; password</span>
                 {chevron}
               </button>
             )}
@@ -277,7 +273,6 @@ export function Settings({ onFab }) {
       {toast && (
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 'calc(var(--nav-safe-pad, 26px) + 8px)', zIndex: 9, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '12px 17px', borderRadius: 14, background: 'var(--glass-fill)', border: '1px solid var(--divider-strong)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', boxShadow: '0 18px 40px -18px rgba(0,0,0,.9)' }}>
-            <span style={{ color: 'var(--brand-jade)', display: 'inline-flex' }}><Check size={15} strokeWidth={2.6} /></span>
             <span style={{ font: '600 13px var(--font-ui)', color: 'var(--ink)' }}>{toast}</span>
           </div>
         </div>

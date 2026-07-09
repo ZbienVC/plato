@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { X, Check, Mic, Camera, MapPin, ArrowRightLeft, TrendingUp } from 'lucide-react';
+import { X, Check, Mic, Camera, MapPin, ArrowRightLeft, TrendingUp, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 // Five gated Plus features. Barcode is intentionally NOT listed — it's free.
 const BENEFITS = [
-  { icon: Mic, bg: 'rgba(95,212,196,.14)', color: 'var(--info)', title: 'voice log ai', desc: 'say what you ate, we do the macros' },
+  { icon: Mic, bg: 'rgba(95,212,196,.14)', color: 'var(--info)', title: 'voice logging', desc: 'say what you ate, we do the macros' },
   { icon: Camera, bg: 'rgba(225,160,171,.16)', color: 'var(--macro-fat)', title: 'photo logging', desc: 'snap your plate for instant estimates' },
   { icon: MapPin, bg: 'rgba(231,182,124,.14)', color: 'var(--warning)', title: 'restaurant mode', desc: 'real menu macros from 14+ chains' },
   { icon: ArrowRightLeft, bg: 'rgba(174,166,234,.16)', color: 'var(--accent-violet, #AEA6EA)', title: 'concierge swaps', desc: 'swap any meal, keep your macros' },
@@ -12,8 +12,8 @@ const BENEFITS = [
 ];
 
 const PLANS = {
-  monthly: { label: 'monthly', price: '$7.99', per: '/ month', fine: 'free for 48 hours, then $7.99/mo · cancel anytime' },
-  annual: { label: 'annual', price: '$59.99', per: '/ year', fine: 'free for 48 hours, then $59.99/yr · cancel anytime' },
+  monthly: { price: '$7.99', per: '/ month', fine: 'free for 48 hours, then $7.99/mo · cancel anytime' },
+  annual: { price: '$59.99', per: '/ year', fine: 'free for 48 hours, then $59.99/yr · cancel anytime' },
 };
 
 function planStyle(active) {
@@ -26,6 +26,21 @@ function planStyle(active) {
   };
 }
 
+const linkStyle = {
+  background: 'none', border: 'none', color: 'var(--sage)',
+  font: '600 12px var(--font-ui)', cursor: 'pointer',
+};
+
+// Trial status derived from real premium context. Kept at module scope (like
+// Home.jsx's trialLabel) so the React Compiler doesn't flag the Date.now()
+// read as impure inside render.
+function trialInfo(premium) {
+  if (premium?.status !== 'trial' || !premium?.trialExpiresAt) return { isTrial: false, hoursLeft: 0 };
+  const ms = new Date(premium.trialExpiresAt).getTime() - Date.now();
+  if (ms <= 0) return { isTrial: false, hoursLeft: 0 };
+  return { isTrial: true, hoursLeft: Math.max(1, Math.ceil(ms / 3600000)) };
+}
+
 export function PaywallSheet({ open, onClose, showToast }) {
   const { premium, startTrial, activatePremium, premiumCheckoutUrl } = useApp();
 
@@ -35,6 +50,17 @@ export function PaywallSheet({ open, onClose, showToast }) {
   const [entered, setEntered] = useState(false);
 
   const checkoutConfigured = useMemo(() => Boolean(premiumCheckoutUrl), [premiumCheckoutUrl]);
+
+  // Trial-active state: the sheet shows a "you're on a free trial" chip and a
+  // "manage subscription" CTA instead of the trial pitch. Bound to real
+  // premium context — not mock — so it reflects the user's actual status.
+  const { isTrial, hoursLeft } = trialInfo(premium);
+
+  const selected = PLANS[plan] || PLANS.annual;
+  const ctaLabel = isTrial ? 'manage subscription' : 'start 48-hour free trial';
+  const fineprint = isTrial
+    ? `your trial ends in ${hoursLeft}h · ${plan === 'annual' ? '$59.99/yr' : '$7.99/mo'} after · cancel anytime`
+    : selected.fine;
 
   // Seed the email field + trigger the slide-in when the sheet opens. The
   // `setEntered(false)` lives in the cleanup (not the effect body) so it runs
@@ -54,8 +80,6 @@ export function PaywallSheet({ open, onClose, showToast }) {
   }, [open, premium?.email]);
 
   if (!open) return null;
-
-  const selected = PLANS[plan] || PLANS.annual;
 
   const handleStart = async () => {
     if (loading) return;
@@ -88,12 +112,16 @@ export function PaywallSheet({ open, onClose, showToast }) {
     }
   };
 
+  // Trial CTA opens secure checkout to manage the subscription; otherwise it
+  // starts the trial. Both flows are preserved from the original wiring.
+  const handlePrimary = isTrial ? handleUnlock : handleStart;
+
   return (
     <div
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 100,
-        background: 'rgba(0,0,0,.55)',
+        background: 'rgba(4,9,8,.64)',
         backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)',
         display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
       }}
@@ -101,7 +129,7 @@ export function PaywallSheet({ open, onClose, showToast }) {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: '100%', maxWidth: 430, maxHeight: '94%',
+          width: '100%', maxWidth: 430, maxHeight: '96%',
           display: 'flex', flexDirection: 'column',
           borderRadius: '28px 28px 0 0',
           background: 'var(--sheet-fill, var(--glass-fill))',
@@ -119,7 +147,7 @@ export function PaywallSheet({ open, onClose, showToast }) {
           <div style={{ width: 40, height: 4, borderRadius: 999, background: 'var(--divider-strong)' }} />
         </div>
 
-        {/* Close chevron */}
+        {/* Close button */}
         <div style={{ flex: 'none', display: 'flex', justifyContent: 'flex-end', padding: '4px 16px 0' }}>
           <button
             onClick={onClose}
@@ -145,14 +173,23 @@ export function PaywallSheet({ open, onClose, showToast }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 18px 44px -16px rgba(67,198,172,.6)', color: '#04231C',
             }}>
-              <TrendingUp size={30} strokeWidth={1.9} />
+              <Sparkles size={30} strokeWidth={1.9} />
             </div>
             <div style={{
               marginTop: 16, fontFamily: 'var(--font-display)', fontWeight: 800,
               fontSize: 26, letterSpacing: '-.02em', lineHeight: 1.15, color: 'var(--ink)',
             }}>
-              unlock everything plato plus can do
+              unlock everything Plato Plus can do
             </div>
+            {isTrial && (
+              <div style={{
+                marginTop: 8, padding: '6px 13px', borderRadius: 999,
+                background: 'rgba(67,198,172,.14)', color: 'var(--primary)',
+                font: '600 13px var(--font-ui)', fontVariantNumeric: 'tabular-nums',
+              }}>
+                you're on a free trial · {hoursLeft}h left
+              </div>
+            )}
           </div>
 
           {/* Benefit rows */}
@@ -188,7 +225,7 @@ export function PaywallSheet({ open, onClose, showToast }) {
             </button>
           </div>
 
-          {/* Email input */}
+          {/* Email input (screen-specific: needed to seed startTrial/activatePremium) */}
           <input
             type="email"
             value={email}
@@ -205,38 +242,52 @@ export function PaywallSheet({ open, onClose, showToast }) {
 
           {/* Primary CTA */}
           <button
-            onClick={handleStart}
+            onClick={handlePrimary}
             disabled={loading}
             style={{
-              marginTop: 12, width: '100%', height: 54, border: 'none',
-              borderRadius: 'var(--r-control)',
+              marginTop: 16, width: '100%', height: 54, border: 'none',
+              borderRadius: 16,
               background: 'linear-gradient(135deg,#43C6AC,#0F9482)', color: '#04231C',
               font: '700 16px var(--font-ui)', cursor: loading ? 'default' : 'pointer',
               boxShadow: '0 14px 34px -16px rgba(67,198,172,.7)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
-              opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? 'starting…' : 'start 48-hour free trial'}
+            {loading ? (
+              <>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: 18, height: 18, borderRadius: 999,
+                    border: '2.5px solid rgba(4,35,28,.35)', borderTopColor: '#04231C',
+                    animation: 'pwspin .8s linear infinite',
+                  }}
+                />
+                starting…
+              </>
+            ) : ctaLabel}
           </button>
 
           {/* Fine print */}
           <div style={{ marginTop: 11, textAlign: 'center', font: '500 11px var(--font-ui)', color: 'var(--muted)', lineHeight: 1.5 }}>
-            {selected.fine}
+            {fineprint}
           </div>
 
-          {/* Already upgraded */}
-          <div style={{ marginTop: 12, display: 'flex', justifyContent: 'center' }}>
+          {/* Footer links — "restore purchase" reuses the activatePremium unlock flow */}
+          <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center', gap: 16 }}>
+            <button onClick={handleUnlock} disabled={loading} style={linkStyle}>restore purchase</button>
             <button
-              onClick={handleUnlock}
-              disabled={loading}
-              style={{ background: 'none', border: 'none', color: 'var(--sage)', font: '600 12px var(--font-ui)', cursor: loading ? 'default' : 'pointer' }}
+              onClick={() => window.open('https://plato.app/terms', '_blank', 'noopener,noreferrer')}
+              style={linkStyle}
             >
-              already upgraded? unlock
+              terms
             </button>
           </div>
         </div>
       </div>
+
+      {/* Spinner keyframes (matches design's pwspin) */}
+      <style>{'@keyframes pwspin { to { transform: rotate(360deg); } }'}</style>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import {
-  Search, Heart, ChevronLeft, Clock, Users, Plus, Minus, Utensils,
+  Search, Heart, ChevronLeft, Clock, Users, Plus, Minus,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
@@ -12,6 +12,16 @@ const cardStyle = {
 };
 const microLabel = { font: '600 10px/1.2 var(--font-ui)', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--sage)' };
 const TINTS = ['#E1A0AB', '#43C6AC', '#E7B67C', '#5FD4C4', '#AEA6EA'];
+
+// Bowl mark used on recipe thumbnails / hero (matches the design source).
+function BowlIcon({ size = 26, stroke = 'rgba(255,255,255,.85)', strokeWidth = 1.5 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 11h16a8 8 0 0 1-16 0z" />
+      <path d="M12 4v3M9 6v1M15 6v1" />
+    </svg>
+  );
+}
 
 // Small curated fallback list — only surfaced when the user hasn't saved anything of their own.
 const CURATED = [
@@ -187,50 +197,15 @@ export function Recipes({ onFab }) {
 
   return (
     <>
-      <div style={{ height: 12 }} />
-
-      {/* Top bar: title + search */}
-      <div style={{ flex: 'none', padding: '6px 20px 12px', position: 'relative', zIndex: 2 }}>
-        {active ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button onClick={() => setOpenIndex(null)} aria-label="Back to recipe book" style={{
-              width: 38, height: 38, flex: 'none', borderRadius: 999, border: '1px solid var(--glass-border)',
-              background: 'var(--glass-fill)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-              color: 'var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-            }}>
-              <ChevronLeft size={20} />
-            </button>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 22, letterSpacing: '-.02em', color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              recipe
-            </div>
-          </div>
-        ) : (
-          <>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 26, letterSpacing: '-.02em', color: 'var(--ink)' }}>recipes</div>
-            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10, height: 46, padding: '0 14px', borderRadius: 'var(--r-control)', background: 'var(--surface-2)', border: '1px solid var(--glass-border)' }}>
-              <span style={{ color: 'var(--sage)', display: 'inline-flex', flex: 'none' }}><Search size={18} /></span>
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="search recipes"
-                style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: 'var(--ink)', font: '500 14px var(--font-ui)' }}
-              />
-              {query && (
-                <button onClick={() => setQuery('')} aria-label="Clear search" style={{ flex: 'none', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', font: '500 12px var(--font-ui)' }}>clear</button>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Scroll region */}
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 18px var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
+      {/* Scroll region — the viewer runs full-bleed to the top (hero image), the book gets its own header inside. */}
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', position: 'relative', zIndex: 1 }}>
         {active
           ? <Viewer
               recipe={active}
               servings={servings}
               setServings={setServings}
               saved={isSaved(active)}
+              onBack={() => setOpenIndex(null)}
               onToggleSave={() => onSave(active)}
               onLog={() => onLog(active)}
               onAddToPlan={() => onAddToPlan(active)}
@@ -238,11 +213,10 @@ export function Recipes({ onFab }) {
           : <Book
               recipes={filtered}
               query={query}
+              setQuery={setQuery}
               hasSaved={hasSaved}
               savedCount={userBook.length}
-              isSaved={isSaved}
               onOpen={openViewer}
-              onSave={onSave}
             />}
       </div>
 
@@ -260,79 +234,76 @@ export function Recipes({ onFab }) {
 
 /* ---------- Book (grid) ---------- */
 
-function Book({ recipes, query, hasSaved, savedCount, isSaved, onOpen, onSave }) {
-  if (!recipes.length) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '60px 24px', gap: 6, minHeight: 420 }}>
-        <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%, rgba(225,160,171,.30), rgba(15,148,130,.10) 60%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Heart size={40} color="var(--macro-fat)" strokeWidth={1.6} />
-        </div>
-        <div style={{ marginTop: 14, fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 21, letterSpacing: '-.01em', color: 'var(--ink)' }}>
-          {query ? 'no matches' : 'no saved recipes'}
-        </div>
-        <div style={{ font: '400 14px var(--font-ui)', color: 'var(--sage)', maxWidth: 250, lineHeight: 1.5 }}>
-          {query ? 'try a different search.' : 'save recipes and they\'ll show up in your book here.'}
-        </div>
-      </div>
-    );
-  }
-
+function Book({ recipes, query, setQuery, hasSaved, savedCount, onOpen }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 19, letterSpacing: '-.01em', color: 'var(--ink)' }}>
-          {hasSaved ? 'recipe book' : 'discover'}
+    <div style={{ padding: '8px 20px var(--nav-safe-pad)' }}>
+      {/* Header: title + saved count (matches design) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 24, letterSpacing: '-.02em', color: 'var(--ink)' }}>
+          recipe book
         </div>
         <div style={{ font: '500 12px var(--font-ui)', color: 'var(--sage)' }}>
           {hasSaved ? `${savedCount} saved` : 'curated picks'}
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        {recipes.map((r, i) => {
-          const saved = isSaved(r);
-          const thumb = `linear-gradient(150deg,${TINTS[i % TINTS.length]},var(--brand-forest))`;
-          const meta = `${Math.round(r.calories)} kcal${r.time ? ` · ${r.time} min` : ''}`;
-          return (
-            <button
-              key={r.title + i}
-              onClick={() => onOpen(r)}
-              style={{ textAlign: 'left', ...cardStyle, borderRadius: 'var(--r-tile)', overflow: 'hidden', cursor: 'pointer', padding: 0 }}
-            >
-              <div style={{ height: 88, position: 'relative', background: thumb, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Utensils size={26} color="rgba(255,255,255,.85)" strokeWidth={1.5} />
-                <span
-                  role="button"
-                  tabIndex={0}
-                  aria-label={saved ? 'Saved' : 'Save recipe'}
-                  onClick={(e) => { e.stopPropagation(); onSave(r); }}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onSave(r); } }}
-                  style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 999, background: 'rgba(7,13,12,.4)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: saved ? 'var(--macro-fat)' : '#EAF1EF' }}
-                >
-                  <Heart size={15} fill={saved ? 'var(--macro-fat)' : 'none'} strokeWidth={1.9} />
-                </span>
-              </div>
-              <div style={{ padding: '11px 12px 13px' }}>
-                <div style={{ font: '600 14px var(--font-ui)', color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.title}</div>
-                <div style={{ marginTop: 5, font: '500 11px var(--font-ui)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>{meta}</div>
-                <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ font: '600 11px var(--font-ui)', color: 'var(--macro-protein)', fontVariantNumeric: 'tabular-nums' }}>{Math.round(r.protein)}p</span>
-                  <span style={{ font: '500 11px var(--font-ui)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>{Math.round(r.carbs)}c {Math.round(r.fat)}f</span>
-                </div>
-              </div>
-            </button>
-          );
-        })}
+      {/* Search (real query wiring, styled to the surface) */}
+      <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10, height: 44, padding: '0 14px', borderRadius: 'var(--r-control)', background: 'var(--surface-2)', border: '1px solid var(--glass-border)' }}>
+        <span style={{ color: 'var(--sage)', display: 'inline-flex', flex: 'none' }}><Search size={18} /></span>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="search recipes"
+          style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: 'var(--ink)', font: '500 14px var(--font-ui)' }}
+        />
+        {query && (
+          <button onClick={() => setQuery('')} aria-label="Clear search" style={{ flex: 'none', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', font: '500 12px var(--font-ui)' }}>clear</button>
+        )}
       </div>
+
+      {recipes.length === 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '48px 24px', gap: 6, minHeight: 360 }}>
+          <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%, rgba(225,160,171,.30), rgba(15,148,130,.10) 60%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Heart size={40} color="var(--macro-fat)" strokeWidth={1.6} />
+          </div>
+          <div style={{ marginTop: 14, fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 21, letterSpacing: '-.01em', color: 'var(--ink)' }}>
+            {query ? 'no matches' : 'no saved recipes'}
+          </div>
+          <div style={{ font: '400 14px var(--font-ui)', color: 'var(--sage)', maxWidth: 250, lineHeight: 1.5 }}>
+            {query ? 'try a different search.' : 'save recipes and they\'ll show up in your book here.'}
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {recipes.map((r, i) => {
+            const thumb = `linear-gradient(150deg,${TINTS[i % TINTS.length]},var(--brand-forest))`;
+            const meta = `${Math.round(r.calories)} kcal${r.time ? ` · ${r.time} min` : ''}`;
+            return (
+              <button
+                key={r.title + i}
+                onClick={() => onOpen(r)}
+                style={{ textAlign: 'left', ...cardStyle, borderRadius: 20, overflow: 'hidden', cursor: 'pointer', padding: 0 }}
+              >
+                <div style={{ height: 88, background: thumb, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <BowlIcon size={26} />
+                </div>
+                <div style={{ padding: '11px 12px 13px' }}>
+                  <div style={{ font: '600 14px var(--font-ui)', color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.title}</div>
+                  <div style={{ marginTop: 5, font: '500 11px var(--font-ui)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>{meta}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
 
 /* ---------- Viewer (sheet) ---------- */
 
-function Viewer({ recipe, servings, setServings, saved, onToggleSave, onLog, onAddToPlan }) {
+function Viewer({ recipe, servings, setServings, saved, onBack, onToggleSave, onLog, onAddToPlan }) {
   const scale = recipe.servings > 0 ? servings / recipe.servings : 1;
-  const thumb = `linear-gradient(150deg,${TINTS[0]},var(--brand-forest))`;
 
   const macros = [
     { key: 'kcal', val: Math.round(recipe.calories), color: 'var(--macro-cal)' },
@@ -345,21 +316,28 @@ function Viewer({ recipe, servings, setServings, saved, onToggleSave, onLog, onA
   const steps = recipe.steps;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingBottom: 8 }}>
-      {/* Hero */}
-      <div style={{ position: 'relative', height: 172, borderRadius: 'var(--r-card)', overflow: 'hidden', background: thumb, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Utensils size={48} color="rgba(255,255,255,.8)" strokeWidth={1.3} />
+    <div style={{ paddingBottom: 'var(--nav-safe-pad)' }}>
+      {/* Full-bleed hero with overlaid back + favorite controls */}
+      <div style={{ height: 190, position: 'relative', background: 'linear-gradient(150deg,#E1A0AB,#0C3A32)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <BowlIcon size={48} stroke="rgba(255,255,255,.8)" strokeWidth={1.3} />
+        <button
+          onClick={onBack}
+          aria-label="Back to recipe book"
+          style={{ position: 'absolute', top: 12, left: 16, width: 36, height: 36, borderRadius: 999, border: 'none', background: 'rgba(7,13,12,.5)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', color: '#EAF1EF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+        >
+          <ChevronLeft size={18} />
+        </button>
         <button
           onClick={onToggleSave}
           aria-label={saved ? 'Saved' : 'Save recipe'}
-          style={{ position: 'absolute', top: 12, right: 12, width: 38, height: 38, borderRadius: 999, border: 'none', background: 'rgba(7,13,12,.5)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', color: saved ? 'var(--macro-fat)' : '#EAF1EF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+          style={{ position: 'absolute', top: 12, right: 16, width: 36, height: 36, borderRadius: 999, border: 'none', background: 'rgba(7,13,12,.5)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', color: saved ? '#E1A0AB' : '#EAF1EF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
         >
-          <Heart size={17} fill={saved ? 'var(--macro-fat)' : 'none'} strokeWidth={1.9} />
+          <Heart size={17} fill={saved ? '#E1A0AB' : 'none'} strokeWidth={1.9} />
         </button>
       </div>
 
-      {/* Title + meta */}
-      <div>
+      <div style={{ padding: '16px 20px 0' }}>
+        {/* Title + meta */}
         <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 24, letterSpacing: '-.02em', color: 'var(--ink)' }}>{recipe.title}</div>
         <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 14, font: '500 12px var(--font-ui)', color: 'var(--sage)', flexWrap: 'wrap' }}>
           {recipe.time > 0 && (
@@ -368,84 +346,85 @@ function Viewer({ recipe, servings, setServings, saved, onToggleSave, onLog, onA
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontVariantNumeric: 'tabular-nums' }}>
             <Users size={14} />{servings} {servings === 1 ? 'serving' : 'servings'}
           </span>
+          <span style={{ color: 'var(--muted)' }}>url import</span>
         </div>
-      </div>
 
-      {/* Per-serving macros */}
-      <div style={{ background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-control)', padding: 14, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, textAlign: 'center' }}>
-        {macros.map(m => (
-          <div key={m.key}>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19, letterSpacing: '-.02em', color: m.color, fontVariantNumeric: 'tabular-nums' }}>{m.val}</div>
-            <div style={{ font: '600 9px var(--font-ui)', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--sage)' }}>{m.key}</div>
-          </div>
-        ))}
-      </div>
-      <div style={{ marginTop: -8, textAlign: 'center', font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>per serving</div>
-
-      {/* Ingredients + servings scaler */}
-      {ingredients.length > 0 && (
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={microLabel}>ingredients</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <button
-                onClick={() => setServings(s => Math.max(1, s - 1))}
-                aria-label="Fewer servings"
-                style={scalerBtn}
-              ><Minus size={15} /></button>
-              <span style={{ font: '600 13px var(--font-ui)', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', minWidth: 56, textAlign: 'center' }}>
-                {servings} {servings === 1 ? 'serving' : 'servings'}
-              </span>
-              <button
-                onClick={() => setServings(s => Math.min(12, s + 1))}
-                aria-label="More servings"
-                style={scalerBtn}
-              ><Plus size={15} /></button>
+        {/* Per-serving macros */}
+        <div style={{ marginTop: 16, background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-control)', padding: 14, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, textAlign: 'center' }}>
+          {macros.map(m => (
+            <div key={m.key}>
+              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19, letterSpacing: '-.02em', color: m.color, fontVariantNumeric: 'tabular-nums' }}>{m.val}</div>
+              <div style={{ font: '600 9px var(--font-ui)', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--sage)' }}>{m.key}</div>
             </div>
-          </div>
-          <div style={{ marginTop: 10, ...cardStyle, borderRadius: 'var(--r-control)', overflow: 'hidden' }}>
-            {ingredients.map((ig, i) => {
-              const label = typeof ig === 'string' ? ig : ig.name;
-              const amt = typeof ig === 'string' || ig.base == null
-                ? null
-                : `${fmtAmt(ig.base, scale)} ${ig.unit || ''}`.trim();
-              return (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', borderBottom: i < ingredients.length - 1 ? '1px solid var(--hairline)' : 'none' }}>
-                  <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--brand-jade)', flex: 'none' }} />
-                  <span style={{ flex: 1, font: '500 14px var(--font-ui)', color: 'var(--ink)' }}>{label}</span>
-                  {amt && <span style={{ font: '600 13px var(--font-ui)', color: 'var(--sage)', fontVariantNumeric: 'tabular-nums' }}>{amt}</span>}
-                </div>
-              );
-            })}
-          </div>
+          ))}
         </div>
-      )}
+        <div style={{ marginTop: 6, textAlign: 'center', font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>per serving</div>
 
-      {/* Method */}
-      {steps.length > 0 && (
-        <div>
-          <div style={microLabel}>method</div>
-          <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {steps.map((sp, i) => (
-              <div key={i} style={{ display: 'flex', gap: 12 }}>
-                <span style={{ width: 24, height: 24, flex: 'none', borderRadius: 999, background: 'rgba(67,198,172,.14)', color: 'var(--brand-jade)', display: 'flex', alignItems: 'center', justifyContent: 'center', font: '700 12px var(--font-display)' }}>{i + 1}</span>
-                <span style={{ flex: 1, font: '500 14px var(--font-ui)', color: 'var(--ink)', lineHeight: 1.5 }}>{typeof sp === 'string' ? sp : sp.text}</span>
+        {/* Ingredients + servings scaler */}
+        {ingredients.length > 0 && (
+          <>
+            <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={microLabel}>ingredients</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <button
+                  onClick={() => setServings(s => Math.max(1, s - 1))}
+                  aria-label="Fewer servings"
+                  style={scalerBtn}
+                ><Minus size={15} /></button>
+                <span style={{ font: '600 13px var(--font-ui)', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', minWidth: 56, textAlign: 'center' }}>
+                  {servings} {servings === 1 ? 'serving' : 'servings'}
+                </span>
+                <button
+                  onClick={() => setServings(s => Math.min(8, s + 1))}
+                  aria-label="More servings"
+                  style={scalerBtn}
+                ><Plus size={15} /></button>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </div>
+            <div style={{ marginTop: 10, background: 'var(--glass-fill)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-control)', overflow: 'hidden' }}>
+              {ingredients.map((ig, i) => {
+                const label = typeof ig === 'string' ? ig : ig.name;
+                const amt = typeof ig === 'string' || ig.base == null
+                  ? null
+                  : `${fmtAmt(ig.base, scale)} ${ig.unit || ''}`.trim();
+                return (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', borderBottom: i < ingredients.length - 1 ? '1px solid var(--hairline)' : 'none' }}>
+                    <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--brand-jade)', flex: 'none' }} />
+                    <span style={{ flex: 1, font: '500 14px var(--font-ui)', color: 'var(--ink)' }}>{label}</span>
+                    {amt && <span style={{ font: '600 13px var(--font-ui)', color: 'var(--sage)', fontVariantNumeric: 'tabular-nums' }}>{amt}</span>}
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
 
-      {/* Actions */}
-      <div style={{ marginTop: 4, display: 'flex', gap: 10 }}>
-        <button
-          onClick={onLog}
-          style={{ flex: 1, height: 52, border: 'none', borderRadius: 'var(--r-control)', background: 'linear-gradient(135deg,#43C6AC,#0F9482)', color: '#04231C', font: '700 15px var(--font-ui)', cursor: 'pointer', boxShadow: '0 14px 34px -16px rgba(67,198,172,.7)' }}
-        >log now</button>
-        <button
-          onClick={onAddToPlan}
-          style={{ flex: 1, height: 52, borderRadius: 'var(--r-control)', border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--ink)', font: '600 15px var(--font-ui)', cursor: 'pointer' }}
-        >add to plan</button>
+        {/* Method */}
+        {steps.length > 0 && (
+          <>
+            <div style={{ marginTop: 16, ...microLabel }}>method</div>
+            <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {steps.map((sp, i) => (
+                <div key={i} style={{ display: 'flex', gap: 12 }}>
+                  <span style={{ width: 24, height: 24, flex: 'none', borderRadius: 999, background: 'rgba(67,198,172,.14)', color: 'var(--brand-jade)', display: 'flex', alignItems: 'center', justifyContent: 'center', font: '700 12px var(--font-display)' }}>{i + 1}</span>
+                  <span style={{ flex: 1, font: '500 14px var(--font-ui)', color: 'var(--ink)', lineHeight: 1.5 }}>{typeof sp === 'string' ? sp : sp.text}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Actions */}
+        <div style={{ marginTop: 20, display: 'flex', gap: 10 }}>
+          <button
+            onClick={onLog}
+            style={{ flex: 1, height: 52, border: 'none', borderRadius: 15, background: 'linear-gradient(135deg,#43C6AC,#0F9482)', color: '#04231C', font: '700 15px var(--font-ui)', cursor: 'pointer', boxShadow: '0 14px 34px -16px rgba(67,198,172,.7)' }}
+          >log this</button>
+          <button
+            onClick={onAddToPlan}
+            style={{ flex: 1, height: 52, borderRadius: 15, border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--ink)', font: '600 15px var(--font-ui)', cursor: 'pointer' }}
+          >add to plan</button>
+        </div>
       </div>
     </div>
   );

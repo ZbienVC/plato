@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import {
   Settings, ChevronRight, User, Flame, Scale, TrendingUp,
   Award, CreditCard, HelpCircle, LogOut,
@@ -64,7 +64,7 @@ export function You({ onFab }) {
     userProfile, premium, isPremiumActive,
     streak, weightEntries, planConfig,
     isLoggedIn, setAuthModalOpen, logout,
-    setActiveTab, openPremiumModal,
+    setActiveTab,
   } = useApp();
   const { targets, current, progress } = useMacros();
 
@@ -98,13 +98,39 @@ export function You({ onFab }) {
   const goal = goalLabel(planConfig?.goal || userProfile?.goal);
   const billing = trialLabel(premium, premiumActive);
 
+  // Insights promo — real protein adherence + a mini bar chart from macro progress.
+  const proteinPct = current?.calories ? Math.round(Math.min(1, progress?.protein || 0) * 100) : null;
+  const promoBars = useMemo(() => {
+    const p = progress || {};
+    const vals = [p.calories, p.carbs, p.fat, p.protein, Math.min(1, p.protein || 0)]
+      .map((v) => Math.max(0, Math.min(1, Number(v) || 0)));
+    return vals.map((v) => 8 + Math.round(v * 22)); // 8..30px
+  }, [progress]);
+
   const openSettings = () => setActiveTab('settings');
   const openWeight = () => setActiveTab('weight');
   const openInsights = () => setActiveTab('insights');
   // Achievements has no dedicated tab yet — fall back to settings for now.
   const openAchievements = () => setActiveTab('settings');
-  // Billing has no dedicated tab yet — open the premium modal, else settings fallback.
-  const openBilling = () => (openPremiumModal ? openPremiumModal() : setActiveTab('settings'));
+  // A dedicated Billing screen now exists.
+  const openBilling = () => setActiveTab('billing');
+  const openHelp = () => setActiveTab('settings');
+  const openAccount = () => setActiveTab('settings');
+
+  // Offline banner — driven by the real network state, not mock data.
+  const [offline, setOffline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine === false : false));
+  useEffect(() => {
+    const on = () => setOffline(false);
+    const off = () => setOffline(true);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => {
+      window.removeEventListener('online', on);
+      window.removeEventListener('offline', off);
+    };
+  }, []);
+
+  const accountSub = isLoggedIn ? (premium?.email || 'signed in') : 'not signed in';
 
   // Weight sparkline points from real entries (last up to 12)
   const spark = useMemo(() => {
@@ -126,8 +152,15 @@ export function You({ onFab }) {
 
   return (
     <>
-      {/* status bar spacer */}
-      <div style={{ height: 12 }} />
+      {/* status bar */}
+      <div style={{ height: 44, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 26px 0', position: 'relative', zIndex: 2 }}>
+        <span style={{ font: '600 14px var(--font-ui)', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>9:41</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--ink)' }}>
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor" /><rect x="5" y="5" width="3" height="7" rx="1" fill="currentColor" /><rect x="10" y="2" width="3" height="10" rx="1" fill="currentColor" /><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor" opacity=".4" /></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><path d="M1 4a11 11 0 0 1 14 0" /><path d="M3.6 6.6a7 7 0 0 1 8.8 0" /><path d="M6.2 9.1a3 3 0 0 1 3.6 0" /></svg>
+          <svg width="25" height="14" viewBox="0 0 25 14" fill="none"><rect x="1" y="2" width="19" height="10" rx="2.6" stroke="currentColor" strokeWidth="1.3" opacity=".5" /><rect x="3" y="4" width="13" height="6" rx="1.2" fill="currentColor" /><rect x="21.5" y="5" width="2" height="4" rx="1" fill="currentColor" /></svg>
+        </span>
+      </div>
 
       {/* top bar: title + settings */}
       <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 22px 12px', position: 'relative', zIndex: 2 }}>
@@ -141,6 +174,14 @@ export function You({ onFab }) {
 
       {/* scroll region */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 18px var(--nav-safe-pad)', display: 'flex', flexDirection: 'column', gap: 14, position: 'relative', zIndex: 1 }}>
+
+        {/* OFFLINE BANNER */}
+        {offline && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '10px 13px', borderRadius: 14, background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderLeft: '3px solid var(--info)' }}>
+            <span style={{ width: 7, height: 7, borderRadius: 999, background: 'var(--info)', flex: 'none', boxShadow: '0 0 8px var(--info)' }} />
+            <span style={{ font: '500 12px var(--font-ui)', color: 'var(--sage)' }}>offline — showing your last saved profile</span>
+          </div>
+        )}
 
         {/* IDENTITY */}
         {isLoggedIn ? (
@@ -242,13 +283,33 @@ export function You({ onFab }) {
                 <circle cx={spark.last[0]} cy={spark.last[1]} r="4" fill="#43C6AC" />
               </svg>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                <span style={{ font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>trend</span>
+                <span style={{ font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>30 days ago</span>
                 <span style={{ font: '500 11px var(--font-ui)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>{(weightEntries || []).slice(-12).length} entries</span>
               </div>
             </>
           ) : (
             <div style={{ marginTop: 14, font: '500 13px var(--font-ui)', color: 'var(--sage)' }}>log a few weigh-ins to see your trend</div>
           )}
+        </button>
+
+        {/* INSIGHTS PROMO */}
+        <button
+          onClick={openInsights}
+          style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 13, ...cardStyle, borderRadius: 'var(--r-tile)', padding: '15px 16px', cursor: 'pointer' }}
+        >
+          <div style={{ flex: 1 }}>
+            <div style={microLabel}>your week in review</div>
+            <div style={{ marginTop: 5, font: '500 15px var(--font-ui)', color: 'var(--ink)' }}>
+              {proteinPct != null
+                ? `protein adherence ${proteinPct}% — keep the streak going.`
+                : 'log meals this week to unlock your review.'}
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 30, flex: 'none' }}>
+            {promoBars.map((h, i) => (
+              <div key={i} style={{ width: 5, height: h, borderRadius: 3, background: 'var(--macro-protein)' }} />
+            ))}
+          </div>
         </button>
 
         {/* PROGRESS group */}
@@ -301,6 +362,14 @@ export function You({ onFab }) {
                   font: '600 11px var(--font-ui)', fontVariantNumeric: 'tabular-nums',
                 }}>{billing}</span>
               }
+            />
+            <Row
+              icon={<User size={19} />}
+              iconBg="rgba(67,198,172,.14)"
+              iconColor="var(--brand-jade)"
+              label="account"
+              onClick={openAccount}
+              trailing={<span style={{ font: '500 12px var(--font-ui)', color: 'var(--muted)', maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{accountSub}</span>}
               last
             />
           </div>
@@ -322,7 +391,7 @@ export function You({ onFab }) {
               iconBg="rgba(95,212,196,.14)"
               iconColor="var(--info)"
               label="help & support"
-              onClick={openSettings}
+              onClick={openHelp}
               last
             />
           </div>

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ChevronLeft, Plus, TrendingUp, TrendingDown, LineChart, ArrowDown, ArrowUp, Minus } from 'lucide-react';
+import { ChevronLeft, Plus, TrendingUp, TrendingDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const cardStyle = {
@@ -8,6 +8,13 @@ const cardStyle = {
   boxShadow: 'inset 0 1px 0 rgba(255,255,255,.05),0 18px 34px -28px rgba(0,0,0,.9)',
 };
 const microLabel = { font: '600 10px/1.2 var(--font-ui)', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--sage)' };
+
+const RANGES = [
+  ['1M', 30],
+  ['3M', 92],
+  ['6M', 183],
+  ['1Y', 366],
+];
 
 // "2026-07-05" -> "jul 5"
 function shortDate(iso) {
@@ -35,6 +42,7 @@ export function Weight({ onFab }) {
   const { userProfile, weightEntries, logWeight, setActiveTab } = useApp();
   const [formOpen, setFormOpen] = useState(false);
   const [draft, setDraft] = useState('');
+  const [range, setRange] = useState('3M');
 
   // Chronologically sorted ascending by date (oldest -> newest)
   const sorted = useMemo(() => {
@@ -53,6 +61,28 @@ export function Weight({ onFab }) {
   const sinceDelta = first != null && current != null ? current - first : null;
   const losing = sinceDelta != null && sinceDelta < 0;
 
+  // ---- goal weight (derived from user's goal intent + start weight) ----
+  // No numeric goal field exists in the model, so derive a sensible target
+  // from the profile's goal ('lose'/'gain'/'maintain') anchored to the start weight.
+  const goalWeight = useMemo(() => {
+    const start = first != null ? first : current;
+    if (start == null) return null;
+    const intent = (userProfile?.goal || 'maintain').toLowerCase();
+    if (intent === 'lose' || intent === 'cut' || intent === 'weight_loss') return Math.round(start * 0.9);
+    if (intent === 'gain' || intent === 'bulk' || intent === 'muscle' || intent === 'weight_gain') return Math.round(start * 1.08);
+    return Math.round(start); // maintain
+  }, [first, current, userProfile]);
+
+  const toGoal = goalWeight != null && current != null ? current - goalWeight : null; // + = above goal
+  // goal progress: how far from start toward goal (clamped 0..100)
+  const goalProgress = useMemo(() => {
+    if (goalWeight == null || first == null || current == null) return null;
+    const span = first - goalWeight;
+    if (span === 0) return 100;
+    const done = ((first - current) / span) * 100;
+    return Math.max(0, Math.min(100, Math.round(done)));
+  }, [goalWeight, first, current]);
+
   const submit = () => {
     const n = Number(draft);
     if (!Number.isFinite(n) || n <= 0) return;
@@ -68,30 +98,48 @@ export function Weight({ onFab }) {
     setFormOpen(true);
   };
 
-  // ---- trend chart geometry (built from sorted entries) ----
+  // ---- trend chart geometry (built from sorted entries, filtered by range) ----
+  const rangeDays = (RANGES.find(r => r[0] === range) || RANGES[1])[1];
+  const windowed = useMemo(() => {
+    if (sorted.length === 0) return [];
+    const newest = new Date(sorted[sorted.length - 1].date + 'T00:00:00').getTime();
+    const cutoff = newest - rangeDays * 24 * 60 * 60 * 1000;
+    const w = sorted.filter(e => new Date(e.date + 'T00:00:00').getTime() >= cutoff);
+    // keep at least the two most recent points so the line never collapses
+    return w.length >= 2 ? w : sorted.slice(-Math.min(sorted.length, 2));
+  }, [sorted, rangeDays]);
+
   const chart = useMemo(() => {
-    if (sorted.length === 0) return null;
+    if (windowed.length === 0) return null;
     const W = 300, H = 120, padTop = 12, padBottom = 20;
-    const vals = sorted.map(e => Number(e.weight));
+    const vals = windowed.map(e => Number(e.weight));
     let min = Math.min(...vals);
     let max = Math.max(...vals);
+    // include goal in the vertical range so the goal line is visible
+    if (goalWeight != null) { min = Math.min(min, goalWeight); max = Math.max(max, goalWeight); }
     if (min === max) { min -= 1; max += 1; } // flat line safeguard
-    const n = sorted.length;
+    const n = windowed.length;
     const x = (i) => n === 1 ? W : (i / (n - 1)) * W;
     const y = (v) => padTop + (1 - (v - min) / (max - min)) * (H - padTop - padBottom);
-    const pts = sorted.map((e, i) => [x(i), y(Number(e.weight))]);
+    const pts = windowed.map((e, i) => [x(i), y(Number(e.weight))]);
     const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
     const area = `${line} L${W},${H} L0,${H} Z`;
     const last = pts[pts.length - 1];
-    // faint horizontal grid lines
-    const grid = [0.25, 0.5, 0.75].map(f => padTop + f * (H - padTop - padBottom));
-    return { W, H, line, area, last, grid };
-  }, [sorted]);
+    const goalY = goalWeight != null ? y(goalWeight) : null;
+    return { W, H, line, area, last, goalY };
+  }, [windowed, goalWeight]);
 
   return (
     <>
-      {/* status bar spacer */}
-      <div style={{ height: 12 }} />
+      {/* status bar */}
+      <div style={{ height: 44, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 26px 0', position: 'relative', zIndex: 2 }}>
+        <span style={{ font: '600 14px var(--font-ui)', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>9:41</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--ink)' }}>
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor" /><rect x="5" y="5" width="3" height="7" rx="1" fill="currentColor" /><rect x="10" y="2" width="3" height="10" rx="1" fill="currentColor" /><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor" opacity=".4" /></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><path d="M1 4a11 11 0 0 1 14 0" /><path d="M3.6 6.6a7 7 0 0 1 8.8 0" /><path d="M6.2 9.1a3 3 0 0 1 3.6 0" /></svg>
+          <svg width="25" height="14" viewBox="0 0 25 14" fill="none"><rect x="1" y="2" width="19" height="10" rx="2.6" stroke="currentColor" strokeWidth="1.3" opacity=".5" /><rect x="3" y="4" width="13" height="6" rx="1.2" fill="currentColor" /><rect x="21.5" y="5" width="2" height="4" rx="1" fill="currentColor" /></svg>
+        </span>
+      </div>
 
       {/* top bar */}
       <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 20px 12px', position: 'relative', zIndex: 2 }}>
@@ -111,7 +159,7 @@ export function Weight({ onFab }) {
       </div>
 
       {/* scroll region */}
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 18px var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 20px var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
 
         {/* Inline add-entry form */}
         {formOpen && (
@@ -147,7 +195,7 @@ export function Weight({ onFab }) {
         {!hasEntries ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '60px 24px', gap: 6, minHeight: 460 }}>
             <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%, rgba(67,198,172,.3), rgba(15,148,130,.1) 60%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-jade)' }}>
-              <LineChart size={42} strokeWidth={1.6} />
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 17l6-6 4 4 7-7" /><path d="M17 8h4v4" /></svg>
             </div>
             <div style={{ marginTop: 14, fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 21, letterSpacing: '-.01em', color: 'var(--ink)' }}>start your weight journey</div>
             <div style={{ font: '400 14px var(--font-ui)', color: 'var(--sage)', maxWidth: 250, lineHeight: 1.5 }}>log your first weigh-in and watch your trend take shape.</div>
@@ -159,7 +207,7 @@ export function Weight({ onFab }) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-            {/* Hero current weight + delta since first entry */}
+            {/* Hero current weight + delta since first entry + distance to goal */}
             <div style={{ ...cardStyle, borderRadius: 'var(--r-card)', padding: 18 }}>
               <div style={{ font: '600 10px var(--font-ui)', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--sage)' }}>current weight</div>
               <div style={{ marginTop: 6, display: 'flex', alignItems: 'baseline', gap: 8 }}>
@@ -172,9 +220,35 @@ export function Weight({ onFab }) {
                   </span>
                 )}
               </div>
+              {goalWeight != null && toGoal != null && (
+                <div style={{ marginTop: 4, font: '500 13px var(--font-ui)', color: 'var(--sage)', fontVariantNumeric: 'tabular-nums' }}>
+                  {Math.abs(toGoal) < 0.5
+                    ? `at your goal of ${fmtWeight(goalWeight)} lb`
+                    : `${fmtWeight(Math.abs(toGoal))} lb ${toGoal > 0 ? 'to' : 'past'} your goal of ${fmtWeight(goalWeight)} lb`}
+                </div>
+              )}
             </div>
 
-            {/* Trend chart: inline SVG polyline from weightEntries */}
+            {/* Range selector */}
+            <div style={{ display: 'flex', gap: 6, background: 'var(--surface-2)', borderRadius: 12, padding: 4 }}>
+              {RANGES.map(([label]) => {
+                const active = range === label;
+                return (
+                  <button
+                    key={label}
+                    onClick={() => setRange(label)}
+                    style={{
+                      flex: 1, padding: '8px 0', borderRadius: 9, border: 'none', cursor: 'pointer',
+                      font: '600 12px var(--font-ui)', transition: 'all .16s var(--ease-out)',
+                      color: active ? 'var(--on-accent)' : 'var(--sage)',
+                      background: active ? 'var(--primary)' : 'transparent',
+                    }}
+                  >{label}</button>
+                );
+              })}
+            </div>
+
+            {/* Trend chart: inline SVG polyline from weightEntries + dashed goal line */}
             {chart && (
               <div style={{ ...cardStyle, borderRadius: 'var(--r-card)', padding: '18px 16px 14px' }}>
                 <svg viewBox={`0 0 ${chart.W} ${chart.H}`} preserveAspectRatio="none" style={{ width: '100%', height: 120, display: 'block', overflow: 'visible' }}>
@@ -184,10 +258,10 @@ export function Weight({ onFab }) {
                       <stop offset="1" stopColor="#43C6AC" stopOpacity="0" />
                     </linearGradient>
                   </defs>
-                  {/* faint grid */}
-                  {chart.grid.map((gy, i) => (
-                    <line key={i} x1="0" y1={gy} x2={chart.W} y2={gy} stroke="var(--hairline)" strokeWidth="1" />
-                  ))}
+                  {/* dashed goal line */}
+                  {chart.goalY != null && (
+                    <line x1="0" y1={chart.goalY} x2={chart.W} y2={chart.goalY} stroke="var(--warning)" strokeWidth="1.4" strokeDasharray="4 4" opacity=".55" />
+                  )}
                   {/* area fill */}
                   <path d={chart.area} fill="url(#wtfill)" />
                   {/* jade line */}
@@ -196,8 +270,27 @@ export function Weight({ onFab }) {
                   <circle cx={chart.last[0]} cy={chart.last[1]} r="4" fill="#43C6AC" />
                 </svg>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-                  <span style={{ font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>{monthLabel(sorted[0].date)}</span>
-                  <span style={{ font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>{sorted.length === 1 ? 'today' : monthLabel(sorted[sorted.length - 1].date)}</span>
+                  <span style={{ font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>{monthLabel(windowed[0].date)}</span>
+                  {goalWeight != null && (
+                    <span style={{ font: '500 11px var(--font-ui)', color: 'var(--warning)', fontVariantNumeric: 'tabular-nums' }}>goal {fmtWeight(goalWeight)} lb</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Goal progress */}
+            {goalProgress != null && goalWeight != null && first != null && (
+              <div style={{ ...cardStyle, borderRadius: 'var(--r-tile)', padding: '15px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <span style={{ font: '600 13px var(--font-ui)', color: 'var(--ink)' }}>goal progress</span>
+                  <span style={{ font: '600 12px var(--font-ui)', color: 'var(--success)', fontVariantNumeric: 'tabular-nums' }}>{goalProgress}%</span>
+                </div>
+                <div style={{ marginTop: 10, height: 8, borderRadius: 999, background: 'var(--hairline)', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${goalProgress}%`, background: 'linear-gradient(90deg,#8CE0CE,#43C6AC)', borderRadius: 999 }} />
+                </div>
+                <div style={{ marginTop: 9, display: 'flex', justifyContent: 'space-between', font: '500 11px var(--font-ui)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>
+                  <span>start {fmtWeight(first)} lb</span>
+                  <span>goal {fmtWeight(goalWeight)} lb</span>
                 </div>
               </div>
             )}
@@ -211,15 +304,13 @@ export function Weight({ onFab }) {
                   const prev = idxAsc > 0 ? Number(sorted[idxAsc - 1].weight) : null;
                   const delta = prev != null ? Number(e.weight) - prev : null;
                   const down = delta != null && delta < 0;
-                  const up = delta != null && delta > 0;
-                  const color = delta == null ? 'var(--muted)' : down ? 'var(--success)' : up ? 'var(--warning)' : 'var(--muted)';
+                  const color = down ? 'var(--success)' : 'var(--muted)';
                   const isFirst = i === 0;
                   return (
                     <div key={e.date} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderBottom: i < arr.length - 1 ? '1px solid var(--hairline)' : 'none' }}>
                       <span style={{ flex: 1, font: '600 14px var(--font-ui)', color: 'var(--ink)' }}>{isFirst ? 'today' : shortDate(e.date)}</span>
                       <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{fmtWeight(e.weight)}</span>
-                      <span style={{ width: 56, display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', gap: 3, font: '600 12px var(--font-ui)', color, fontVariantNumeric: 'tabular-nums' }}>
-                        {delta == null ? <Minus size={12} /> : down ? <ArrowDown size={12} /> : up ? <ArrowUp size={12} /> : <Minus size={12} />}
+                      <span style={{ width: 56, textAlign: 'right', font: '600 12px var(--font-ui)', color, fontVariantNumeric: 'tabular-nums' }}>
                         {delta == null ? '' : fmtDelta(delta)}
                       </span>
                     </div>

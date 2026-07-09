@@ -197,7 +197,7 @@ function LockOverlay({ onUnlock }) {
       <div style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', padding: '5px 11px', borderRadius: 999, background: 'rgba(231,182,124,.14)', color: 'var(--warning)', font: '700 10px var(--font-ui)', letterSpacing: '.14em', textTransform: 'uppercase' }}>plato plus</div>
       <div style={{ marginTop: 12, fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 22, letterSpacing: '-.02em', color: 'var(--ink)' }}>restaurant mode</div>
       <div style={{ font: '400 14px var(--font-ui)', color: 'var(--sage)', maxWidth: 270, lineHeight: 1.55 }}>
-        log real menu macros from 14+ chains and find on-plan picks that fit your day.
+        log real menu macros from 14+ chains and find on-plan picks near you.
       </div>
       <button
         onClick={onUnlock}
@@ -324,7 +324,7 @@ function MenuView({ slug, filter, setFilter, items, fitsRemaining, onLog, onBack
         <div style={{ minWidth: 0 }}>
           <div style={{ font: '700 17px var(--font-ui)', color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
           <div style={{ font: '500 12px var(--font-ui)', color: 'var(--sage)' }}>
-            {cuisine}{fitCount > 0 ? ` · ${fitCount} fit your day` : ''}
+            {cuisine}{fitCount > 0 ? ` · ${fitCount} fit your remaining macros` : ''}
           </div>
         </div>
       </div>
@@ -354,40 +354,27 @@ function MenuView({ slug, filter, setFilter, items, fitsRemaining, onLog, onBack
 /* ---------- Shared item row ---------- */
 
 function ItemRow({ item, chainLabel, fits, onLog }) {
+  const macroLine = `${Math.round(item.calories || 0)} kcal · ${Math.round(item.protein || 0)}P ${Math.round(item.carbs || 0)}C ${Math.round(item.fat || 0)}F`;
   return (
     <div style={{ ...cardStyle, borderRadius: 'var(--r-tile)', padding: '13px 14px' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           {chainLabel && <div style={{ ...microLabel, marginBottom: 3 }}>{chainLabel}</div>}
           <div style={{ font: '600 15px var(--font-ui)', color: 'var(--ink)' }}>{item.name.toLowerCase()}</div>
-          <div style={{ marginTop: 4, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13, color: 'var(--brand-jade)', fontVariantNumeric: 'tabular-nums' }}>{Math.round(item.calories || 0)} kcal</span>
-            <MacroChip label="p" value={item.protein} color="var(--macro-protein)" />
-            <MacroChip label="c" value={item.carbs} color="var(--macro-carbs)" />
-            <MacroChip label="f" value={item.fat} color="var(--macro-fat)" />
-          </div>
+          <div style={{ marginTop: 3, font: '500 12px var(--font-ui)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>{macroLine}</div>
         </div>
         <button
           onClick={onLog}
-          style={{ flex: 'none', border: 'none', cursor: 'pointer', background: 'var(--primary)', color: 'var(--on-accent)', font: '600 13px var(--font-ui)', padding: '8px 14px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+          style={{ flex: 'none', border: 'none', cursor: 'pointer', background: 'var(--primary)', color: 'var(--on-accent)', font: '600 13px var(--font-ui)', padding: '8px 14px', borderRadius: 999 }}
         >
-          <Plus size={14} strokeWidth={2.4} />log
+          log
         </button>
       </div>
       {fits && (
         <div style={{ marginTop: 9, display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 9px', borderRadius: 999, background: 'rgba(67,198,172,.12)', color: 'var(--success)', font: '600 11px var(--font-ui)' }}>
-          <Check size={12} strokeWidth={2.6} />fits your day
+          <Check size={12} strokeWidth={2.6} />fits your remaining macros
         </div>
       )}
     </div>
-  );
-}
-
-function MacroChip({ label, value, color }) {
-  return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 999, background: 'var(--surface-2)', border: '1px solid var(--hairline)', font: '600 11px var(--font-ui)', color: 'var(--sage)', fontVariantNumeric: 'tabular-nums' }}>
-      <span style={{ width: 6, height: 6, borderRadius: 999, background: color, flex: 'none' }} />
-      {Math.round(value || 0)}{label}
-    </span>
   );
 }

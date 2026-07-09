@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { VerdantShell } from './screens/_shell/VerdantShell';
+import { ErrorBoundary } from './screens/_shell/ErrorBoundary';
 import { Home } from './screens/Home';
 import { Explore } from './screens/Explore';
 import { Plans } from './screens/Plans';
@@ -12,6 +13,7 @@ import { Grocery } from './screens/Grocery';
 import { Insights } from './screens/Insights';
 import { Recipes } from './screens/Recipes';
 import { Restaurant } from './screens/Restaurant';
+import { Billing } from './screens/Billing';
 import { Onboarding } from './screens/Onboarding';
 import { Splash } from './screens/Splash';
 import { VoiceLogOverlay } from './components/organisms/VoiceLogOverlay';
@@ -70,6 +72,7 @@ function AppContent() {
       case 'insights': return <Insights onFab={openLog} />;
       case 'recipes': return <Recipes onFab={openLog} />;
       case 'restaurant': return <Restaurant onFab={openLog} />;
+      case 'billing': return <Billing onFab={openLog} />;
       case 'settings': return <Settings onFab={openLog} />;
       default: return <Home onFab={openLog} />;
     }
@@ -98,8 +101,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </ErrorBoundary>
   );
 }

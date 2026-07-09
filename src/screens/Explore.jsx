@@ -1,16 +1,21 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Search, Plus, Check, Flame, Clock, MapPin, Leaf, ChefHat, Lock,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
 
+const shimmerTile = {
+  background: 'linear-gradient(100deg,var(--surface-2) 30%,var(--surface-3) 50%,var(--surface-2) 70%)',
+  backgroundSize: '200% 100%',
+  animation: 'vd-shimmer 1.4s linear infinite',
+};
+
 const cardStyle = {
   background: 'var(--glass-fill)', border: '1px solid var(--glass-border)',
   backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
   boxShadow: 'inset 0 1px 0 rgba(255,255,255,.05),0 18px 34px -28px rgba(0,0,0,.9)',
 };
-const microLabel = { font: '600 10px/1.2 var(--font-ui)', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--sage)' };
 const sectionTitle = { fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: '-.01em', color: 'var(--ink)' };
 
 const TINTS = ['#5FD4C4', '#43C6AC', '#E7B67C', '#AEA6EA', '#0F9482', '#E1A0AB'];
@@ -61,6 +66,22 @@ export function Explore({ onFab }) {
   const [cat, setCat] = useState('all');
   const [toast, setToast] = useState(null);
 
+  // Live connectivity — drives the offline banner and the loading skeleton.
+  const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const goOnline = () => setOnline(true);
+    const goOffline = () => setOnline(false);
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
+  const offline = !online;
+
   const showToast = (msg) => {
     setToast(msg);
     if (showToast._t) clearTimeout(showToast._t);
@@ -68,6 +89,16 @@ export function Explore({ onFab }) {
   };
 
   const openLog = () => (onFab ? onFab() : setActiveTab('log'));
+
+  // Switching category briefly shows the skeleton (mirrors the design's loading state)
+  // while results settle. Skip the flash when offline (nothing to fetch).
+  const selectCat = (c) => {
+    setCat(c);
+    if (c === cat || offline) return;
+    setLoading(true);
+    if (selectCat._t) clearTimeout(selectCat._t);
+    selectCat._t = setTimeout(() => setLoading(false), 420);
+  };
 
   const addFood = (food) => {
     logMeal({ ...food, source: 'explore' });
@@ -133,37 +164,47 @@ export function Explore({ onFab }) {
       <div style={{ height: 12 }} />
 
       {/* top bar */}
-      <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '6px 20px 12px', position: 'relative', zIndex: 2 }}>
+      <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 20px 12px', position: 'relative', zIndex: 2 }}>
         <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 26, letterSpacing: '-.02em', color: 'var(--ink)' }}>explore</div>
-        <button
-          onClick={openLog}
-          aria-label="Search"
-          style={{ width: 36, height: 36, flex: 'none', borderRadius: 999, border: '1px solid var(--glass-border)', background: 'var(--glass-fill)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', color: 'var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-        >
-          <Search size={18} />
-        </button>
       </div>
 
       {/* scroll region */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '2px 18px var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
 
-        {/* search-prompt field → opens log */}
-        <button
-          onClick={openLog}
-          style={{ width: '100%', height: 48, borderRadius: 'var(--r-control)', border: '1px solid var(--glass-border)', background: 'var(--glass-fill)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center', gap: 10, padding: '0 15px', cursor: 'pointer', textAlign: 'left' }}
-        >
-          <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><Search size={19} /></span>
-          <span style={{ font: '500 14px var(--font-ui)', color: 'var(--muted)' }}>search foods, recipes, restaurants</span>
-        </button>
+        {/* offline banner */}
+        {offline && (
+          <div style={{ margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 9, padding: '10px 13px', borderRadius: 14, background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderLeft: '3px solid var(--info)' }}>
+            <span style={{ width: 7, height: 7, borderRadius: 999, background: 'var(--info)', flex: 'none', boxShadow: '0 0 8px var(--info)' }} />
+            <span style={{ font: '500 12px var(--font-ui)', color: 'var(--sage)' }}>you're offline — showing saved picks</span>
+          </div>
+        )}
+
+        {/* search-prompt field → opens log (sticky) */}
+        <div style={{ position: 'sticky', top: 0, zIndex: 3 }}>
+          <button
+            onClick={openLog}
+            style={{ width: '100%', height: 48, borderRadius: 'var(--r-control)', border: '1px solid var(--glass-border)', background: 'var(--glass-fill)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center', gap: 10, padding: '0 15px', cursor: 'pointer', textAlign: 'left' }}
+          >
+            <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><Search size={19} /></span>
+            <span style={{ font: '500 14px var(--font-ui)', color: 'var(--muted)' }}>search foods, recipes, restaurants</span>
+          </button>
+        </div>
 
         {/* category chips */}
-        <div className="no-scrollbar" style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '14px 0 4px' }}>
+        <div
+          className="no-scrollbar"
+          style={{
+            display: 'flex', gap: 8, overflowX: 'auto', padding: '14px 0 4px',
+            WebkitMaskImage: 'linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 26px),transparent)',
+            maskImage: 'linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 26px),transparent)',
+          }}
+        >
           {CATS.map((c) => {
             const active = cat === c;
             return (
               <button
                 key={c}
-                onClick={() => setCat(c)}
+                onClick={() => selectCat(c)}
                 style={{
                   flex: 'none', padding: '8px 15px', borderRadius: 999, cursor: 'pointer', whiteSpace: 'nowrap',
                   font: '600 13px var(--font-ui)', transition: 'all .16s var(--ease-out)',
@@ -178,6 +219,25 @@ export function Explore({ onFab }) {
           })}
         </div>
 
+        {/* loading skeleton */}
+        {loading && (
+          <div style={{ paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ ...shimmerTile, width: 132, height: 130, borderRadius: 18 }} />
+              <div style={{ ...shimmerTile, width: 132, height: 130, borderRadius: 18 }} />
+              <div style={{ ...shimmerTile, width: 132, height: 130, borderRadius: 18 }} />
+            </div>
+            <div style={{ ...shimmerTile, height: 104, borderRadius: 20 }} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div style={{ ...shimmerTile, height: 60, borderRadius: 16 }} />
+              <div style={{ ...shimmerTile, height: 60, borderRadius: 16 }} />
+              <div style={{ ...shimmerTile, height: 60, borderRadius: 16 }} />
+              <div style={{ ...shimmerTile, height: 60, borderRadius: 16 }} />
+            </div>
+          </div>
+        )}
+
+        {!loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 22, paddingTop: 16 }}>
 
           {/* trending now */}
@@ -187,7 +247,12 @@ export function Explore({ onFab }) {
                 <span style={{ color: 'var(--warning)', display: 'inline-flex' }}><Flame size={16} /></span>
                 <div style={sectionTitle}>trending now</div>
               </div>
-              <div className="no-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 0 4px' }}>
+              {offline ? (
+                <div style={{ padding: 20, borderRadius: 18, border: '1px dashed var(--glass-border)', textAlign: 'center', font: '500 13px var(--font-ui)', color: 'var(--muted)' }}>
+                  trending needs a connection
+                </div>
+              ) : (
+              <div className="no-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 0 4px', WebkitMaskImage: 'linear-gradient(90deg,transparent,#000 16px,#000 calc(100% - 24px),transparent)', maskImage: 'linear-gradient(90deg,transparent,#000 16px,#000 calc(100% - 24px),transparent)' }}>
                 {TRENDING.map((t, i) => (
                   <div key={t.name} style={{ ...cardStyle, flex: 'none', width: 134, borderRadius: 18, overflow: 'hidden' }}>
                     <div style={{ height: 78, background: tintGrad(i), position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -207,6 +272,7 @@ export function Explore({ onFab }) {
                   </div>
                 ))}
               </div>
+              )}
             </div>
           )}
 
@@ -337,37 +403,14 @@ export function Explore({ onFab }) {
             </div>
           )}
 
-          {/* entry-point tiles */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <button
-              onClick={() => setActiveTab('meals')}
-              style={{ ...cardStyle, borderRadius: 'var(--r-tile)', padding: 14, cursor: 'pointer', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 8 }}
-            >
-              <span style={{ color: 'var(--primary)', display: 'inline-flex' }}><ChefHat size={20} /></span>
-              <div>
-                <div style={{ font: '600 14px var(--font-ui)', color: 'var(--ink)' }}>browse recipes</div>
-                <div style={{ marginTop: 2, font: '500 11px var(--font-ui)', color: 'var(--sage)' }}>saved & suggested meals</div>
-              </div>
-            </button>
-            <button
-              onClick={() => setActiveTab('meals')}
-              style={{ ...cardStyle, borderRadius: 'var(--r-tile)', padding: 14, cursor: 'pointer', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 8 }}
-            >
-              <span style={{ color: 'var(--primary)', display: 'inline-flex' }}><Flame size={20} /></span>
-              <div>
-                <div style={{ font: '600 14px var(--font-ui)', color: 'var(--ink)' }}>generate a plan</div>
-                <div style={{ marginTop: 2, font: '500 11px var(--font-ui)', color: 'var(--sage)' }}>built around your macros</div>
-              </div>
-            </button>
-          </div>
-
         </div>
+        )}
       </div>
 
       {/* quick-add confirmation toast */}
       {toast && (
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 'calc(var(--nav-safe-pad, 92px))', zIndex: 6, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '11px 16px', borderRadius: 14, background: 'var(--glass-fill)', border: '1px solid var(--divider-strong)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', boxShadow: '0 18px 40px -18px rgba(0,0,0,.9)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '11px 16px', borderRadius: 14, background: 'var(--glass-fill)', border: '1px solid var(--divider-strong)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', boxShadow: '0 18px 40px -18px rgba(0,0,0,.9)', animation: 'slideUp .24s var(--ease-out)' }}>
             <span style={{ width: 19, height: 19, borderRadius: 999, background: 'var(--success)', color: 'var(--on-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
               <Check size={12} strokeWidth={3} />
             </span>
