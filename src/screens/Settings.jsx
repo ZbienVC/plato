@@ -263,7 +263,12 @@ export function Settings({ onFab }) {
               <span style={{ font: '600 14px var(--font-ui)' }}>reset all data</span>
             </button>
           </div>
-          <div style={{ marginTop: 12, textAlign: 'center', font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>Plato 2.0.0 · terms · privacy</div>
+          <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, padding: '2px 0 8px' }}>
+            <img src="/plato-logo.png" alt="Plato" width={54} height={54} style={{ display: 'block', width: 54, height: 54, borderRadius: 16, boxShadow: '0 12px 26px -14px rgba(0,0,0,.65),0 0 18px -8px rgba(67,198,172,.4)' }} />
+            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 17, letterSpacing: '-.02em', color: 'var(--ink)' }}>Plato</div>
+            <div style={{ font: '500 11px var(--font-ui)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>version 2.0.0</div>
+            <div style={{ font: '600 11px var(--font-ui)', color: 'var(--sage)', letterSpacing: '.02em' }}>terms · privacy</div>
+          </div>
         </div>
 
       </div>

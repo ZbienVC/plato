@@ -17,16 +17,29 @@ const fieldInput = {
   color: 'var(--ink)', font: '500 15px var(--font-ui)',
 };
 
+// Tab labels sit above the sliding pill indicator (transparent background;
+// the pill provides the active fill).
 function tabStyle(active) {
   return {
-    flex: 1, padding: '10px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
-    font: '600 14px var(--font-ui)', transition: 'all .16s var(--ease-out)',
+    position: 'relative', zIndex: 1, flex: 1, padding: '10px 0', borderRadius: 10,
+    border: 'none', background: 'none', cursor: 'pointer',
+    font: '600 14px var(--font-ui)', transition: 'color .18s var(--ease-out)',
     color: active ? 'var(--on-accent)' : 'var(--sage)',
-    background: active ? 'var(--primary)' : 'transparent',
   };
 }
 
-export function AuthSheet({ open, onClose, onSuccess }) {
+// Focus-ring aware field wrapper: on focus the border turns primary with a
+// soft ring; the focused field id is tracked in local state.
+function fieldWrapStyle(focused) {
+  return {
+    ...fieldWrap,
+    transition: 'border-color .18s var(--ease-out), box-shadow .18s var(--ease-out)',
+    border: `1px solid ${focused ? 'var(--primary)' : 'var(--glass-border)'}`,
+    boxShadow: focused ? '0 0 0 3px rgba(67,198,172,.15)' : 'none',
+  };
+}
+
+export function AuthSheet({ open, onClose, onSuccess, showToast }) {
   const [mode, setMode] = useState('signup'); // 'signup' | 'login' | 'reset'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,6 +47,11 @@ export function AuthSheet({ open, onClose, onSuccess }) {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [focusedField, setFocusedField] = useState(null); // tracks focus ring target
+
+  // Social sign-in placeholders (OAuth not wired yet — surface a toast if available).
+  const handleApple = () => showToast?.('continuing with Apple…');
+  const handleGoogle = () => showToast?.('continuing with Google…');
 
   // Password reset flow state.
   const [resetSent, setResetSent] = useState(false);
@@ -152,6 +170,28 @@ export function AuthSheet({ open, onClose, onSuccess }) {
           <div style={{ width: 40, height: 4, borderRadius: 999, background: 'var(--divider-strong)' }} />
         </div>
 
+        {/* logo mark + wordmark with soft radial glow */}
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+          marginBottom: 18,
+        }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{
+              position: 'absolute', inset: -16, borderRadius: '50%',
+              background: 'radial-gradient(circle,rgba(67,198,172,.5),transparent 68%)',
+              filter: 'blur(7px)',
+            }} />
+            <img
+              src="/plato-logo.png"
+              alt="Plato"
+              width={60}
+              height={60}
+              style={{ position: 'relative', display: 'block', width: 60, height: 60, borderRadius: 16 }}
+            />
+          </div>
+          <div style={{ font: '800 26px var(--font-display)', color: 'var(--ink)' }}>Plato</div>
+        </div>
+
         {isReset ? (
           <>
             {/* reset header */}
@@ -243,11 +283,19 @@ export function AuthSheet({ open, onClose, onSuccess }) {
           </>
         ) : (
         <>
-        {/* segmented tabs */}
+        {/* segmented tabs with animated sliding indicator */}
         <div style={{
-          display: 'flex', background: 'var(--surface-2)', borderRadius: 13,
-          padding: 4, gap: 3, marginBottom: 20,
+          position: 'relative', display: 'flex', background: 'var(--surface-2)',
+          borderRadius: 13, padding: 4, gap: 3, marginBottom: 20,
         }}>
+          <div style={{
+            position: 'absolute', top: 4, bottom: 4,
+            left: isSignup ? 4 : 'calc(50% + 1.5px)',
+            width: 'calc(50% - 5.5px)', borderRadius: 10,
+            background: 'var(--primary)',
+            boxShadow: '0 6px 16px -6px rgba(67,198,172,.55)',
+            transition: 'left .3s var(--ease-out)',
+          }} />
           <button type="button" onClick={() => switchMode('signup')} style={tabStyle(isSignup)}>sign up</button>
           <button type="button" onClick={() => switchMode('login')} style={tabStyle(!isSignup)}>log in</button>
         </div>
@@ -256,12 +304,14 @@ export function AuthSheet({ open, onClose, onSuccess }) {
         {isSignup && (
           <div style={{ marginBottom: 12 }}>
             <div style={{ ...microLabel, marginBottom: 7 }}>name</div>
-            <div style={fieldWrap}>
+            <div style={fieldWrapStyle(focusedField === 'name')}>
               <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><User size={18} /></span>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                onFocus={() => setFocusedField('name')}
+                onBlur={() => setFocusedField(null)}
                 placeholder="your name (optional)"
                 autoComplete="name"
                 style={fieldInput}
@@ -273,12 +323,14 @@ export function AuthSheet({ open, onClose, onSuccess }) {
         {/* email */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ ...microLabel, marginBottom: 7 }}>email</div>
-          <div style={fieldWrap}>
+          <div style={fieldWrapStyle(focusedField === 'email')}>
             <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><Mail size={18} /></span>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onFocus={() => setFocusedField('email')}
+              onBlur={() => setFocusedField(null)}
               placeholder="you@email.com"
               required
               autoComplete="email"
@@ -299,12 +351,14 @@ export function AuthSheet({ open, onClose, onSuccess }) {
               >forgot password?</button>
             )}
           </div>
-          <div style={fieldWrap}>
+          <div style={fieldWrapStyle(focusedField === 'password')}>
             <span style={{ color: 'var(--sage)', display: 'inline-flex' }}><Lock size={18} /></span>
             <input
               type={showPw ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onFocus={() => setFocusedField('password')}
+              onBlur={() => setFocusedField(null)}
               placeholder="at least 6 characters"
               required
               minLength={6}
@@ -318,6 +372,43 @@ export function AuthSheet({ open, onClose, onSuccess }) {
               style={{ background: 'none', border: 'none', color: 'var(--sage)', cursor: 'pointer', display: 'inline-flex' }}
             >{showPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
           </div>
+        </div>
+
+        {/* or divider + social sign-in */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0 14px' }}>
+          <div style={{ flex: 1, height: 1, background: 'var(--hairline)' }} />
+          <span style={{ font: '600 11px var(--font-ui)', color: 'var(--muted)', letterSpacing: '.08em' }}>or</span>
+          <div style={{ flex: 1, height: 1, background: 'var(--hairline)' }} />
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            type="button"
+            onClick={handleApple}
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
+              height: 50, borderRadius: 14, border: '1px solid var(--glass-border)',
+              background: 'var(--surface-2)', color: 'var(--ink)',
+              font: '600 14px var(--font-ui)', cursor: 'pointer',
+              transition: 'transform .14s var(--ease-out), border-color .18s var(--ease-out)',
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.04c-.03-2.6 2.12-3.85 2.22-3.91-1.21-1.77-3.09-2.01-3.76-2.04-1.6-.16-3.12.94-3.93.94-.81 0-2.06-.92-3.39-.89-1.74.03-3.35 1.01-4.25 2.57-1.81 3.14-.46 7.79 1.3 10.34.86 1.25 1.88 2.65 3.22 2.6 1.29-.05 1.78-.83 3.34-.83 1.56 0 2 .83 3.37.81 1.39-.03 2.27-1.27 3.12-2.53.98-1.45 1.39-2.85 1.41-2.92-.03-.01-2.7-1.04-2.73-4.13M14.6 4.5c.71-.86 1.19-2.06 1.06-3.25-1.02.04-2.26.68-2.99 1.54-.66.76-1.23 1.98-1.08 3.15 1.14.09 2.3-.58 3.01-1.44" /></svg>
+            Apple
+          </button>
+          <button
+            type="button"
+            onClick={handleGoogle}
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
+              height: 50, borderRadius: 14, border: '1px solid var(--glass-border)',
+              background: 'var(--surface-2)', color: 'var(--ink)',
+              font: '600 14px var(--font-ui)', cursor: 'pointer',
+              transition: 'transform .14s var(--ease-out), border-color .18s var(--ease-out)',
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" /><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" /><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" /><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" /></svg>
+            Google
+          </button>
         </div>
         </>
         )}

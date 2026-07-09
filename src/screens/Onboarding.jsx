@@ -230,26 +230,51 @@ export function Onboarding({ onComplete }) {
         {/* ── WELCOME ── */}
         {step === 'welcome' && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '24px 34px', gap: 4 }}>
-              <div style={{
-                width: 76, height: 76, borderRadius: 22, background: 'linear-gradient(140deg,#43C6AC,#0F9482)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 22px 54px -18px rgba(67,198,172,.6),inset 0 1px 0 rgba(255,255,255,.35)',
-                animation: 'vd-fade-up .6s var(--ease-out)',
-              }}>
-                <div style={{ width: 38, height: 38, borderRadius: '50%', border: '3px solid rgba(255,255,255,.92)', position: 'relative' }}>
-                  <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: 13, height: 13, borderRadius: '50%', background: '#F3FBF8' }} />
-                </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '16px 24px 10px', position: 'relative', overflow: 'hidden' }}>
+              {/* ambient floating specks */}
+              {[
+                { top: '12%', left: '15%', size: 7, bg: '#5FD4C4', op: .6, dur: '3.4s', delay: '0s' },
+                { top: '19%', right: '17%', size: 6, bg: '#E7B67C', op: .55, dur: '2.8s', delay: '.5s' },
+                { top: '8%', right: '33%', size: 5, bg: '#E1A0AB', op: .5, dur: '3.9s', delay: '.9s' },
+                { bottom: '31%', left: '19%', size: 5, bg: '#43C6AC', op: .45, dur: '3.2s', delay: '.2s' },
+              ].map((d, i) => (
+                <div key={i} aria-hidden style={{ position: 'absolute', top: d.top, bottom: d.bottom, left: d.left, right: d.right, width: d.size, height: d.size, borderRadius: '50%', background: d.bg, opacity: d.op, animation: `vd-float ${d.dur} ease-in-out infinite ${d.delay}` }} />
+              ))}
+
+              {/* logo + radial halo glow */}
+              <div style={{ position: 'relative' }}>
+                <div aria-hidden style={{ position: 'absolute', inset: -22, borderRadius: '50%', background: 'radial-gradient(circle,rgba(67,198,172,.34),transparent 66%)', filter: 'blur(6px)', animation: 'vd-halo .8s var(--ease-out) .14s both' }} />
+                <img src="/plato-logo.png" alt="Plato" width="90" height="90" style={{ position: 'relative', display: 'block', width: 90, height: 90, borderRadius: 24, boxShadow: '0 22px 46px -18px rgba(0,0,0,.7),0 0 30px -6px rgba(67,198,172,.38)', transformOrigin: 'center', animation: 'vd-logo-in .72s var(--ease-out) both,vd-logo-bob 5.5s ease-in-out 1.15s infinite' }} />
               </div>
-              <div style={{ marginTop: 22, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 36, letterSpacing: '-.03em', color: 'var(--ink)' }}>plato</div>
-              <div style={{ marginTop: 4, font: '500 15px var(--font-ui)', color: 'var(--sage)' }}>your plan, your macros, your pace.</div>
-              <div style={{ marginTop: 16, font: '400 14px var(--font-ui)', color: 'var(--muted)', maxWidth: 280, lineHeight: 1.55 }}>
-                answer four quick questions and we'll build a nutrition plan around you — in under a minute.
+
+              <div style={{ marginTop: 26, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 40, letterSpacing: '-.03em', color: 'var(--ink)', animation: 'vd-fade-up .6s var(--ease-out) .05s both' }}>plato</div>
+              <div style={{ marginTop: 6, font: '500 15px var(--font-ui)', color: 'var(--sage)', animation: 'vd-fade-up .6s var(--ease-out) .1s both' }}>your AI nutrition companion</div>
+
+              {/* feature highlights */}
+              <div style={{ ...glass, marginTop: 26, width: '100%', borderRadius: 22, padding: '4px 16px', animation: 'vd-fade-up .6s var(--ease-out) .15s both' }}>
+                {[
+                  { grad: 'linear-gradient(150deg,#43C6AC,var(--brand-forest))', label: <>track macros in seconds</>, border: true,
+                    icon: <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z" /> },
+                  { grad: 'linear-gradient(150deg,#5FD4C4,var(--brand-forest))', label: <>AI-powered meal plans</>, border: true,
+                    icon: <><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" /><path d="M19 14l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" /></> },
+                  { grad: 'linear-gradient(150deg,#E7B67C,var(--brand-forest))', label: <>real food database <span style={{ color: 'var(--sage)', fontWeight: 500 }}>(USDA)</span></>, border: false,
+                    icon: <><ellipse cx="12" cy="5.5" rx="7.5" ry="3" /><path d="M4.5 5.5v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-6" /><path d="M4.5 11.5v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-6" /></> },
+                ].map((f, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 0', borderBottom: f.border ? '1px solid var(--hairline)' : 'none', textAlign: 'left' }}>
+                    <div style={{ width: 44, height: 44, flex: 'none', borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', background: f.grad, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.16)' }}>
+                      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.95)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{f.icon}</svg>
+                    </div>
+                    <div style={{ font: '600 15px var(--font-ui)', color: 'var(--ink)' }}>{f.label}</div>
+                  </div>
+                ))}
               </div>
             </div>
-            <div style={{ flex: 'none', padding: '0 24px 30px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
-              <button onClick={() => go('basics')} style={primaryBtn}>get started</button>
-              <div style={{ font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>free to start · no account needed</div>
+            <div style={{ flex: 'none', padding: '6px 24px 26px', display: 'flex', flexDirection: 'column', gap: 11 }}>
+              <button onClick={() => go('basics')} style={primaryBtn}>get started free</button>
+              <button onClick={onComplete} style={{ width: '100%', height: 52, borderRadius: 'var(--r-control)', border: '1px solid var(--glass-border)', background: 'var(--glass-fill)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', color: 'var(--ink)', font: '600 15px var(--font-ui)', cursor: 'pointer' }}>sign in to your account</button>
+              <div style={{ textAlign: 'center', marginTop: 2 }}>
+                <button onClick={onComplete} style={{ background: 'none', border: 'none', color: 'var(--sage)', font: '600 13px var(--font-ui)', cursor: 'pointer', padding: 6 }}>continue without an account</button>
+              </div>
             </div>
           </div>
         )}
@@ -523,6 +548,9 @@ export function Onboarding({ onComplete }) {
         @keyframes vd-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes vd-float { 0%,100% { transform: translateY(0); opacity: .5; } 50% { transform: translateY(-12px); opacity: 1; } }
         @keyframes vd-orb-fill { from { height: 6%; } to { height: 84%; } }
+        @keyframes vd-halo { 0% { opacity: 0; transform: scale(.55); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes vd-logo-in { 0% { opacity: 0; transform: scale(.72) translateY(10px); } 62% { opacity: 1; transform: scale(1.045) translateY(0); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes vd-logo-bob { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(1.016); } }
         @media (prefers-reduced-motion: reduce) {
           [data-onb] * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
         }

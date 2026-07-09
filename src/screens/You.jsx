@@ -336,7 +336,17 @@ export function You({ onFab }) {
           ><LogOut size={17} />sign out</button>
         )}
 
-        <div style={{ textAlign: 'center', padding: '8px 0 4px', font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>Plato 2.0 · made with care</div>
+        <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, padding: '2px 0 6px' }}>
+          <img
+            src="/plato-logo.png"
+            alt="Plato"
+            width="52"
+            height="52"
+            style={{ display: 'block', width: 52, height: 52, borderRadius: 15, boxShadow: '0 12px 24px -14px rgba(0,0,0,.6),0 0 16px -8px rgba(67,198,172,.4)' }}
+          />
+          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16, letterSpacing: '-.02em', color: 'var(--ink)' }}>Plato</div>
+          <div style={{ font: '500 11px var(--font-ui)', color: 'var(--muted)' }}>version 2.0 · made with care</div>
+        </div>
       </div>
     </>
   );

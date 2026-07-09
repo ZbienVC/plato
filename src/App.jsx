@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { VerdantShell } from './screens/_shell/VerdantShell';
 import { Home } from './screens/Home';
@@ -13,6 +13,7 @@ import { Insights } from './screens/Insights';
 import { Recipes } from './screens/Recipes';
 import { Restaurant } from './screens/Restaurant';
 import { Onboarding } from './screens/Onboarding';
+import { Splash } from './screens/Splash';
 import { VoiceLogOverlay } from './components/organisms/VoiceLogOverlay';
 import { PaywallSheet } from './screens/PaywallSheet';
 import { useToast } from './components/organisms/Toast';
@@ -28,6 +29,12 @@ function AppContent() {
     authModalOpen, setAuthModalOpen, loginSuccess,
   } = useApp();
   const { showToast, ToastContainer } = useToast();
+
+  const [splashDone, setSplashDone] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSplashDone(true), 1700);
+    return () => clearTimeout(t);
+  }, []);
 
   const [welcomeDone, setWelcomeDone] = useState(
     () => localStorage.getItem('plato_welcome_done') === 'true' || !!userProfile?.name
@@ -45,6 +52,7 @@ function AppContent() {
     if (alreadyOnboarded) setHasOnboarded(true);
   };
 
+  if (!splashDone) return <Splash />;
   if (!welcomeDone) return <WelcomeScreen onContinueAsGuest={handleWelcomeGuest} onAuthSuccess={handleWelcomeAuth} />;
   if (!hasOnboarded) return <Onboarding onComplete={completeOnboarding} />;
 
