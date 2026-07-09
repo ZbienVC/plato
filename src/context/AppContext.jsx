@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
-import { auth, saveLogEntry as apiSaveLog, getProfile, logWater as apiLogWater } from '../lib/api';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { auth, saveLogEntry as apiSaveLog, getProfile, logWater as apiLogWater,
+  getActivePlanRemote, savePlanRemote, getRecipesRemote, saveRecipeRemote } from '../lib/api';
 import { MEAL_DATABASE } from '../services/mealGenerator';
 import { saveLogEntry } from '../lib/api';
 
@@ -255,10 +256,36 @@ export function AppProvider({ children }) {
       saveState('savedRecipes', updated);
       return updated;
     });
+    saveRecipeRemote(recipe).catch(() => {});
   }, []);
 
   // === GROCERY CHECKLIST ===
   const [groceryChecked, setGroceryChecked] = useState(() => loadState('groceryChecked', {}));
+
+  // === BACKEND SYNC: meal plan + saved recipes (loop-safe via ref) ===
+  const lastSyncedPlanRef = useRef(null);
+  useEffect(() => {
+    if (!authToken) return undefined;
+    let cancelled = false;
+    (async () => {
+      const serverPlan = await getActivePlanRemote();
+      if (!cancelled && serverPlan && serverPlan.meals?.length) {
+        lastSyncedPlanRef.current = serverPlan;
+        setPlan(serverPlan);
+      }
+      const serverRecipes = await getRecipesRemote();
+      if (!cancelled && Array.isArray(serverRecipes) && serverRecipes.length) {
+        setSavedRecipes(serverRecipes);
+      }
+    })().catch(() => {});
+    return () => { cancelled = true; };
+  }, [authToken]);
+  useEffect(() => {
+    if (!authToken || !plan) return;
+    if (plan === lastSyncedPlanRef.current) return;   // don't echo a hydrated plan back
+    lastSyncedPlanRef.current = plan;
+    savePlanRemote(plan).catch(() => {});
+  }, [plan, authToken]);
 
   // === PERSIST STATE ON CHANGE ===
   useEffect(() => { saveState('dark', dark); }, [dark]);

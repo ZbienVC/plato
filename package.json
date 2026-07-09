@@ -1,38 +1,45 @@
 {
-    "name":  "plato",
-    "version":  "0.0.0",
-    "private":  true,
-    "type":  "module",
-    "scripts":  {
-                    "build":  "vite build",
-                    "server":  "tsx server.ts",
-                    "preview":  "vite preview",
-                    "lint":  "eslint .",
-                    "dev:full":  "tsx server.ts",
-                    "dev":  "vite"
-                },
-    "dependencies":  {
-                         "lucide-react":  "^0.577.0",
-                         "tailwind-merge":  "^3.5.0",
-                         "react":  "^19.2.0",
-                         "tailwindcss":  "^4.2.1",
-                         "clsx":  "^2.1.1",
-                         "@tailwindcss/vite":  "^4.2.1",
-                         "react-dom":  "^19.2.0",
-                         "framer-motion":  "^12.38.0"
-                     },
-    "devDependencies":  {
-                            "@vitejs/plugin-react":  "^5.1.1",
-                            "eslint-plugin-react-hooks":  "^7.0.1",
-                            "@eslint/js":  "^9.39.1",
-                            "@types/react-dom":  "^19.2.3",
-                            "eslint-plugin-react-refresh":  "^0.4.24",
-                            "eslint":  "^9.39.1",
-                            "globals":  "^16.5.0",
-                            "@types/react":  "^19.2.7",
-                            "vite":  "^7.3.1"
-                        },
-    "engines":  {
-                    "node":  "\u003e=20.0.0"
-                }
+    "name": "plato",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "server": "tsx server.ts",
+        "preview": "vite preview",
+        "lint": "eslint .",
+        "dev:full": "tsx server.ts",
+        "dev": "vite"
+    },
+    "dependencies": {
+        "@tailwindcss/vite": "^4.2.1",
+        "bcryptjs": "^3.0.3",
+        "better-sqlite3": "^12.11.1",
+        "clsx": "^2.1.1",
+        "cors": "^2.8.6",
+        "dotenv": "^17.4.2",
+        "express": "^4.22.2",
+        "framer-motion": "^12.38.0",
+        "jsonwebtoken": "^9.0.3",
+        "lucide-react": "^0.577.0",
+        "react": "^19.2.0",
+        "react-dom": "^19.2.0",
+        "tailwind-merge": "^3.5.0",
+        "tailwindcss": "^4.2.1"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.39.1",
+        "@types/react": "^19.2.7",
+        "@types/react-dom": "^19.2.3",
+        "@vitejs/plugin-react": "^5.1.1",
+        "eslint": "^9.39.1",
+        "eslint-plugin-react-hooks": "^7.0.1",
+        "eslint-plugin-react-refresh": "^0.4.24",
+        "globals": "^16.5.0",
+        "tsx": "^4.23.0",
+        "vite": "^7.3.1"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    }
 }

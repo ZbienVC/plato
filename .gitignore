@@ -38,3 +38,6 @@ _livecap.cjs
 _diag.cjs
 _markqa.cjs
 _markqa.html
+# local sqlite
+plato.db
+plato.db-*

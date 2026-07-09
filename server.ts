@@ -35,6 +35,11 @@ import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Database from 'better-sqlite3';
+import { plansRouter } from './server/routes/plans';
+import { recipesRouter } from './server/routes/recipes';
+import { authResetRouter } from './server/routes/authReset';
+import { billingRouter, requirePremium } from './server/routes/billing';
+import { aiRouter } from './server/routes/ai';
 
 dotenv.config();
 
@@ -126,6 +131,53 @@ db.exec(`
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
   CREATE INDEX IF NOT EXISTS weight_log_user_date ON weight_log(user_id, date);
+
+  CREATE TABLE IF NOT EXISTS meal_plans (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    name TEXT,
+    meals_json TEXT,
+    macros_json TEXT,
+    config_json TEXT,
+    grocery_json TEXT,
+    is_active INTEGER NOT NULL DEFAULT 0,
+    rev INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS meal_plans_user ON meal_plans(user_id, is_active);
+
+  CREATE TABLE IF NOT EXISTS saved_recipes (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    recipe_json TEXT NOT NULL,
+    is_deleted INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS saved_recipes_user ON saved_recipes(user_id, is_deleted);
+
+  CREATE TABLE IF NOT EXISTS password_resets (
+    token TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    used INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS subscriptions (
+    user_id TEXT PRIMARY KEY,
+    status TEXT NOT NULL DEFAULT 'free',
+    plan TEXT,
+    current_period_end TEXT,
+    stripe_customer_id TEXT,
+    stripe_subscription_id TEXT,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
 `);
 
 // â”€â”€â”€ Auth helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -188,6 +240,7 @@ async function getUSDAFood(fdcId: string) {
 async function startServer() {
   const app = express();
   app.use(cors({ origin: true, credentials: true }));
+  app.use('/api/billing/webhook', express.raw({ type: 'application/json' }));
   app.use(express.json());
 
   // â”€â”€ Health â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -439,6 +492,17 @@ async function startServer() {
   })
 
   // â”€â”€ Vite SPA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Extended routes: plans, recipes, password reset, billing, ai/barcode ──
+  const routerCtx = { db, authMiddleware, signToken };
+  app.use(plansRouter(routerCtx));
+  app.use(recipesRouter(routerCtx));
+  app.use(authResetRouter(routerCtx));
+  app.use(billingRouter(routerCtx));
+  // Server-side premium enforcement for AI logging (barcode stays free)
+  app.use('/api/ai/voice', authMiddleware, requirePremium(db));
+  app.use('/api/ai/photo', authMiddleware, requirePremium(db));
+  app.use(aiRouter(routerCtx));
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },

@@ -393,3 +393,163 @@ export async function getWeightHistory(days = 90) {
     return data.entries || [];
   } catch { return []; }
 }
+
+// ─── Plan sync ──────────────────────────────────────────────────────────────
+// The app's plan object is { name, calories, protein, carbs, fat, mealsPerDay,
+// meals, createdAt, config? }. The backend stores meals/macros/config as JSON.
+function appPlanToBody(plan: any) {
+  return {
+    name: plan?.name || 'My Plan',
+    meals: plan?.meals || [],
+    macros: { calories: plan?.calories, protein: plan?.protein, carbs: plan?.carbs, fat: plan?.fat, mealsPerDay: plan?.mealsPerDay },
+    config: plan?.config || null,
+    isActive: true,
+  };
+}
+function serverPlanToApp(p: any) {
+  if (!p) return null;
+  const m = p.macros || {};
+  return {
+    name: p.name, meals: p.meals || [],
+    calories: m.calories, protein: m.protein, carbs: m.carbs, fat: m.fat,
+    mealsPerDay: m.mealsPerDay, config: p.config || undefined,
+    createdAt: p.createdAt || p.created_at, _serverId: p.id, _rev: p.rev,
+  };
+}
+
+export async function getActivePlanRemote(): Promise<any | null> {
+  if (!HAS_BACKEND || !auth.isLoggedIn()) return null;
+  try {
+    const res = await fetch(`${BASE}/plans/active`, { headers: authHeaders() });
+    if (!res.ok) return null;
+    const d = await res.json();
+    return serverPlanToApp(d.plan);
+  } catch { return null; }
+}
+
+export async function savePlanRemote(plan: any): Promise<any | null> {
+  if (!HAS_BACKEND || !auth.isLoggedIn() || !plan) return null;
+  try {
+    const res = await fetch(`${BASE}/plans`, {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify(appPlanToBody(plan)),
+    });
+    if (!res.ok) return null;
+    const d = await res.json();
+    return serverPlanToApp(d.plan);
+  } catch { return null; }
+}
+
+export async function syncGroceryRemote(planServerId: string, grocery: unknown) {
+  if (!HAS_BACKEND || !auth.isLoggedIn() || !planServerId) return null;
+  try {
+    const res = await fetch(`${BASE}/plans/${planServerId}/grocery`, {
+      method: 'PUT', headers: authHeaders(), body: JSON.stringify({ grocery }),
+    });
+    return res.ok ? res.json() : null;
+  } catch { return null; }
+}
+
+// ─── Recipe sync ────────────────────────────────────────────────────────────
+export async function getRecipesRemote(): Promise<any[]> {
+  if (!HAS_BACKEND || !auth.isLoggedIn()) return [];
+  try {
+    const res = await fetch(`${BASE}/recipes`, { headers: authHeaders() });
+    if (!res.ok) return [];
+    const d = await res.json();
+    return d.recipes || [];
+  } catch { return []; }
+}
+
+export async function saveRecipeRemote(recipe: any): Promise<any | null> {
+  if (!HAS_BACKEND || !auth.isLoggedIn() || !recipe) return null;
+  try {
+    const res = await fetch(`${BASE}/recipes`, {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify({ recipe }),
+    });
+    if (!res.ok) return null;
+    const d = await res.json();
+    return d.recipe || null;
+  } catch { return null; }
+}
+
+export async function deleteRecipeRemote(id: string) {
+  if (!HAS_BACKEND || !auth.isLoggedIn() || !id) return false;
+  try {
+    const res = await fetch(`${BASE}/recipes/${id}`, { method: 'DELETE', headers: authHeaders() });
+    return res.ok;
+  } catch { return false; }
+}
+
+// ─── Password reset ─────────────────────────────────────────────────────────
+export async function requestPasswordReset(email: string) {
+  try {
+    const res = await fetch(`${BASE}/auth/reset/request`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }),
+    });
+    return safeJson(res);
+  } catch { return { ok: true }; } // never reveal failures
+}
+
+export async function confirmPasswordReset(token: string, password: string) {
+  const res = await fetch(`${BASE}/auth/reset/confirm`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, password }),
+  });
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error((data.error as string) || 'Reset failed');
+  if (data.token) setToken(data.token as string);
+  return data;
+}
+
+// ─── Billing (Stripe) ───────────────────────────────────────────────────────
+export async function getBillingStatus() {
+  if (!HAS_BACKEND || !auth.isLoggedIn()) return { status: 'free', configured: false };
+  try {
+    const res = await fetch(`${BASE}/billing/status`, { headers: authHeaders() });
+    return res.ok ? res.json() : { status: 'free', configured: false };
+  } catch { return { status: 'free', configured: false }; }
+}
+
+export async function createCheckout(plan: 'monthly' | 'annual' = 'monthly') {
+  const res = await fetch(`${BASE}/billing/checkout`, {
+    method: 'POST', headers: authHeaders(), body: JSON.stringify({ plan }),
+  });
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error((data.error as string) || 'Billing not configured');
+  return data as { url?: string };
+}
+
+export async function openBillingPortal() {
+  const res = await fetch(`${BASE}/billing/portal`, { method: 'POST', headers: authHeaders() });
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error((data.error as string) || 'Billing not configured');
+  return data as { url?: string };
+}
+
+// ─── Barcode + AI logging ───────────────────────────────────────────────────
+export async function lookupBarcode(code: string): Promise<FoodResult | null> {
+  if (!auth.isLoggedIn()) return null;
+  try {
+    const res = await fetch(`${BASE}/food/barcode/${encodeURIComponent(code)}`, { headers: authHeaders() });
+    if (!res.ok) return null;
+    const d = await res.json();
+    return d.food || null;
+  } catch { return null; }
+}
+
+export async function extractVoiceMeal(text: string) {
+  const res = await fetch(`${BASE}/ai/voice`, {
+    method: 'POST', headers: authHeaders(), body: JSON.stringify({ text }),
+  });
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error((data.error as string) || 'AI voice not configured');
+  return data.meal;
+}
+
+export async function extractPhotoMeal(imageBase64: string, mediaType = 'image/jpeg') {
+  const res = await fetch(`${BASE}/ai/photo`, {
+    method: 'POST', headers: authHeaders(), body: JSON.stringify({ imageBase64, mediaType }),
+  });
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error((data.error as string) || 'AI photo not configured');
+  return data.meal;
+}
