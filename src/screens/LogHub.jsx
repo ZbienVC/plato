@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Search, Zap, PencilLine, Mic, Barcode, Camera,
-  X, ChevronLeft, Plus, Minus, Check, Flashlight,
+  X, ChevronLeft, Plus, Minus, Check,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMacros } from '../hooks/useMacros';
-import { searchFood } from '../lib/api';
+import { searchFood, lookupBarcode } from '../lib/api';
 
 const cardStyle = {
   background: 'var(--glass-fill)', border: '1px solid var(--glass-border)',
@@ -80,13 +80,22 @@ export function LogHub({ onFab }) {
 
   // confirm state
   const [confirmFood, setConfirmFood] = useState(null);
+  const [confirmFrom, setConfirmFrom] = useState('search'); // where confirm was opened from
   const [qty, setQty] = useState(1);
 
   // manual state
   const [manual, setManual] = useState({ name: '', calories: '', protein: '', carbs: '', fat: '' });
 
-  // scan fallback state
+  // scan state (barcode lookup — FREE, no premium gate)
   const [barcode, setBarcode] = useState('');
+  const [scanLoading, setScanLoading] = useState(false);
+  const [scanError, setScanError] = useState('');
+  const [camActive, setCamActive] = useState(false);
+  const hasBarcodeDetector = typeof window !== 'undefined' && 'BarcodeDetector' in window
+    && typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
+  const videoRef = useRef(null);
+  const camStreamRef = useRef(null);
+  const camLoopRef = useRef(null);
 
   const toastT = useRef(null);
   const debounceT = useRef(null);
@@ -129,22 +138,23 @@ export function LogHub({ onFab }) {
   const onQueryChange = (v) => { setQuery(v); runSearch(v); };
 
   // ── open confirm for a food result ──────────────────────────────────────
-  const openConfirm = (food) => {
+  const openConfirm = (food, from = 'search') => {
     setConfirmFood({
       name: food.name || 'food',
-      source: food.brand ? food.brand : 'usda',
+      source: food.brand ? food.brand : (food.source || 'usda'),
       serving: food.serving || 'per serving',
       calories: Number(food.calories) || 0,
       protein: Number(food.protein) || 0,
       carbs: Number(food.carbs) || 0,
       fat: Number(food.fat) || 0,
     });
+    setConfirmFrom(from);
     setQty(1);
     setMode('confirm');
   };
 
   const back = () => {
-    if (mode === 'confirm') { setMode(confirmFood ? 'search' : 'hub'); return; }
+    if (mode === 'confirm') { setMode(confirmFood ? confirmFrom : 'hub'); return; }
     setMode('hub');
   };
 
@@ -185,11 +195,87 @@ export function LogHub({ onFab }) {
     setActiveTab('home');
   };
 
-  const scanFallbackLog = () => {
-    // no real scanner — log a placeholder scanned item, then land on home
-    commitLog({ name: barcode.trim() ? `scanned · ${barcode.trim()}` : 'scanned item', calories: 0, protein: 0, carbs: 0, fat: 0 });
-    setActiveTab('home');
-  };
+  // ── real barcode lookup ─────────────────────────────────────────────────
+  const runBarcodeLookup = useCallback(async (raw) => {
+    const code = String(raw ?? barcode).replace(/[^0-9]/g, '').trim();
+    if (!code) { setScanError('enter a barcode number first'); return; }
+    setScanError('');
+    setScanLoading(true);
+    try {
+      const food = await lookupBarcode(code);
+      if (food) {
+        // feed into the SAME confirm step search results use
+        openConfirm(food, 'scan');
+      } else {
+        setScanError('product not found — try search or manual');
+      }
+    } catch {
+      setScanError('lookup failed — try again');
+    } finally {
+      setScanLoading(false);
+    }
+  }, [barcode]);
+
+  // ── optional camera scan path (BarcodeDetector) ─────────────────────────
+  const stopCamera = useCallback(() => {
+    const hadStream = !!camStreamRef.current;
+    if (camLoopRef.current) { cancelAnimationFrame(camLoopRef.current); camLoopRef.current = null; }
+    if (camStreamRef.current) {
+      camStreamRef.current.getTracks().forEach((t) => t.stop());
+      camStreamRef.current = null;
+    }
+    if (videoRef.current) videoRef.current.srcObject = null;
+    // only touch state when something was actually running — avoids
+    // needless renders (and the set-state-in-effect lint) on teardown
+    if (hadStream) setCamActive(false);
+  }, []);
+
+  const startCamera = useCallback(async () => {
+    if (!hasBarcodeDetector) return;
+    setScanError('');
+    try {
+      const detector = new window.BarcodeDetector({
+        formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'],
+      });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      });
+      camStreamRef.current = stream;
+      setCamActive(true);
+      const video = videoRef.current;
+      if (video) {
+        video.srcObject = stream;
+        await video.play().catch(() => {});
+      }
+      const tick = async () => {
+        if (!camStreamRef.current || !videoRef.current) return;
+        try {
+          const codes = await detector.detect(videoRef.current);
+          if (codes && codes.length) {
+            const raw = codes[0].rawValue || '';
+            const code = String(raw).replace(/[^0-9]/g, '').trim();
+            if (code) {
+              setBarcode(code);
+              stopCamera();
+              runBarcodeLookup(code);
+              return;
+            }
+          }
+        } catch { /* keep scanning */ }
+        camLoopRef.current = requestAnimationFrame(tick);
+      };
+      camLoopRef.current = requestAnimationFrame(tick);
+    } catch {
+      setScanError('camera unavailable — enter the barcode by hand');
+      stopCamera();
+    }
+  }, [hasBarcodeDetector, runBarcodeLookup, stopCamera]);
+
+  // stop the camera whenever we leave scan mode or unmount
+  useEffect(() => {
+    if (mode !== 'scan') stopCamera();
+    return () => stopCamera();
+  }, [mode, stopCamera]);
 
   const isSheet = ['hub', 'search', 'quick', 'manual', 'confirm'].includes(mode);
 
@@ -418,47 +504,72 @@ export function LogHub({ onFab }) {
           </div>
         )}
 
-        {/* ── SCAN (free, no scanner) ─────────────────────────── */}
+        {/* ── SCAN (barcode lookup — FREE) ────────────────────── */}
         {mode === 'scan' && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, paddingTop: 10 }}>
-            {/* capture-style viewfinder */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, paddingTop: 10 }}>
+            {/* viewfinder — shows live camera feed when active, otherwise a static frame */}
             <div style={{ position: 'relative', width: '100%', maxWidth: 260, aspectRatio: '250 / 170', borderRadius: 14, background: 'linear-gradient(180deg,#0a1512,#050a09)', overflow: 'hidden' }}>
+              <video
+                ref={videoRef}
+                playsInline
+                muted
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: camActive ? 'block' : 'none' }}
+              />
               <Corner style={{ top: 0, left: 0, borderTop: '3px solid var(--brand-jade)', borderLeft: '3px solid var(--brand-jade)', borderRadius: '10px 0 0 0' }} />
               <Corner style={{ top: 0, right: 0, borderTop: '3px solid var(--brand-jade)', borderRight: '3px solid var(--brand-jade)', borderRadius: '0 10px 0 0' }} />
               <Corner style={{ bottom: 0, left: 0, borderBottom: '3px solid var(--brand-jade)', borderLeft: '3px solid var(--brand-jade)', borderRadius: '0 0 0 10px' }} />
               <Corner style={{ bottom: 0, right: 0, borderBottom: '3px solid var(--brand-jade)', borderRight: '3px solid var(--brand-jade)', borderRadius: '0 0 10px 0' }} />
               <div style={{ position: 'absolute', top: '50%', left: 14, right: 14, height: 2, background: 'var(--brand-jade)', boxShadow: '0 0 12px var(--brand-jade)' }} />
-              <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', display: 'flex', gap: 3, opacity: 0.5 }}>
-                {[2, 4, 2, 5, 2, 3, 2, 5].map((w, i) => (
-                  <div key={i} style={{ width: w, height: 44, background: '#EAF1EF' }} />
-                ))}
-              </div>
+              {!camActive && (
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', display: 'flex', gap: 3, opacity: 0.5 }}>
+                  {[2, 4, 2, 5, 2, 3, 2, 5].map((w, i) => (
+                    <div key={i} style={{ width: w, height: 44, background: '#EAF1EF' }} />
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div style={{ font: '600 15px var(--font-ui)', color: 'var(--ink)' }}>point at a barcode</div>
-            <div style={{ font: '500 13px var(--font-ui)', color: 'var(--sage)', textAlign: 'center', maxWidth: 260, lineHeight: 1.5, marginTop: -14 }}>
-              barcode scanning is free. line up a package barcode inside the frame — or enter it by hand.
+            <div style={{ font: '600 15px var(--font-ui)', color: 'var(--ink)' }}>
+              {camActive ? 'point at a barcode' : 'look up a barcode'}
+            </div>
+            <div style={{ font: '500 13px var(--font-ui)', color: 'var(--sage)', textAlign: 'center', maxWidth: 260, lineHeight: 1.5, marginTop: -12 }}>
+              barcode lookup is free. {hasBarcodeDetector ? 'scan with your camera, or ' : ''}enter the number by hand.
             </div>
 
-            {/* manual barcode fallback */}
+            {/* barcode entry + lookup */}
             <div style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 10 }}>
               <input
                 value={barcode}
-                onChange={(e) => setBarcode(e.target.value.replace(/[^0-9]/g, ''))}
+                onChange={(e) => { setBarcode(e.target.value.replace(/[^0-9]/g, '')); if (scanError) setScanError(''); }}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !scanLoading) runBarcodeLookup(); }}
                 placeholder="enter barcode number"
                 inputMode="numeric"
+                disabled={scanLoading}
                 style={{ width: '100%', height: 48, borderRadius: 14, border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--ink)', padding: '0 14px', outline: 'none', font: '500 15px var(--font-ui)', textAlign: 'center', letterSpacing: '.05em', fontVariantNumeric: 'tabular-nums' }}
               />
-              <div style={{ display: 'flex', gap: 10 }}>
+
+              {scanError && (
+                <div style={{ font: '500 12px var(--font-ui)', color: 'var(--macro-fat, #E1A0AB)', textAlign: 'center', lineHeight: 1.4 }}>{scanError}</div>
+              )}
+
+              <button
+                onClick={() => runBarcodeLookup()}
+                disabled={scanLoading || !barcode.trim()}
+                style={{ ...primaryBtn(), marginTop: 0, height: 48, opacity: (scanLoading || !barcode.trim()) ? 0.55 : 1, cursor: (scanLoading || !barcode.trim()) ? 'default' : 'pointer' }}
+              >{scanLoading ? 'looking up…' : 'look up'}</button>
+
+              {hasBarcodeDetector && (
                 <button
-                  onClick={() => { setBarcode(''); showToast('scanning again'); }}
-                  style={{ flex: 1, height: 44, borderRadius: 999, border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--ink)', font: '600 13px var(--font-ui)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-                ><Flashlight size={16} />scan again</button>
-                <button
-                  onClick={scanFallbackLog}
-                  style={{ flex: 1, height: 44, borderRadius: 999, border: 'none', background: 'var(--primary)', color: 'var(--on-accent)', font: '600 13px var(--font-ui)', cursor: 'pointer' }}
-                >enter manually</button>
-              </div>
+                  onClick={() => (camActive ? stopCamera() : startCamera())}
+                  disabled={scanLoading}
+                  style={{ height: 44, borderRadius: 999, border: '1px solid var(--glass-border)', background: 'var(--surface-2)', color: 'var(--ink)', font: '600 13px var(--font-ui)', cursor: scanLoading ? 'default' : 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+                ><Camera size={16} />{camActive ? 'stop camera' : 'scan with camera'}</button>
+              )}
+
+              <button
+                onClick={() => setMode('search')}
+                style={{ height: 40, borderRadius: 999, border: 'none', background: 'none', color: 'var(--sage)', font: '600 12px var(--font-ui)', cursor: 'pointer' }}
+              >or search foods instead</button>
             </div>
           </div>
         )}
