@@ -1,0 +1,166 @@
+/* =====================================================================
+   PLATO — "Elevated Verdant" design system
+   Canonical tokens from the redesign spec (§0/§1). Dark is default;
+   light activates via [data-theme="light"] on <html>. New screens use
+   these var(--token) values via inline styles or the utility classes
+   below. Legacy screens keep working off the older index.css layer
+   until each is converted.
+   ===================================================================== */
+
+:root,
+[data-theme="dark"] {
+  /* Surfaces — dark (default) */
+  --bg-base: #070D0C;
+  --bg-base-2: #0A1210;
+  --surface-1: #0E1614;
+  --surface-2: #121C19;
+  --surface-3: #17231E;
+  --glass-fill: rgba(16, 26, 22, .50);
+  --hairline: rgba(160, 205, 190, .09);
+  --glass-border: rgba(160, 215, 200, .12);
+  --divider-strong: rgba(160, 215, 200, .18);
+
+  /* Brand ramp (cool teal-jade, muted) */
+  --brand-forest: #0C3A32;
+  --brand-deep: #0F9482;
+  --brand-jade: #43C6AC;
+  --brand-mint: #8CE0CE;
+  --primary: #43C6AC;
+
+  /* Text — dark */
+  --ink: #EAF1EF;
+  --sage: #94A9A3;
+  --muted: #5F726D;
+  --on-accent: #04231C;
+
+  /* Macros / duotone */
+  --macro-cal: #43C6AC;
+  --macro-protein: #5FD4C4;
+  --macro-carbs: #E7B67C;
+  --macro-fat: #E1A0AB;
+  --accent-violet: #AEA6EA;
+  --macro-protein-grad: linear-gradient(90deg, #5FD4C4, #43C6AC);
+  --macro-carbs-grad: linear-gradient(90deg, #F0CC9C, #E7B67C);
+  --macro-fat-grad: linear-gradient(90deg, #ECBFC6, #E1A0AB);
+
+  /* Semantic */
+  --success: #43C6AC;
+  --warning: #E7B67C;
+  --danger: #E1616C;
+  --info: #5FD4C4;
+
+  /* Radii */
+  --r-card: 22px;
+  --r-tile: 20px;
+  --r-control: 16px;
+  --r-fab: 21px;
+  --r-avatar: 13px;
+
+  /* Motion */
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+  --ease-out: cubic-bezier(.22, .61, .36, 1);
+  --tap-scale: .97;
+
+  /* Layout */
+  --content-max: 430px;
+  --nav-safe-pad: 104px;
+
+  /* Type */
+  --font-display: "Geist", "SF Pro Display", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --font-ui: "Plus Jakarta Sans", "SF Pro Text", ui-sans-serif, -apple-system, system-ui, sans-serif;
+
+  /* Orb + page */
+  --page-bg: var(--mesh-dark);
+  --grain-op: .4;
+  --orb-shell: radial-gradient(120% 120% at 32% 26%, #1a2a24 0%, #0E1614 58%, #070D0C 100%);
+  --orb-scrim: radial-gradient(64% 56% at 50% 50%, rgba(4,9,8,.92) 0%, rgba(4,9,8,.66) 40%, rgba(4,9,8,.2) 66%, transparent 82%);
+  --orb-text: #FFFFFF;
+  --orb-sub: rgba(255,255,255,.82);
+  --orb-label: rgba(255,255,255,.72);
+  --phone-shadow: 0 60px 140px -50px rgba(0,0,0,.55), 0 0 0 1px rgba(160,215,200,.06);
+
+  --mesh-dark:
+    radial-gradient(58% 42% at 80% 6%, rgba(67,198,172,.15), transparent),
+    radial-gradient(48% 40% at 10% 20%, rgba(15,148,130,.13), transparent),
+    radial-gradient(44% 48% at 92% 84%, rgba(231,182,124,.06), transparent),
+    radial-gradient(60% 60% at 32% 102%, rgba(95,212,196,.08), transparent),
+    linear-gradient(162deg, #08110E, #060B0A, #080F0D);
+}
+
+[data-theme="light"] {
+  --bg-base: #F3F7F4;
+  --bg-base-2: #F3F7F4;
+  --surface-1: #FFFFFF;
+  --surface-2: #F7FAF8;
+  --surface-3: #EEF3F0;
+  --glass-fill: rgba(255, 255, 255, .62);
+  --hairline: rgba(12, 58, 50, .10);
+  --glass-border: rgba(12, 58, 50, .08);
+  --divider-strong: rgba(12, 58, 50, .14);
+
+  --primary: #0F9482;
+
+  --ink: #0E1614;
+  --sage: #48605A;
+  --muted: #7E938C;
+  --on-accent: #04231C;
+
+  --page-bg: #F3F7F4;
+  --grain-op: 0;
+  --orb-shell: radial-gradient(120% 120% at 32% 26%, #FFFFFF 0%, #EDF3F0 55%, #DCE7E2 100%);
+  --orb-scrim: transparent;
+  --orb-text: #0E1614;
+  --orb-sub: rgba(14,22,20,.72);
+  --orb-label: rgba(14,22,20,.6);
+  --phone-shadow: 0 50px 120px -50px rgba(20,50,44,.30), 0 0 0 1px rgba(12,58,50,.08);
+}
+
+/* ── Utility classes ───────────────────────────────────────────── */
+.mesh-dark { background: var(--mesh-dark); }
+
+.glass {
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 18px 34px -28px rgba(0, 0, 0, .9);
+}
+.glass-nav {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+/* App root shell — the mobile canvas */
+.verdant-root {
+  min-height: 100dvh;
+  background: var(--bg-base);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+.verdant-grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--grain-op);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='3' height='3'%3E%3Ccircle cx='1' cy='1' r='.5' fill='white'/%3E%3C/svg%3E");
+  background-size: 3px 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verdant-root *, .verdant-root *::before, .verdant-root *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+@keyframes vd-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes vd-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.014); } }
+@keyframes vd-caustic { 0% { transform: translate(-4%,3%) scale(1.05); opacity: .45; } 50% { transform: translate(5%,-4%) scale(1.18); opacity: .8; } 100% { transform: translate(-4%,3%) scale(1.05); opacity: .45; } }
+@keyframes vd-softpulse { 0%, 100% { opacity: .65; transform: scale(1); } 50% { opacity: 1; transform: scale(1.35); } }

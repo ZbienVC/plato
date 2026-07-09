@@ -320,7 +320,7 @@ export async function updateProfile(data: Record<string, unknown>) {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 4000); // 4s timeout
-    const res = await fetch(`\/profile`, {
+    const res = await fetch(`${BASE}/profile`, {
       method: 'PUT',
       headers: authHeaders(),
       body: JSON.stringify(data),

@@ -3,8 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plato</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#070D0C" />
+    <title>Plato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script>
+      // No-flash theme bootstrap — tri-state plato.theme = system | light | dark (default system → dark-first)
+      (function () {
+        try {
+          var pref = localStorage.getItem('plato.theme') || 'system';
+          var effective = pref === 'system'
+            ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+            : pref;
+          document.documentElement.setAttribute('data-theme', effective);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

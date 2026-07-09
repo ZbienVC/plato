@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
-import { auth, saveLogEntry as apiSaveLog, getProfile } from '../lib/api';
+import { auth, saveLogEntry as apiSaveLog, getProfile, logWater as apiLogWater } from '../lib/api';
 import { MEAL_DATABASE } from '../services/mealGenerator';
 import { saveLogEntry } from '../lib/api';
 
@@ -61,7 +61,30 @@ function inferSlotFromTime(date = new Date()) {
 
 export function AppProvider({ children }) {
   // === THEME ===
-  const [dark, setDark] = useState(() => loadState('dark', false));
+  const [dark, setDark] = useState(() => loadState('dark', true));
+
+  // === THEME (tri-state: system | light | dark → applies data-theme on <html>) ===
+  const [theme, setThemeState] = useState(() => {
+    try { return localStorage.getItem('plato.theme') || 'system'; } catch { return 'system'; }
+  });
+  const setTheme = useCallback((t) => {
+    setThemeState(t);
+    try { localStorage.setItem('plato.theme', t); } catch { /* ignore */ }
+  }, []);
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: light)');
+    const apply = () => {
+      const eff = theme === 'system' ? (mq.matches ? 'light' : 'dark') : theme;
+      document.documentElement.setAttribute('data-theme', eff);
+      setDark(eff === 'dark');
+    };
+    apply();
+    if (theme === 'system') {
+      mq.addEventListener?.('change', apply);
+      return () => mq.removeEventListener?.('change', apply);
+    }
+    return undefined;
+  }, [theme]);
 
   // === USER PROFILE ===
   const [userProfile, setUserProfile] = useState(() => loadState('userProfile', {
@@ -206,6 +229,23 @@ export function AppProvider({ children }) {
 
   // === STREAK ===
   const [streak, setStreak] = useState(() => loadState('streak', 0));
+
+  // === WATER (cups; 1 cup = 250ml; goal default 8 cups = 2000ml) ===
+  const [waterCups, setWaterCups] = useState(() => {
+    const saved = loadState('water', null);
+    if (saved && saved.date === today) return saved.cups || 0;
+    return 0;
+  });
+  const [waterGoalCups, setWaterGoalCups] = useState(() => loadState('waterGoal', 8));
+  useEffect(() => { saveState('water', { date: today, cups: waterCups }); }, [waterCups, today]);
+  useEffect(() => { saveState('waterGoal', waterGoalCups); }, [waterGoalCups]);
+  const addWater = useCallback((delta = 1) => {
+    setWaterCups(prev => {
+      const next = Math.max(0, prev + delta);
+      if (delta > 0) { apiLogWater(delta * 250).catch(() => {}); }
+      return next;
+    });
+  }, []);
 
   // === SAVED RECIPES (alias) ===
   const [savedRecipes, setSavedRecipes] = useState(() => loadState('savedRecipes', []));
@@ -461,6 +501,9 @@ export function AppProvider({ children }) {
   const value = {
     // Theme
     dark, setDark,
+    theme, setTheme,
+    // Water
+    waterCups, setWaterCups, waterGoalCups, setWaterGoalCups, addWater,
     swapMeal,
     // User
     userProfile, setUserProfile,
