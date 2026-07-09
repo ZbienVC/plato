@@ -163,7 +163,7 @@ export function Billing({ onFab }) {
       <div style={{ height: 12 }} />
       <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 20px 14px', position: 'relative', zIndex: 2 }}>
         <button
-          onClick={() => setActiveTab('you')}
+          onClick={() => setActiveTab('profile')}
           aria-label="Back to you"
           style={{ width: 38, height: 38, flex: 'none', borderRadius: 999, border: '1px solid var(--glass-border)', background: 'var(--glass-fill)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', color: 'var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
         >

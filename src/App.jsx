@@ -20,7 +20,6 @@ import { VoiceLogOverlay } from './components/organisms/VoiceLogOverlay';
 import { PaywallSheet } from './screens/PaywallSheet';
 import { useToast } from './components/organisms/Toast';
 import { AuthSheet } from './screens/AuthSheet';
-import { WelcomeScreen } from './pages/WelcomeScreen';
 import './styles/index.css';
 
 function AppContent() {
@@ -38,24 +37,17 @@ function AppContent() {
     return () => clearTimeout(t);
   }, []);
 
-  const [welcomeDone, setWelcomeDone] = useState(
-    () => localStorage.getItem('plato_welcome_done') === 'true' || !!userProfile?.name
-  );
   const [hasOnboarded, setHasOnboarded] = useState(
     () => localStorage.getItem('plato_onboarded') === 'true' || !!userProfile?.name
   );
 
-  const completeOnboarding = () => { localStorage.setItem('plato_onboarded', 'true'); setHasOnboarded(true); };
-  const handleWelcomeGuest = () => { localStorage.setItem('plato_welcome_done', 'true'); setWelcomeDone(true); };
-  const handleWelcomeAuth = () => {
-    const alreadyOnboarded = localStorage.getItem('plato_onboarded') === 'true' || !!userProfile?.name;
+  const completeOnboarding = () => {
+    localStorage.setItem('plato_onboarded', 'true');
     localStorage.setItem('plato_welcome_done', 'true');
-    setWelcomeDone(true);
-    if (alreadyOnboarded) setHasOnboarded(true);
+    setHasOnboarded(true);
   };
 
   if (!splashDone) return <Splash />;
-  if (!welcomeDone) return <WelcomeScreen onContinueAsGuest={handleWelcomeGuest} onAuthSuccess={handleWelcomeAuth} />;
   if (!hasOnboarded) return <Onboarding onComplete={completeOnboarding} />;
 
   const openLog = () => setActiveTab('log');

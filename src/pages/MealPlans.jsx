@@ -240,7 +240,7 @@ export function MealPlans() {
               </div>
               <h3 className="text-base font-bold text-slate-900 mb-1">No plan yet</h3>
               <p className="text-sm text-slate-400 mb-4">Complete onboarding to generate a personalized plan.</p>
-              <motion.button whileTap={{ scale: 0.97 }} onClick={() => setActiveTab('you')}
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => setActiveTab('profile')}
                 className="px-6 py-2.5 rounded-xl text-white text-sm font-semibold" style={{ background: "linear-gradient(135deg,#10b981,#059669)" }}>
                 Get Started
               </motion.button>
