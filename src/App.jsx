@@ -12,11 +12,11 @@ import { Grocery } from './screens/Grocery';
 import { Insights } from './screens/Insights';
 import { Recipes } from './screens/Recipes';
 import { Restaurant } from './screens/Restaurant';
-import { Onboarding } from './pages/Onboarding';
+import { Onboarding } from './screens/Onboarding';
 import { VoiceLogOverlay } from './components/organisms/VoiceLogOverlay';
-import { PremiumPaywallModal } from './components/organisms/PremiumPaywallModal';
+import { PaywallSheet } from './screens/PaywallSheet';
 import { useToast } from './components/organisms/Toast';
-import { AuthModal } from './components/organisms/AuthModal';
+import { AuthSheet } from './screens/AuthSheet';
 import { WelcomeScreen } from './pages/WelcomeScreen';
 import './styles/index.css';
 
@@ -81,8 +81,8 @@ function AppContent() {
           onSuccess={() => { setShowVoiceLog(false); showToast('Meal logged from voice!', 'success', 2400); }}
         />
       )}
-      <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} onSuccess={loginSuccess} />
-      <PremiumPaywallModal open={premiumModalOpen} onClose={closePremiumModal} showToast={showToast} />
+      <AuthSheet open={authModalOpen} onClose={() => setAuthModalOpen(false)} onSuccess={loginSuccess} />
+      <PaywallSheet open={premiumModalOpen} onClose={closePremiumModal} showToast={showToast} />
       <ToastContainer />
     </>
   );
