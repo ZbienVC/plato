@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { VerdantShell } from './screens/_shell/VerdantShell';
 import { Home } from './screens/Home';
+import { Explore } from './screens/Explore';
+import { Plans } from './screens/Plans';
+import { You } from './screens/You';
+import { Weight } from './screens/Weight';
+import { Settings } from './screens/Settings';
 import { Onboarding } from './pages/Onboarding';
 import { LogMeal } from './pages/LogMeal';
-import { MealPlans } from './pages/MealPlans';
-import { Profile } from './pages/Profile';
-import { WeightTracker } from './components/organisms/WeightTracker';
 import { GroceryList } from './components/organisms/GroceryList';
-import { SettingsPanel } from './components/organisms/SettingsPanel';
 import { VoiceLogOverlay } from './components/organisms/VoiceLogOverlay';
 import { PremiumPaywallModal } from './components/organisms/PremiumPaywallModal';
 import { useToast } from './components/organisms/Toast';
@@ -22,36 +23,6 @@ function ScreenScroll({ children }) {
   return (
     <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: 14, paddingBottom: 'var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
       <div className="page-shell" style={{ paddingBottom: 24 }}>{children}</div>
-    </div>
-  );
-}
-
-function Explore() {
-  const { logMeal } = useApp();
-  const foods = [
-    { name: 'Chicken & Rice', calories: 450, protein: 42, carbs: 38, fat: 8 },
-    { name: 'Greek Yogurt', calories: 120, protein: 15, carbs: 9, fat: 2 },
-    { name: 'Protein Shake', calories: 160, protein: 30, carbs: 8, fat: 3 },
-    { name: 'Oatmeal', calories: 280, protein: 8, carbs: 48, fat: 6 },
-    { name: 'Eggs (3)', calories: 210, protein: 18, carbs: 1, fat: 14 },
-    { name: 'Salad + Chicken', calories: 380, protein: 35, carbs: 12, fat: 16 },
-  ];
-  return (
-    <div>
-      <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}>quick add</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        {foods.map(food => (
-          <button key={food.name} onClick={() => logMeal({ ...food, slot: 'snack' })} className="glass" style={{ borderRadius: 'var(--r-card)', padding: 14, textAlign: 'left', cursor: 'pointer', color: 'var(--ink)' }}>
-            <p style={{ font: '600 14px var(--font-ui)', color: 'var(--ink)', margin: 0 }}>{food.name}</p>
-            <p style={{ font: '500 12px var(--font-ui)', color: 'var(--sage)', margin: '4px 0 0' }}>{food.calories} kcal</p>
-            <div style={{ display: 'flex', gap: 8, marginTop: 6, fontVariantNumeric: 'tabular-nums' }}>
-              <span style={{ font: '600 12px var(--font-ui)', color: 'var(--macro-protein)' }}>{food.protein}P</span>
-              <span style={{ font: '600 12px var(--font-ui)', color: 'var(--macro-carbs)' }}>{food.carbs}C</span>
-              <span style={{ font: '600 12px var(--font-ui)', color: 'var(--macro-fat)' }}>{food.fat}F</span>
-            </div>
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
@@ -90,12 +61,12 @@ function AppContent() {
     switch (activeTab) {
       case 'home': return <Home onFab={openLog} />;
       case 'log': return <ScreenScroll><LogMeal /></ScreenScroll>;
-      case 'meals': return <ScreenScroll><MealPlans /></ScreenScroll>;
-      case 'explore': return <ScreenScroll><Explore /></ScreenScroll>;
-      case 'profile': return <ScreenScroll><Profile /></ScreenScroll>;
-      case 'weight': return <ScreenScroll><WeightTracker /></ScreenScroll>;
+      case 'meals': return <Plans onFab={openLog} />;
+      case 'explore': return <Explore onFab={openLog} />;
+      case 'profile': return <You onFab={openLog} />;
+      case 'weight': return <Weight onFab={openLog} />;
       case 'grocery': return <ScreenScroll><GroceryList /></ScreenScroll>;
-      case 'settings': return <ScreenScroll><SettingsPanel /></ScreenScroll>;
+      case 'settings': return <Settings onFab={openLog} />;
       default: return <Home onFab={openLog} />;
     }
   };
