@@ -104,8 +104,8 @@ export function Plans({ onFab }) {
       <div style={{ flex: 'none', padding: '0 20px 12px', position: 'relative', zIndex: 2 }}>
         <div style={{ display: 'flex', background: 'var(--surface-2)', borderRadius: 14, padding: 4, gap: 3 }}>
           <button onClick={() => setTab('week')} style={tabStyle(tab === 'week')}>my plan</button>
-          <button onClick={() => setTab('recipes')} style={tabStyle(tab === 'recipes')}>recipes</button>
-          <button onClick={() => setTab('restaurant')} style={tabStyle(tab === 'restaurant')}>
+          <button onClick={() => setActiveTab('recipes')} style={tabStyle(false)}>recipes</button>
+          <button onClick={() => setActiveTab('restaurant')} style={tabStyle(false)}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, justifyContent: 'center' }}>
               restaurant
               <span style={{ color: 'var(--warning)', display: 'inline-flex' }}><Lock size={12} /></span>

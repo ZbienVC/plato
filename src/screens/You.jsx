@@ -100,8 +100,7 @@ export function You({ onFab }) {
 
   const openSettings = () => setActiveTab('settings');
   const openWeight = () => setActiveTab('weight');
-  // Insights has no dedicated tab yet — fall back to settings for now.
-  const openInsights = () => setActiveTab('settings');
+  const openInsights = () => setActiveTab('insights');
   // Achievements has no dedicated tab yet — fall back to settings for now.
   const openAchievements = () => setActiveTab('settings');
   // Billing has no dedicated tab yet — open the premium modal, else settings fallback.

@@ -7,25 +7,18 @@ import { Plans } from './screens/Plans';
 import { You } from './screens/You';
 import { Weight } from './screens/Weight';
 import { Settings } from './screens/Settings';
+import { LogHub } from './screens/LogHub';
+import { Grocery } from './screens/Grocery';
+import { Insights } from './screens/Insights';
+import { Recipes } from './screens/Recipes';
+import { Restaurant } from './screens/Restaurant';
 import { Onboarding } from './pages/Onboarding';
-import { LogMeal } from './pages/LogMeal';
-import { GroceryList } from './components/organisms/GroceryList';
 import { VoiceLogOverlay } from './components/organisms/VoiceLogOverlay';
 import { PremiumPaywallModal } from './components/organisms/PremiumPaywallModal';
 import { useToast } from './components/organisms/Toast';
 import { AuthModal } from './components/organisms/AuthModal';
 import { WelcomeScreen } from './pages/WelcomeScreen';
 import './styles/index.css';
-
-// Transitional wrapper: hosts a not-yet-converted legacy page inside the
-// Verdant frame with a scroll region that clears the floating nav.
-function ScreenScroll({ children }) {
-  return (
-    <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: 14, paddingBottom: 'var(--nav-safe-pad)', position: 'relative', zIndex: 1 }}>
-      <div className="page-shell" style={{ paddingBottom: 24 }}>{children}</div>
-    </div>
-  );
-}
 
 function AppContent() {
   const {
@@ -60,12 +53,15 @@ function AppContent() {
   const renderScreen = () => {
     switch (activeTab) {
       case 'home': return <Home onFab={openLog} />;
-      case 'log': return <ScreenScroll><LogMeal /></ScreenScroll>;
+      case 'log': return <LogHub onFab={openLog} />;
       case 'meals': return <Plans onFab={openLog} />;
       case 'explore': return <Explore onFab={openLog} />;
       case 'profile': return <You onFab={openLog} />;
       case 'weight': return <Weight onFab={openLog} />;
-      case 'grocery': return <ScreenScroll><GroceryList /></ScreenScroll>;
+      case 'grocery': return <Grocery onFab={openLog} />;
+      case 'insights': return <Insights onFab={openLog} />;
+      case 'recipes': return <Recipes onFab={openLog} />;
+      case 'restaurant': return <Restaurant onFab={openLog} />;
       case 'settings': return <Settings onFab={openLog} />;
       default: return <Home onFab={openLog} />;
     }
